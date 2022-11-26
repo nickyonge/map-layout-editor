@@ -108,8 +108,6 @@ public class WorldCreator : MonoBehaviour
         if (_updating) { return; }
         _updating = true;
 
-        CheckPrimitives();
-
         ResetType resetType = ResetType.None;
 
         if (!_initialized || forceRedraw)
@@ -154,6 +152,8 @@ public class WorldCreator : MonoBehaviour
                 resetType = ResetType.AppearanceOnly;
             }
         }
+        
+        CheckPrimitives(forceRedraw);
 
         switch (resetType)
         {
@@ -305,11 +305,18 @@ public class WorldCreator : MonoBehaviour
         }
     }
 
-    void CheckPrimitives()
+    void CheckPrimitives(bool forceReset = false)
     {
+        if (forceReset)
+        {
+            if (_quadPrimitive != null) { DestroyGivenObject(_quadPrimitive); }
+            if (_cubePrimitive != null) { DestroyGivenObject(_cubePrimitive); }
+            if (_spherePrimitive != null) { DestroyGivenObject(_spherePrimitive); }
+        }
         if (_quadPrimitive == null)
         {
             _quadPrimitive = GameObject.CreatePrimitive(PrimitiveType.Quad);
+            if (_quadPrimitive.TryGetComponent(out Collider collider)) { DestroyGivenObject(collider); }
             _quadPrimitive.name = "Quad Primitive";
             _quadPrimitive.hideFlags = HideFlags.HideInHierarchy;
             _quadPrimitive.transform.position = Vector3.zero;
@@ -321,6 +328,7 @@ public class WorldCreator : MonoBehaviour
         if (_cubePrimitive == null)
         {
             _cubePrimitive = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            if (_cubePrimitive.TryGetComponent(out Collider collider)) { DestroyGivenObject(collider); }
             _cubePrimitive.name = "Cube Primitive";
             _cubePrimitive.hideFlags = HideFlags.HideInHierarchy;
             _cubePrimitive.transform.position = Vector3.zero;
@@ -332,6 +340,7 @@ public class WorldCreator : MonoBehaviour
         if (_spherePrimitive == null)
         {
             _spherePrimitive = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            if (_spherePrimitive.TryGetComponent(out Collider collider)) { DestroyGivenObject(collider); }
             _spherePrimitive.name = "Sphere Primitive";
             _spherePrimitive.hideFlags = HideFlags.HideInHierarchy;
             _spherePrimitive.transform.position = Vector3.zero;
@@ -346,14 +355,18 @@ public class WorldCreator : MonoBehaviour
     {
         for (int i = this.transform.childCount; i > 0; --i)
         {
-            if (Application.isPlaying)
-            {
-                Destroy(this.transform.GetChild(0).gameObject);
-            }
-            else
-            {
-                DestroyImmediate(this.transform.GetChild(0).gameObject);
-            }
+            DestroyGivenObject(this.transform.GetChild(0).gameObject);
+        }
+    }
+    void DestroyGivenObject(Object obj)
+    {
+        if (Application.isPlaying)
+        {
+            Destroy(obj);
+        }
+        else
+        {
+            DestroyImmediate(obj);
         }
     }
 
