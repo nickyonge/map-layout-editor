@@ -38,10 +38,12 @@ public class WorldCreator : MonoBehaviour
 
 
     private GameObject _mapPointsContainer;
-    private Transform[] _pointsTransforms;
-    private MeshFilter[] _pointsMeshFilters;
-    private MeshRenderer[] _pointsMeshRenderers;
     private GameObject _mapGraphic;
+
+    private Transform[] _pointsTransforms = new Transform[0];
+    private MeshFilter[] _pointsMeshFilters = new MeshFilter[0];
+    private MeshRenderer[] _pointsMeshRenderers = new MeshRenderer[0];
+    private Vector2[] _pointsPositions = new Vector2[0];
 
 
 
@@ -58,9 +60,9 @@ public class WorldCreator : MonoBehaviour
     private static GameObject _quadPrimitive;
     private static GameObject _cubePrimitive;
     private static GameObject _spherePrimitive;
-    private Mesh _quadMesh;
-    private Mesh _cubeMesh;
-    private Mesh _sphereMesh;
+    private static Mesh _quadMesh;
+    private static Mesh _cubeMesh;
+    private static Mesh _sphereMesh;
 
 
     private bool _initialized = false;
@@ -131,10 +133,13 @@ public class WorldCreator : MonoBehaviour
             bool hardRedraw =
                 _mapPointsContainer == null ||
                 transform.childCount != 2 ||
-                _pointsMeshFilters.Length == 0 ||
-                _pointsMeshRenderers.Length == 0 ||
-                _pointsTransforms.Length == 0 ||
+                _pointsMeshFilters == null || _pointsMeshFilters.Length == 0 ||
+                _pointsMeshRenderers == null || _pointsMeshRenderers.Length == 0 ||
+                _pointsTransforms == null || _pointsTransforms.Length == 0 ||
+                _pointsPositions == null || _pointsPositions.Length == 0 ||
+
                 _pointsMeshFilters.Length != _pointsMeshRenderers.Length ||
+                _pointsPositions.Length != _pointsMeshRenderers.Length ||
                 _pointsTransforms.Length != _pointsMeshRenderers.Length;
 
             bool softRedraw = hardRedraw ||
@@ -162,7 +167,7 @@ public class WorldCreator : MonoBehaviour
                 resetType = ResetType.AppearanceOnly;
             }
         }
-        
+
         CheckPrimitives(forceRedraw);
 
         switch (resetType)
@@ -195,6 +200,7 @@ public class WorldCreator : MonoBehaviour
                     _pointsTransforms = new Transform[rows * columns];
                     _pointsMeshFilters = new MeshFilter[rows * columns];
                     _pointsMeshRenderers = new MeshRenderer[rows * columns];
+                    _pointsPositions = new Vector2[rows * columns];
                     int index = 0;
 
                     if (rows < 2) { rows = 2; }
@@ -224,6 +230,12 @@ public class WorldCreator : MonoBehaviour
                             _pointsTransforms[index] = pt.transform;
                             _pointsMeshFilters[index] = mf;
                             _pointsMeshRenderers[index] = mr;
+                            // _pointsPositions[index] = new Vector2((float)j / rows, (float)i / columns);
+                            // _pointsPositions[index] = new Vector2((float)i / columns, (float)j / rows);
+                            _pointsPositions[index] = new Vector2((float)j / (columns - 1), (float)i / (rows - 1));
+                            // _pointsPositions[index] = new Vector2((float)j / (float)columns, (float)i / (float)rows);
+                            // _pointsPositions[index] = new Vector2(j / columns, i / rows);
+                            // _pointsPositions[index] = new Vector2((float)i / (rows - 1), (float)j / (columns - 1));
                             mr.enabled = meshType != MeshType.None;
                             index++;
                         }
@@ -243,9 +255,12 @@ public class WorldCreator : MonoBehaviour
 
             case ResetType.AppearanceOnly:
 
+                bool newMap = false;
+
                 // update map 
                 if (_mapGraphic == null)
                 {
+                    newMap = true;
                     _mapGraphic = GameObject.Instantiate(_quadPrimitive);
                     _mapGraphic.SetActive(true);
                     _mapGraphic.name = "Map Graphic";
@@ -267,13 +282,34 @@ public class WorldCreator : MonoBehaviour
                     }
                 }
 
-                if (resetType == ResetType.Full || _lastMeshType != meshType)
+                if (resetType == ResetType.Full || _lastMeshType != meshType || newMap)
                 {
-                    Mesh mesh = GetMeshType(meshType);
                     bool visible = meshType != MeshType.None;
+                    Texture2D texture = (Texture2D)mapMaterial.mainTexture;
+                    Mesh mesh = GetMeshType(meshType);
                     for (int i = 0; i < _pointsMeshFilters.Length; i++)
                     {
-                        _pointsMeshFilters[i].sharedMesh = mesh;
+                        if (newMap && mesh != null)
+                        {
+                            mesh = Instantiate(mesh);
+                            Color c = TestPixel(texture, _pointsPositions[i].x, _pointsPositions[i].y);
+                            Color[] cs = mesh.colors;
+                            if (cs.Length == 0 || cs[0] != c || cs[cs.Length - 1] != c)
+                            {
+                                if (cs.Length == 0)
+                                {
+                                    cs = new Color[mesh.vertices.Length];
+                                }
+                                for (int j = 0; j < cs.Length; j++)
+                                {
+                                    cs[j] = c;
+                                }
+                            }
+                            mesh.SetColors(cs);
+                        }
+
+
+                        _pointsMeshFilters[i].mesh = mesh;
                         _pointsMeshRenderers[i].enabled = visible;
                     }
                 }
@@ -323,6 +359,7 @@ public class WorldCreator : MonoBehaviour
             if (_cubePrimitive != null) { DestroyGivenObject(_cubePrimitive); }
             if (_spherePrimitive != null) { DestroyGivenObject(_spherePrimitive); }
         }
+        Color[] c;
         if (_quadPrimitive == null)
         {
             _quadPrimitive = GameObject.CreatePrimitive(PrimitiveType.Quad);
@@ -333,7 +370,11 @@ public class WorldCreator : MonoBehaviour
             _quadPrimitive.transform.eulerAngles = Vector3.zero;
             _quadPrimitive.transform.localScale = Vector3.one;
             _quadPrimitive.SetActive(false);
-            _quadMesh = _quadPrimitive.GetComponent<MeshFilter>().sharedMesh;
+            _quadMesh = Instantiate(_quadPrimitive.GetComponent<MeshFilter>().sharedMesh);
+            c = new Color[_quadMesh.vertices.Length];
+            for (int i = 0; i < c.Length; i++) { c[i] = Color.white; }
+            _quadMesh.SetColors(c);
+            _quadPrimitive.GetComponent<MeshFilter>().mesh = _quadMesh;
         }
         if (_cubePrimitive == null)
         {
@@ -345,7 +386,11 @@ public class WorldCreator : MonoBehaviour
             _cubePrimitive.transform.eulerAngles = Vector3.zero;
             _cubePrimitive.transform.localScale = Vector3.one;
             _cubePrimitive.SetActive(false);
-            _cubeMesh = _cubePrimitive.GetComponent<MeshFilter>().sharedMesh;
+            _cubeMesh = Instantiate(_cubePrimitive.GetComponent<MeshFilter>().sharedMesh);
+            c = new Color[_cubeMesh.vertices.Length];
+            for (int i = 0; i < c.Length; i++) { c[i] = Color.white; }
+            _cubeMesh.SetColors(c);
+            _cubePrimitive.GetComponent<MeshFilter>().mesh = _cubeMesh;
         }
         if (_spherePrimitive == null)
         {
@@ -357,8 +402,20 @@ public class WorldCreator : MonoBehaviour
             _spherePrimitive.transform.eulerAngles = Vector3.zero;
             _spherePrimitive.transform.localScale = Vector3.one;
             _spherePrimitive.SetActive(false);
-            _sphereMesh = _spherePrimitive.GetComponent<MeshFilter>().sharedMesh;
+            _sphereMesh = Instantiate(_spherePrimitive.GetComponent<MeshFilter>().sharedMesh);
+            c = new Color[_sphereMesh.vertices.Length];
+            for (int i = 0; i < c.Length; i++) { c[i] = Color.white; }
+            _sphereMesh.SetColors(c);
+            _spherePrimitive.GetComponent<MeshFilter>().mesh = _sphereMesh;
         }
+    }
+
+    private Color TestPixel(Texture2D texture, float widthPercent, float heightPercent)
+    {
+        int x = Mathf.FloorToInt(texture.width * Mathf.Clamp01(widthPercent));
+        int y = Mathf.FloorToInt(texture.height * Mathf.Clamp01(heightPercent));
+        if (widthPercent == 0) { Debug.Log($"X:{x}, Y:{y}");}
+        return texture.GetPixel(x, y);
     }
 
     void ClearMap()
