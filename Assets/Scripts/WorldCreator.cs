@@ -27,8 +27,8 @@ public class WorldCreator : MonoBehaviour
     [Delayed] public float height = 10f;
 
 
-    [Range(0.01f, 1f)] public float pointSizeMultiplier = 0.1f;
-    public bool dynamicPointSize;
+    [Range(0.001f, 2f)] public float pointSizeMultiplier = 0.75f;
+    public bool dynamicPointSize = true;
 
     private const int MAX_MATERIAL_COMPRESSION = 101;
     [Range(1, MAX_MATERIAL_COMPRESSION)] public int materialCompression = 20;
@@ -59,7 +59,7 @@ public class WorldCreator : MonoBehaviour
     private float _lastWidth;
     private float _lastHeight;
     private float _lastPointSizeMultiplier;
-    private bool _lastDynamicPointSize
+    private bool _lastDynamicPointSize;
     private int _lastMaterialCompression;
     private float _lastHorzSpacing;
     private float _lastVertSpacing;
@@ -75,6 +75,10 @@ public class WorldCreator : MonoBehaviour
     private static Mesh _quadMesh;
     private static Mesh _cubeMesh;
     private static Mesh _sphereMesh;
+
+
+    private float _rowSpacing = 0f;
+    private float _columnSpacing = 0f;
 
 
     private bool _initialized = false;
@@ -174,6 +178,7 @@ public class WorldCreator : MonoBehaviour
             }
             else if (
                 pointSizeMultiplier != _lastPointSizeMultiplier ||
+                dynamicPointSize != _lastDynamicPointSize ||
                 materialCompression != _lastMaterialCompression ||
                 meshType != _lastMeshType)
             {
@@ -220,22 +225,22 @@ public class WorldCreator : MonoBehaviour
                     if (rows < 2) { rows = 2; }
                     if (columns < 2) { columns = 2; }
 
-                    float columnSpacing = width / (columns - 1);
-                    float rowSpacing = height / (rows - 1);
+                    _columnSpacing = width / (columns - 1);
+                    _rowSpacing = height / (rows - 1);
 
                     // create points 
                     for (int i = 0; i < rows; i++)
                     {
                         GameObject r = new GameObject($"Row {i}");
                         r.transform.SetParent(_mapPointsContainer.transform);
-                        r.transform.localPosition = new Vector3(0, (rowSpacing * i), 0);
+                        r.transform.localPosition = new Vector3(0, (_rowSpacing * i), 0);
                         r.transform.localEulerAngles = Vector3.zero;
                         r.transform.localScale = Vector3.one;
                         for (int j = 0; j < columns; j++)
                         {
                             GameObject pt = new GameObject($"Point {i}:{j}");
                             pt.transform.SetParent(r.transform);
-                            pt.transform.localPosition = new Vector3(j * columnSpacing, 0f, 0f);
+                            pt.transform.localPosition = new Vector3(j * _columnSpacing, 0f, 0f);
                             pt.transform.localEulerAngles = Vector3.zero;
                             MeshFilter mf = pt.AddComponent<MeshFilter>();
                             // mf.sharedMesh = GetMeshType(meshType);
@@ -283,9 +288,19 @@ public class WorldCreator : MonoBehaviour
                 _mapGraphic.transform.localScale = new Vector3(width, height, 1);
 
                 // get all meshrenderers in map points container 
-                if (resetType == ResetType.Full || _lastPointSizeMultiplier != pointSizeMultiplier)
+                if (forceRedraw || resetType == ResetType.Full || 
+                    _lastPointSizeMultiplier != pointSizeMultiplier || 
+                    _lastDynamicPointSize != dynamicPointSize)
                 {
-                    Vector3 size = Vector3.one * pointSizeMultiplier;
+                    float horz = pointSizeMultiplier;
+                    float vert = pointSizeMultiplier;
+
+                    if (dynamicPointSize) {
+                        horz *= _columnSpacing;
+                        vert *= _rowSpacing;
+                    }
+
+                    Vector3 size = new Vector3(horz, vert, Mathf.Min(horz,vert));
                     foreach (Transform t in _pointsTransforms)
                     {
                         t.localScale = size;
@@ -312,6 +327,7 @@ public class WorldCreator : MonoBehaviour
 
                 // reset values 
                 _lastPointSizeMultiplier = pointSizeMultiplier;
+                _lastDynamicPointSize = dynamicPointSize;
                 _lastMaterialCompression = materialCompression;
                 _lastMeshType = meshType;
                 break;
