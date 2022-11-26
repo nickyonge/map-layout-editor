@@ -29,11 +29,14 @@ public class WorldCreator : MonoBehaviour
 
     [Range(0.01f, 0.5f)] public float pointSize = 0.1f;
 
-    const float minSpacing = 0.2f;
-    const float maxSpacing = 2f;
+    private const int MAX_MATERIAL_COMPRESSION = 101;
+    [Range(1, MAX_MATERIAL_COMPRESSION)] public int materialCompression = 20;
 
-    [Range(minSpacing, maxSpacing)] public float horzSpacing = 0.5f;
-    [Range(minSpacing, maxSpacing)] public float vertSpacing = 0.5f;
+    const float MIN_SPACING = 0.2f;
+    const float MAX_SPACING = 2f;
+
+    [Range(MIN_SPACING, MAX_SPACING)] public float horzSpacing = 0.5f;
+    [Range(MIN_SPACING, MAX_SPACING)] public float vertSpacing = 0.5f;
 
     public MeshType meshType;
 
@@ -54,6 +57,7 @@ public class WorldCreator : MonoBehaviour
     private float _lastWidth;
     private float _lastHeight;
     private float _lastPointSize;
+    private int _lastMaterialCompression;
     private float _lastHorzSpacing;
     private float _lastVertSpacing;
     private MeshType _lastMeshType;
@@ -165,6 +169,7 @@ public class WorldCreator : MonoBehaviour
             }
             else if (
                 pointSize != _lastPointSize ||
+                materialCompression != _lastMaterialCompression ||
                 meshType != _lastMeshType)
             {
                 // just appearance changed, point size or source image 
@@ -230,7 +235,7 @@ public class WorldCreator : MonoBehaviour
                             MeshFilter mf = pt.AddComponent<MeshFilter>();
                             // mf.sharedMesh = GetMeshType(meshType);
                             MeshRenderer mr = pt.AddComponent<MeshRenderer>();
-                            mr.sharedMaterial = pointMaterial;
+                            // mr.sharedMaterial = pointMaterial;
                             _pointsTransforms[index] = pt.transform;
                             _pointsMeshFilters[index] = mf;
                             _pointsMeshRenderers[index] = mr;
@@ -281,9 +286,13 @@ public class WorldCreator : MonoBehaviour
                     }
                 }
 
-                if (forceRedraw || resetType == ResetType.Full || _lastMeshType != meshType || newMap)
+                if (forceRedraw || newMap || resetType == ResetType.Full ||
+                    _lastMeshType != meshType || materialCompression != _lastMaterialCompression)
                 {
+                    if (materialCompression != _lastMaterialCompression)
+                    {
 
+                    }
                     bool visible = meshType != MeshType.None;
                     Texture2D texture = (Texture2D)mapMaterial.mainTexture;
                     for (int i = 0; i < _pointsMeshFilters.Length; i++)
@@ -291,11 +300,13 @@ public class WorldCreator : MonoBehaviour
                         Color color = TestPixel(texture, _pointsPositions[i].x, _pointsPositions[i].y);
                         _pointsMeshFilters[i].sharedMesh = GetMeshType(meshType, color);
                         _pointsMeshRenderers[i].enabled = visible;
+                        _pointsMeshRenderers[i].sharedMaterial = GetMaterialByColor(color);
                     }
                 }
 
                 // reset values 
                 _lastPointSize = pointSize;
+                _lastMaterialCompression = materialCompression;
                 _lastMeshType = meshType;
                 break;
 
@@ -315,6 +326,21 @@ public class WorldCreator : MonoBehaviour
     }
 
     private Dictionary<Color, Material> _pointMaterialsByColor = new Dictionary<Color, Material>();
+    private Material GetMaterialByColor(Color color)
+    {
+        if (_pointMaterialsByColor == null) { _pointMaterialsByColor = new Dictionary<Color, Material>(); }
+        if (_pointMaterialsByColor.ContainsKey(color))
+        {
+            return _pointMaterialsByColor[color];
+        }
+        else
+        {
+            Material mat = Instantiate(pointMaterial);
+            mat.color = color;
+            _pointMaterialsByColor.Add(color, mat);
+            return mat;
+        }
+    }
 
     private Mesh GetMeshType(MeshType type, Color color)
     {
@@ -430,7 +456,6 @@ public class WorldCreator : MonoBehaviour
         }
     }
 
-    private const int roundRGBValue = 10;
     private Color TestPixel(Texture2D texture, float widthPercent, float heightPercent)
     {
         int x = Mathf.FloorToInt(texture.width * Mathf.Clamp01(widthPercent));
@@ -438,9 +463,12 @@ public class WorldCreator : MonoBehaviour
         if (widthPercent == 0) { Debug.Log($"X:{x}, Y:{y}"); }
         Color color = texture.GetPixel(x, y);
         // limit RGB channels 
-        color.r = Mathf.Round(color.r * roundRGBValue) / roundRGBValue;
-        color.g = Mathf.Round(color.g * roundRGBValue) / roundRGBValue;
-        color.b = Mathf.Round(color.b * roundRGBValue) / roundRGBValue;
+        if (materialCompression > 0 && materialCompression < MAX_MATERIAL_COMPRESSION)
+        {
+            color.r = Mathf.Round(color.r * materialCompression) / materialCompression;
+            color.g = Mathf.Round(color.g * materialCompression) / materialCompression;
+            color.b = Mathf.Round(color.b * materialCompression) / materialCompression;
+        }
         return color;
     }
 
