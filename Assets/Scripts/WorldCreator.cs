@@ -21,7 +21,8 @@ public class WorldCreator : MonoBehaviour
 
     [Range(0.01f, 0.5f)] public float pointSize = 0.1f;
 
-    [Range(0.25f, 2f)] public float spacing = 0.5f;
+    [Range(0.25f, 2f)] public float horzSpacing = 0.5f;
+    [Range(0.25f, 2f)] public float vertSpacing = 0.5f;
 
     public Material mapMaterial;
     public Material pointMaterial;
@@ -41,7 +42,8 @@ public class WorldCreator : MonoBehaviour
     private float _lastWidth;
     private float _lastHeight;
     private float _lastPointSize;
-    private float _lastSpacing;
+    private float _lastHorzSpacing;
+    private float _lastVertSpacing;
 
     private int _lastRows;
     private int _lastColumns;
@@ -81,20 +83,12 @@ public class WorldCreator : MonoBehaviour
 
     void GenerateMap()
     {
-        Debug.Log("Generating map...");
+        // Debug.Log("Generating map...");
 
         if (_updating) { return; }
         _updating = true;
 
         CheckPrimitives();
-
-        if (mapSourceImage == null)
-        {
-            // null image, clear map, do nothing 
-            ClearMap();
-            _updating = false;
-            return;
-        }
 
         ResetType resetType = ResetType.None;
 
@@ -102,16 +96,16 @@ public class WorldCreator : MonoBehaviour
         {
             resetType = ResetType.Full;
             _initialized = true;
-            forceRedraw = false;
+            forceRedraw = true;
         }
         else
         {
-            Debug.Log("child count: " + transform.childCount);
             if (_mapPointsContainer == null ||
                 transform.childCount != 2 ||
                 width != _lastWidth ||
                 height != _lastHeight ||
-                spacing != _lastSpacing)
+                horzSpacing != _lastHorzSpacing ||
+                vertSpacing != _lastVertSpacing)
             {
                 // scale changed
                 resetType = ResetType.Full;
@@ -131,56 +125,69 @@ public class WorldCreator : MonoBehaviour
         {
             case ResetType.Full:
 
-                ClearMap();
-
-                // create container 
-                _mapPointsContainer = new GameObject("Map Points Container");
-                _mapPointsContainer.transform.SetParent(transform);
-                _mapPointsContainer.transform.localPosition = new Vector3(
-                    width * -0.5f, height * -0.5f, 0);
-                _mapPointsContainer.transform.localEulerAngles = Vector3.zero;
-                _mapPointsContainer.transform.localScale = Vector3.one;
-
                 // determine rows and columns
-                int rows = Mathf.RoundToInt(height / spacing) + 1;
-                int columns = Mathf.RoundToInt(width / spacing) + 1;
+                int rows = Mathf.RoundToInt(height / vertSpacing) + 1;
+                int columns = Mathf.RoundToInt(width / horzSpacing) + 1;
 
-                _pointsTransforms = new Transform[rows * columns];
-                _pointsMeshRenderer = new MeshRenderer[rows * columns];
-                int index = 0;
+                // determine if recalculation is ACTUALLY needed 
 
-                if (rows < 2) { rows = 2; }
-                if (columns < 2) { columns = 2; }
-
-                float columnSpacing = width / (columns - 1);
-                float rowSpacing = height / (rows - 1);
-
-                // create points 
-                for (int i = 0; i < rows; i++)
+                if (forceRedraw || 
+                    width != _lastWidth ||
+                    height != _lastHeight ||
+                    rows != _lastRows ||
+                    columns != _lastColumns)
                 {
-                    GameObject r = new GameObject($"Row {i}");
-                    r.transform.SetParent(_mapPointsContainer.transform);
-                    r.transform.localPosition = new Vector3(0, (rowSpacing * i), 0);
-                    r.transform.localEulerAngles = Vector3.zero;
-                    r.transform.localScale = Vector3.one;
-                    for (int j = 0; j < columns; j++)
+
+                    ClearMap();
+
+                    // create container 
+                    _mapPointsContainer = new GameObject("Map Points Container");
+                    _mapPointsContainer.transform.SetParent(transform);
+                    _mapPointsContainer.transform.localPosition = new Vector3(
+                        width * -0.5f, height * -0.5f, 0);
+                    _mapPointsContainer.transform.localEulerAngles = Vector3.zero;
+                    _mapPointsContainer.transform.localScale = Vector3.one;
+
+                    _pointsTransforms = new Transform[rows * columns];
+                    _pointsMeshRenderer = new MeshRenderer[rows * columns];
+                    int index = 0;
+
+                    if (rows < 2) { rows = 2; }
+                    if (columns < 2) { columns = 2; }
+
+                    float columnSpacing = width / (columns - 1);
+                    float rowSpacing = height / (rows - 1);
+
+                    // create points 
+                    for (int i = 0; i < rows; i++)
                     {
-                        GameObject pt = GameObject.Instantiate(_cubePrimitive);
-                        pt.SetActive(true);
-                        pt.name = $"Point {i}:{j}";
-                        pt.transform.SetParent(r.transform);
-                        pt.transform.localPosition = new Vector3(j * columnSpacing, 0f, 0f);
-                        pt.transform.localEulerAngles = Vector3.zero;
-                        _pointsTransforms[index] = pt.transform;
-                        _pointsMeshRenderer[index] = pt.GetComponent<MeshRenderer>();
-                        index++;
+                        GameObject r = new GameObject($"Row {i}");
+                        r.transform.SetParent(_mapPointsContainer.transform);
+                        r.transform.localPosition = new Vector3(0, (rowSpacing * i), 0);
+                        r.transform.localEulerAngles = Vector3.zero;
+                        r.transform.localScale = Vector3.one;
+                        for (int j = 0; j < columns; j++)
+                        {
+                            GameObject pt = GameObject.Instantiate(_cubePrimitive);
+                            pt.SetActive(true);
+                            pt.name = $"Point {i}:{j}";
+                            pt.transform.SetParent(r.transform);
+                            pt.transform.localPosition = new Vector3(j * columnSpacing, 0f, 0f);
+                            pt.transform.localEulerAngles = Vector3.zero;
+                            _pointsTransforms[index] = pt.transform;
+                            _pointsMeshRenderer[index] = pt.GetComponent<MeshRenderer>();
+                            index++;
+                        }
                     }
                 }
 
                 // reset values 
                 _lastWidth = width;
                 _lastHeight = height;
-                _lastSpacing = spacing;
+                _lastHorzSpacing = horzSpacing;
+                _lastVertSpacing = vertSpacing;
+                _lastRows = rows;
+                _lastColumns = columns;
 
                 // done, update points 
                 goto case ResetType.AppearanceOnly;
@@ -228,16 +235,15 @@ public class WorldCreator : MonoBehaviour
 
             case ResetType.None:
                 // do nothing 
-                _updating = false;
-                return;
+                break;
 
             default:
                 // invalid type 
                 Debug.LogError($"ERROR: invalid reset type {resetType}, returning");
-                _updating = false;
-                return;
+                break;
         }
 
+        forceRedraw = false;
         _updating = false;
 
     }
