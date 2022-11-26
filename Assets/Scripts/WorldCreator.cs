@@ -27,16 +27,18 @@ public class WorldCreator : MonoBehaviour
     [Delayed] public float height = 10f;
 
 
-    [Range(0.01f, 0.5f)] public float pointSize = 0.1f;
+    [Range(0.01f, 1f)] public float pointSizeMultiplier = 0.1f;
+    public bool dynamicPointSize;
 
     private const int MAX_MATERIAL_COMPRESSION = 101;
     [Range(1, MAX_MATERIAL_COMPRESSION)] public int materialCompression = 20;
 
-    const float MIN_SPACING = 0.2f;
+    const float MIN_SPACING = 0.5f;
     const float MAX_SPACING = 2f;
 
     [Range(MIN_SPACING, MAX_SPACING)] public float horzSpacing = 0.5f;
     [Range(MIN_SPACING, MAX_SPACING)] public float vertSpacing = 0.5f;
+    [Range(0.1f, 2f)] public float spacingMultiplier = 1f;
 
     public MeshType meshType;
 
@@ -56,10 +58,12 @@ public class WorldCreator : MonoBehaviour
 
     private float _lastWidth;
     private float _lastHeight;
-    private float _lastPointSize;
+    private float _lastPointSizeMultiplier;
+    private bool _lastDynamicPointSize
     private int _lastMaterialCompression;
     private float _lastHorzSpacing;
     private float _lastVertSpacing;
+    private float _lastSpacingMultiplier;
     private MeshType _lastMeshType;
 
     private int _lastRows;
@@ -154,7 +158,8 @@ public class WorldCreator : MonoBehaviour
                 width != _lastWidth ||
                 height != _lastHeight ||
                 horzSpacing != _lastHorzSpacing ||
-                vertSpacing != _lastVertSpacing;
+                vertSpacing != _lastVertSpacing ||
+                spacingMultiplier != _lastSpacingMultiplier;
 
 
             if (softRedraw || hardRedraw)
@@ -168,7 +173,7 @@ public class WorldCreator : MonoBehaviour
                 resetType = ResetType.Full;
             }
             else if (
-                pointSize != _lastPointSize ||
+                pointSizeMultiplier != _lastPointSizeMultiplier ||
                 materialCompression != _lastMaterialCompression ||
                 meshType != _lastMeshType)
             {
@@ -184,8 +189,8 @@ public class WorldCreator : MonoBehaviour
             case ResetType.Full:
 
                 // determine rows and columns
-                int rows = Mathf.RoundToInt(height / vertSpacing) + 1;
-                int columns = Mathf.RoundToInt(width / horzSpacing) + 1;
+                int rows = Mathf.RoundToInt(height / (vertSpacing * spacingMultiplier)) + 1;
+                int columns = Mathf.RoundToInt(width / (horzSpacing * spacingMultiplier)) + 1;
 
                 // determine if recalculation is ACTUALLY needed 
 
@@ -251,6 +256,7 @@ public class WorldCreator : MonoBehaviour
                 _lastHeight = height;
                 _lastHorzSpacing = horzSpacing;
                 _lastVertSpacing = vertSpacing;
+                _lastSpacingMultiplier = spacingMultiplier;
                 _lastRows = rows;
                 _lastColumns = columns;
 
@@ -277,9 +283,9 @@ public class WorldCreator : MonoBehaviour
                 _mapGraphic.transform.localScale = new Vector3(width, height, 1);
 
                 // get all meshrenderers in map points container 
-                if (resetType == ResetType.Full || _lastPointSize != pointSize)
+                if (resetType == ResetType.Full || _lastPointSizeMultiplier != pointSizeMultiplier)
                 {
-                    Vector3 size = Vector3.one * pointSize;
+                    Vector3 size = Vector3.one * pointSizeMultiplier;
                     foreach (Transform t in _pointsTransforms)
                     {
                         t.localScale = size;
@@ -305,7 +311,7 @@ public class WorldCreator : MonoBehaviour
                 }
 
                 // reset values 
-                _lastPointSize = pointSize;
+                _lastPointSizeMultiplier = pointSizeMultiplier;
                 _lastMaterialCompression = materialCompression;
                 _lastMeshType = meshType;
                 break;
