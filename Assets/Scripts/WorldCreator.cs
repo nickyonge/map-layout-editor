@@ -234,12 +234,7 @@ public class WorldCreator : MonoBehaviour
                             _pointsTransforms[index] = pt.transform;
                             _pointsMeshFilters[index] = mf;
                             _pointsMeshRenderers[index] = mr;
-                            // _pointsPositions[index] = new Vector2((float)j / rows, (float)i / columns);
-                            // _pointsPositions[index] = new Vector2((float)i / columns, (float)j / rows);
                             _pointsPositions[index] = new Vector2((float)j / (columns - 1), (float)i / (rows - 1));
-                            // _pointsPositions[index] = new Vector2((float)j / (float)columns, (float)i / (float)rows);
-                            // _pointsPositions[index] = new Vector2(j / columns, i / rows);
-                            // _pointsPositions[index] = new Vector2((float)i / (rows - 1), (float)j / (columns - 1));
                             mr.enabled = meshType != MeshType.None;
                             index++;
                         }
@@ -286,33 +281,15 @@ public class WorldCreator : MonoBehaviour
                     }
                 }
 
-                if (resetType == ResetType.Full || _lastMeshType != meshType || newMap)
+                if (forceRedraw || resetType == ResetType.Full || _lastMeshType != meshType || newMap)
                 {
+
                     bool visible = meshType != MeshType.None;
                     Texture2D texture = (Texture2D)mapMaterial.mainTexture;
                     for (int i = 0; i < _pointsMeshFilters.Length; i++)
                     {
-                        Mesh mesh = GetMeshType(meshType);
-                        if (mesh != null)
-                        {
-                            Color c = TestPixel(texture, _pointsPositions[i].x, _pointsPositions[i].y);
-                            Color[] cs = mesh.colors;
-                            if (cs.Length == 0 || cs[0] != c || cs[cs.Length - 1] != c)
-                            {
-                                if (cs.Length == 0)
-                                {
-                                    cs = new Color[mesh.vertices.Length];
-                                }
-                                for (int j = 0; j < cs.Length; j++)
-                                {
-                                    cs[j] = c;
-                                }
-                            }
-                            mesh.SetColors(cs);
-                        }
-
-
-                        _pointsMeshFilters[i].mesh = mesh;
+                        Color color = TestPixel(texture, _pointsPositions[i].x, _pointsPositions[i].y);
+                        _pointsMeshFilters[i].sharedMesh = GetMeshType(meshType, color);
                         _pointsMeshRenderers[i].enabled = visible;
                     }
                 }
@@ -337,27 +314,67 @@ public class WorldCreator : MonoBehaviour
 
     }
 
-    private Mesh GetMeshType(MeshType type, bool instantiate = true)
+    private Dictionary<Color, Material> _pointMaterialsByColor = new Dictionary<Color, Material>();
+
+    private Mesh GetMeshType(MeshType type, Color color)
     {
-        switch (type)
+        if (type == MeshType.None) { return null; }
+
+        if (_meshDicts.ContainsKey(type))
         {
-            case MeshType.Quad:
-                return instantiate ? Instantiate(_quadMesh) : _quadMesh;
-            case MeshType.Cube:
-                return instantiate ? Instantiate(_cubeMesh) : _cubeMesh;
-            case MeshType.Sphere:
-                return instantiate ? Instantiate(_sphereMesh) : _sphereMesh;
-            case MeshType.None:
-                return null;
-            default:
-                return null;
+            if (_meshDicts[type].ContainsKey(color))
+            {
+                return _meshDicts[type][color];
+            }
+            else
+            {
+                Mesh mesh;
+                switch (type)
+                {
+                    case MeshType.Quad:
+                        mesh = Instantiate(_quadMesh);
+                        break;
+                    case MeshType.Cube:
+                        mesh = Instantiate(_cubeMesh);
+                        break;
+                    case MeshType.Sphere:
+                        mesh = Instantiate(_sphereMesh);
+                        break;
+                    default:
+                        Debug.LogError($"ERROR: invalid mesh type {type}, cannot instantiate mesh");
+                        return null;
+                }
+                Color[] cs = mesh.colors;
+                if (cs.Length == 0 || cs[0] != color || cs[cs.Length - 1] != color)
+                {
+                    if (cs.Length == 0)
+                    {
+                        cs = new Color[mesh.vertices.Length];
+                    }
+                    for (int j = 0; j < cs.Length; j++)
+                    {
+                        cs[j] = color;
+                    }
+                }
+                mesh.SetColors(cs);
+                _meshDicts[type].Add(color, mesh);
+                return mesh;
+            }
+        }
+        else
+        {
+            _meshDicts.Add(type, new Dictionary<Color, Mesh>());
+            return GetMeshType(type, color);
         }
     }
+
+    private Dictionary<MeshType, Dictionary<Color, Mesh>> _meshDicts = new Dictionary<MeshType, Dictionary<Color, Mesh>>();
 
     void CheckPrimitives(bool forceReset = false)
     {
         if (forceReset)
         {
+            _meshDicts.Clear();
             if (_quadPrimitive != null) { DestroyGivenObject(_quadPrimitive); }
             if (_cubePrimitive != null) { DestroyGivenObject(_cubePrimitive); }
             if (_spherePrimitive != null) { DestroyGivenObject(_spherePrimitive); }
@@ -413,16 +430,24 @@ public class WorldCreator : MonoBehaviour
         }
     }
 
+    private const int roundRGBValue = 10;
     private Color TestPixel(Texture2D texture, float widthPercent, float heightPercent)
     {
         int x = Mathf.FloorToInt(texture.width * Mathf.Clamp01(widthPercent));
         int y = Mathf.FloorToInt(texture.height * Mathf.Clamp01(heightPercent));
-        if (widthPercent == 0) { Debug.Log($"X:{x}, Y:{y}");}
-        return texture.GetPixel(x, y);
+        if (widthPercent == 0) { Debug.Log($"X:{x}, Y:{y}"); }
+        Color color = texture.GetPixel(x, y);
+        // limit RGB channels 
+        color.r = Mathf.Round(color.r * roundRGBValue) / roundRGBValue;
+        color.g = Mathf.Round(color.g * roundRGBValue) / roundRGBValue;
+        color.b = Mathf.Round(color.b * roundRGBValue) / roundRGBValue;
+        return color;
     }
 
     void ClearMap()
     {
+        _pointMaterialsByColor.Clear();
+        _meshDicts.Clear();
         for (int i = this.transform.childCount; i > 0; --i)
         {
             DestroyGivenObject(this.transform.GetChild(0).gameObject);
