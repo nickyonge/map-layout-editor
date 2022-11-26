@@ -21,19 +21,22 @@ public class WorldCreator : MonoBehaviour
 
     [Range(0.01f, 0.5f)] public float pointSize = 0.1f;
 
-    [Range(0.01f, 2f)] public float spacing = 0.5f;
+    [Range(0.25f, 2f)] public float spacing = 0.5f;
 
     public Material mapMaterial;
+    public Material pointMaterial;
 
 
     private GameObject _mapPointsContainer;
     private Transform[] _pointsTransforms;
+    private MeshRenderer[] _pointsMeshRenderer;
     private GameObject _mapGraphic;
     private MeshRenderer _mapMeshRenderer;
 
 
     private Texture2D _lastMapSourceImage;
     private Material _lastMapMaterial;
+    private Material _lastPointMaterial;
 
     private float _lastWidth;
     private float _lastHeight;
@@ -50,16 +53,21 @@ public class WorldCreator : MonoBehaviour
     private bool _initialized = false;
 
 
-    // Start is called before the first frame update
+    [SerializeField] private bool forceRedraw = false;
+
+
+    [ExecuteInEditMode]
     void Start()
     {
         GenerateMap();
     }
 
-    void OnInspectorGUI() {
+    void OnInspectorGUI()
+    {
         GenerateMap();
     }
-    void OnAwake() {
+    void OnEnable()
+    {
         GenerateMap();
     }
 
@@ -90,13 +98,15 @@ public class WorldCreator : MonoBehaviour
 
         ResetType resetType = ResetType.None;
 
-        if (!_initialized)
+        if (!_initialized || forceRedraw)
         {
             resetType = ResetType.Full;
             _initialized = true;
+            forceRedraw = false;
         }
         else
         {
+            Debug.Log("child count: " + transform.childCount);
             if (_mapPointsContainer == null ||
                 transform.childCount != 2 ||
                 width != _lastWidth ||
@@ -109,7 +119,8 @@ public class WorldCreator : MonoBehaviour
             else if (
                 pointSize != _lastPointSize ||
                 mapSourceImage != _lastMapSourceImage ||
-                mapMaterial != _lastMapMaterial)
+                mapMaterial != _lastMapMaterial ||
+                pointMaterial != _lastPointMaterial)
             {
                 // just appearance changed, point size or source image 
                 resetType = ResetType.AppearanceOnly;
@@ -125,27 +136,31 @@ public class WorldCreator : MonoBehaviour
                 // create container 
                 _mapPointsContainer = new GameObject("Map Points Container");
                 _mapPointsContainer.transform.SetParent(transform);
-                _mapPointsContainer.transform.localPosition = Vector3.zero;
+                _mapPointsContainer.transform.localPosition = new Vector3(
+                    width * -0.5f, height * -0.5f, 0);
                 _mapPointsContainer.transform.localEulerAngles = Vector3.zero;
                 _mapPointsContainer.transform.localScale = Vector3.one;
 
                 // determine rows and columns
-                int rows = Mathf.FloorToInt(height / spacing);
-                int columns = Mathf.FloorToInt(width / spacing);
+                int rows = Mathf.RoundToInt(height / spacing) + 1;
+                int columns = Mathf.RoundToInt(width / spacing) + 1;
 
                 _pointsTransforms = new Transform[rows * columns];
+                _pointsMeshRenderer = new MeshRenderer[rows * columns];
                 int index = 0;
 
-                Debug.Log("rows/columns " + rows + "/" + columns);
+                if (rows < 2) { rows = 2; }
+                if (columns < 2) { columns = 2; }
 
-
+                float columnSpacing = width / (columns - 1);
+                float rowSpacing = height / (rows - 1);
 
                 // create points 
                 for (int i = 0; i < rows; i++)
                 {
                     GameObject r = new GameObject($"Row {i}");
                     r.transform.SetParent(_mapPointsContainer.transform);
-                    r.transform.localPosition = new Vector3(0, spacing * i, 0);
+                    r.transform.localPosition = new Vector3(0, (rowSpacing * i), 0);
                     r.transform.localEulerAngles = Vector3.zero;
                     r.transform.localScale = Vector3.one;
                     for (int j = 0; j < columns; j++)
@@ -154,9 +169,10 @@ public class WorldCreator : MonoBehaviour
                         pt.SetActive(true);
                         pt.name = $"Point {i}:{j}";
                         pt.transform.SetParent(r.transform);
-                        pt.transform.localPosition = new Vector3(j * spacing, 0f, 0f);
+                        pt.transform.localPosition = new Vector3(j * columnSpacing, 0f, 0f);
                         pt.transform.localEulerAngles = Vector3.zero;
                         _pointsTransforms[index] = pt.transform;
+                        _pointsMeshRenderer[index] = pt.GetComponent<MeshRenderer>();
                         index++;
                     }
                 }
@@ -181,22 +197,33 @@ public class WorldCreator : MonoBehaviour
                     _mapGraphic.transform.localPosition = Vector3.zero;
                     _mapGraphic.transform.localEulerAngles = Vector3.zero;
                 }
-                _mapGraphic.transform.localScale = new Vector3(width, height, 1f);
+                _mapGraphic.transform.localScale = new Vector3(width, height, 1);
                 _mapMeshRenderer = _mapGraphic.GetComponent<MeshRenderer>();
                 Material mat = new Material(mapMaterial);
                 mat.mainTexture = mapSourceImage;
                 _mapMeshRenderer.sharedMaterial = mat;
 
                 // get all meshrenderers in map points container 
-                foreach (Transform t in _pointsTransforms)
+                if (resetType == ResetType.Full || _lastPointSize != pointSize)
                 {
-                    t.localScale = Vector3.one * pointSize;
+                    foreach (Transform t in _pointsTransforms)
+                    {
+                        t.localScale = new Vector3(pointSize, pointSize, 0.02f);
+                    }
+                }
+                if (resetType == ResetType.Full || _lastPointMaterial != pointMaterial)
+                {
+                    foreach (MeshRenderer mr in _pointsMeshRenderer)
+                    {
+                        mr.sharedMaterial = pointMaterial;
+                    }
                 }
 
                 // reset values 
                 _lastMapSourceImage = mapSourceImage;
                 _lastPointSize = pointSize;
                 _lastMapMaterial = mapMaterial;
+                _lastPointMaterial = pointMaterial;
                 break;
 
             case ResetType.None:
@@ -241,30 +268,16 @@ public class WorldCreator : MonoBehaviour
 
     void ClearMap()
     {
-        int cc = transform.childCount;
-        for (int i = cc - 1; i >= 0; i--)
+        for (int i = this.transform.childCount; i > 0; --i)
         {
-            DestroyGameObject(transform.GetChild(i).gameObject);
-        }
-    }
-
-    void DestroyGameObject(GameObject obj)
-    {
-        if (Application.isPlaying)
-            Destroy(_mapPointsContainer);
-        else
-        {
-#if UNITY_EDITOR
-            // bonkers workaround to calling destroy 
-            UnityEditor.EditorApplication.delayCall += () =>
+            if (Application.isPlaying)
             {
-                // UnityEditor.Undo.DestroyObjectImmediate(_mapPointsContainer);// with undo 
-                DestroyImmediate(_mapPointsContainer);// no undo 
-            };
-#else
-            // theoretically impossible to get here but whatever 
-            DestroyImmediate(_mapPointsContainer);// no undo 
-#endif
+                Destroy(this.transform.GetChild(0).gameObject);
+            }
+            else
+            {
+                DestroyImmediate(this.transform.GetChild(0).gameObject);
+            }
         }
     }
 
