@@ -82,6 +82,16 @@ public class WorldCreator : MonoBehaviour
     void OnEnable()
     {
         GenerateMap();
+
+        // Debug.Log("A: " + ColorComparator.GetColorDifference(Color.black, Color.white));
+        // Debug.Log("b: " + ColorComparator.GetColorDifference(Color.white, Color.black));
+        // Debug.Log("c: " + ColorComparator.GetColorDifference(Color.white, Color.white));
+        // Debug.Log("d: " + ColorComparator.GetColorDifference(Color.black, Color.black));
+        // Debug.Log("e: " + ColorComparator.GetColorDifference(Color.black, Color.red));
+        // Debug.Log("f: " + ColorComparator.GetColorDifference(Color.white, Color.red));
+        // Debug.Log("g: " + ColorComparator.GetColorDifference(Color.green, Color.magenta));
+
+
     }
 
     [ExecuteInEditMode]
