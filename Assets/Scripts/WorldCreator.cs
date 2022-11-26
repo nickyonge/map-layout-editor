@@ -26,10 +26,14 @@ public class WorldCreator : MonoBehaviour
     [Delayed] public float width = 20f;
     [Delayed] public float height = 10f;
 
+
     [Range(0.01f, 0.5f)] public float pointSize = 0.1f;
 
-    [Range(0.25f, 2f)] public float horzSpacing = 0.5f;
-    [Range(0.25f, 2f)] public float vertSpacing = 0.5f;
+    const float minSpacing = 0.2f;
+    const float maxSpacing = 2f;
+
+    [Range(minSpacing, maxSpacing)] public float horzSpacing = 0.5f;
+    [Range(minSpacing, maxSpacing)] public float vertSpacing = 0.5f;
 
     public MeshType meshType;
 
@@ -224,7 +228,7 @@ public class WorldCreator : MonoBehaviour
                             pt.transform.localPosition = new Vector3(j * columnSpacing, 0f, 0f);
                             pt.transform.localEulerAngles = Vector3.zero;
                             MeshFilter mf = pt.AddComponent<MeshFilter>();
-                            mf.sharedMesh = GetMeshType(meshType);
+                            // mf.sharedMesh = GetMeshType(meshType);
                             MeshRenderer mr = pt.AddComponent<MeshRenderer>();
                             mr.sharedMaterial = pointMaterial;
                             _pointsTransforms[index] = pt.transform;
@@ -286,12 +290,11 @@ public class WorldCreator : MonoBehaviour
                 {
                     bool visible = meshType != MeshType.None;
                     Texture2D texture = (Texture2D)mapMaterial.mainTexture;
-                    Mesh mesh = GetMeshType(meshType);
                     for (int i = 0; i < _pointsMeshFilters.Length; i++)
                     {
-                        if (newMap && mesh != null)
+                        Mesh mesh = GetMeshType(meshType);
+                        if (mesh != null)
                         {
-                            mesh = Instantiate(mesh);
                             Color c = TestPixel(texture, _pointsPositions[i].x, _pointsPositions[i].y);
                             Color[] cs = mesh.colors;
                             if (cs.Length == 0 || cs[0] != c || cs[cs.Length - 1] != c)
@@ -334,16 +337,16 @@ public class WorldCreator : MonoBehaviour
 
     }
 
-    private Mesh GetMeshType(MeshType type)
+    private Mesh GetMeshType(MeshType type, bool instantiate = true)
     {
         switch (type)
         {
             case MeshType.Quad:
-                return _quadMesh;
+                return instantiate ? Instantiate(_quadMesh) : _quadMesh;
             case MeshType.Cube:
-                return _cubeMesh;
+                return instantiate ? Instantiate(_cubeMesh) : _cubeMesh;
             case MeshType.Sphere:
-                return _sphereMesh;
+                return instantiate ? Instantiate(_sphereMesh) : _sphereMesh;
             case MeshType.None:
                 return null;
             default:
