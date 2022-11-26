@@ -13,6 +13,14 @@ public class WorldCreator : MonoBehaviour
         Full,
     }
 
+    public enum MeshType
+    {
+        Cube,
+        Sphere,
+        Quad,
+        None,
+    }
+
     private static bool _updating = false;
 
     [Delayed] public float width = 20f;
@@ -23,12 +31,16 @@ public class WorldCreator : MonoBehaviour
     [Range(0.25f, 2f)] public float horzSpacing = 0.5f;
     [Range(0.25f, 2f)] public float vertSpacing = 0.5f;
 
+    public MeshType meshType;
+
     public Material mapMaterial;
     public Material pointMaterial;
 
 
     private GameObject _mapPointsContainer;
     private Transform[] _pointsTransforms;
+    private MeshFilter[] _pointsMeshFilters;
+    private MeshRenderer[] _pointsMeshRenderers;
     private GameObject _mapGraphic;
 
 
@@ -38,12 +50,17 @@ public class WorldCreator : MonoBehaviour
     private float _lastPointSize;
     private float _lastHorzSpacing;
     private float _lastVertSpacing;
+    private MeshType _lastMeshType;
 
     private int _lastRows;
     private int _lastColumns;
 
     private static GameObject _quadPrimitive;
     private static GameObject _cubePrimitive;
+    private static GameObject _spherePrimitive;
+    private Mesh _quadMesh;
+    private Mesh _cubeMesh;
+    private Mesh _sphereMesh;
 
 
     private bool _initialized = false;
@@ -65,6 +82,15 @@ public class WorldCreator : MonoBehaviour
     void OnEnable()
     {
         GenerateMap();
+    }
+
+    [ExecuteInEditMode]
+    void Update()
+    {
+        if (forceRedraw)
+        {
+            GenerateMap();
+        }
     }
 
 #if UNITY_EDITOR
@@ -94,22 +120,35 @@ public class WorldCreator : MonoBehaviour
         }
         else
         {
-            if (_mapPointsContainer == null ||
+            bool hardRedraw =
+                _mapPointsContainer == null ||
                 transform.childCount != 2 ||
+                _pointsMeshFilters.Length == 0 ||
+                _pointsMeshRenderers.Length == 0 ||
+                _pointsTransforms.Length == 0 ||
+                _pointsMeshFilters.Length != _pointsMeshRenderers.Length ||
+                _pointsTransforms.Length != _pointsMeshRenderers.Length;
+
+            bool softRedraw = hardRedraw ||
                 width != _lastWidth ||
                 height != _lastHeight ||
                 horzSpacing != _lastHorzSpacing ||
-                vertSpacing != _lastVertSpacing)
+                vertSpacing != _lastVertSpacing;
+
+
+            if (softRedraw || hardRedraw)
             {
                 // check for parenting issue 
-                if (transform.childCount != 2 || _mapPointsContainer == null) {
+                if (hardRedraw)
+                {
                     forceRedraw = true;// gotta recreate the hierarchy, force redraw 
                 }
                 // scale changed
                 resetType = ResetType.Full;
             }
             else if (
-                pointSize != _lastPointSize)
+                pointSize != _lastPointSize ||
+                meshType != _lastMeshType)
             {
                 // just appearance changed, point size or source image 
                 resetType = ResetType.AppearanceOnly;
@@ -126,7 +165,7 @@ public class WorldCreator : MonoBehaviour
 
                 // determine if recalculation is ACTUALLY needed 
 
-                if (forceRedraw || 
+                if (forceRedraw ||
                     width != _lastWidth ||
                     height != _lastHeight ||
                     rows != _lastRows ||
@@ -144,6 +183,8 @@ public class WorldCreator : MonoBehaviour
                     _mapPointsContainer.transform.localScale = Vector3.one;
 
                     _pointsTransforms = new Transform[rows * columns];
+                    _pointsMeshFilters = new MeshFilter[rows * columns];
+                    _pointsMeshRenderers = new MeshRenderer[rows * columns];
                     int index = 0;
 
                     if (rows < 2) { rows = 2; }
@@ -162,15 +203,18 @@ public class WorldCreator : MonoBehaviour
                         r.transform.localScale = Vector3.one;
                         for (int j = 0; j < columns; j++)
                         {
-                            GameObject pt = GameObject.Instantiate(_cubePrimitive);
-                            pt.SetActive(true);
-                            pt.name = $"Point {i}:{j}";
+                            GameObject pt = new GameObject($"Point {i}:{j}");
                             pt.transform.SetParent(r.transform);
                             pt.transform.localPosition = new Vector3(j * columnSpacing, 0f, 0f);
                             pt.transform.localEulerAngles = Vector3.zero;
-                            _pointsTransforms[index] = pt.transform;
-                            MeshRenderer mr = pt.GetComponent<MeshRenderer>();
+                            MeshFilter mf = pt.AddComponent<MeshFilter>();
+                            mf.sharedMesh = GetMeshType(meshType);
+                            MeshRenderer mr = pt.AddComponent<MeshRenderer>();
                             mr.sharedMaterial = pointMaterial;
+                            _pointsTransforms[index] = pt.transform;
+                            _pointsMeshFilters[index] = mf;
+                            _pointsMeshRenderers[index] = mr;
+                            mr.enabled = meshType != MeshType.None;
                             index++;
                         }
                     }
@@ -206,14 +250,27 @@ public class WorldCreator : MonoBehaviour
                 // get all meshrenderers in map points container 
                 if (resetType == ResetType.Full || _lastPointSize != pointSize)
                 {
+                    Vector3 size = Vector3.one * pointSize;
                     foreach (Transform t in _pointsTransforms)
                     {
-                        t.localScale = new Vector3(pointSize, pointSize, 0.02f);
+                        t.localScale = size;
+                    }
+                }
+
+                if (resetType == ResetType.Full || _lastMeshType != meshType)
+                {
+                    Mesh mesh = GetMeshType(meshType);
+                    bool visible = meshType != MeshType.None;
+                    for (int i = 0; i < _pointsMeshFilters.Length; i++)
+                    {
+                        _pointsMeshFilters[i].sharedMesh = mesh;
+                        _pointsMeshRenderers[i].enabled = visible;
                     }
                 }
 
                 // reset values 
                 _lastPointSize = pointSize;
+                _lastMeshType = meshType;
                 break;
 
             case ResetType.None:
@@ -231,6 +288,23 @@ public class WorldCreator : MonoBehaviour
 
     }
 
+    private Mesh GetMeshType(MeshType type)
+    {
+        switch (type)
+        {
+            case MeshType.Quad:
+                return _quadMesh;
+            case MeshType.Cube:
+                return _cubeMesh;
+            case MeshType.Sphere:
+                return _sphereMesh;
+            case MeshType.None:
+                return null;
+            default:
+                return null;
+        }
+    }
+
     void CheckPrimitives()
     {
         if (_quadPrimitive == null)
@@ -242,6 +316,7 @@ public class WorldCreator : MonoBehaviour
             _quadPrimitive.transform.eulerAngles = Vector3.zero;
             _quadPrimitive.transform.localScale = Vector3.one;
             _quadPrimitive.SetActive(false);
+            _quadMesh = _quadPrimitive.GetComponent<MeshFilter>().sharedMesh;
         }
         if (_cubePrimitive == null)
         {
@@ -252,6 +327,18 @@ public class WorldCreator : MonoBehaviour
             _cubePrimitive.transform.eulerAngles = Vector3.zero;
             _cubePrimitive.transform.localScale = Vector3.one;
             _cubePrimitive.SetActive(false);
+            _cubeMesh = _cubePrimitive.GetComponent<MeshFilter>().sharedMesh;
+        }
+        if (_spherePrimitive == null)
+        {
+            _spherePrimitive = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            _spherePrimitive.name = "Sphere Primitive";
+            _spherePrimitive.hideFlags = HideFlags.HideInHierarchy;
+            _spherePrimitive.transform.position = Vector3.zero;
+            _spherePrimitive.transform.eulerAngles = Vector3.zero;
+            _spherePrimitive.transform.localScale = Vector3.one;
+            _spherePrimitive.SetActive(false);
+            _sphereMesh = _spherePrimitive.GetComponent<MeshFilter>().sharedMesh;
         }
     }
 
