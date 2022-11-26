@@ -15,9 +15,8 @@ public class WorldCreator : MonoBehaviour
 
     private static bool _updating = false;
 
-    public Texture2D mapSourceImage;
-    public float width = 20f;
-    public float height = 10f;
+    [Delayed] public float width = 20f;
+    [Delayed] public float height = 10f;
 
     [Range(0.01f, 0.5f)] public float pointSize = 0.1f;
 
@@ -30,14 +29,9 @@ public class WorldCreator : MonoBehaviour
 
     private GameObject _mapPointsContainer;
     private Transform[] _pointsTransforms;
-    private MeshRenderer[] _pointsMeshRenderer;
     private GameObject _mapGraphic;
-    private MeshRenderer _mapMeshRenderer;
 
 
-    private Texture2D _lastMapSourceImage;
-    private Material _lastMapMaterial;
-    private Material _lastPointMaterial;
 
     private float _lastWidth;
     private float _lastHeight;
@@ -107,14 +101,15 @@ public class WorldCreator : MonoBehaviour
                 horzSpacing != _lastHorzSpacing ||
                 vertSpacing != _lastVertSpacing)
             {
+                // check for parenting issue 
+                if (transform.childCount != 2 || _mapPointsContainer == null) {
+                    forceRedraw = true;// gotta recreate the hierarchy, force redraw 
+                }
                 // scale changed
                 resetType = ResetType.Full;
             }
             else if (
-                pointSize != _lastPointSize ||
-                mapSourceImage != _lastMapSourceImage ||
-                mapMaterial != _lastMapMaterial ||
-                pointMaterial != _lastPointMaterial)
+                pointSize != _lastPointSize)
             {
                 // just appearance changed, point size or source image 
                 resetType = ResetType.AppearanceOnly;
@@ -149,7 +144,6 @@ public class WorldCreator : MonoBehaviour
                     _mapPointsContainer.transform.localScale = Vector3.one;
 
                     _pointsTransforms = new Transform[rows * columns];
-                    _pointsMeshRenderer = new MeshRenderer[rows * columns];
                     int index = 0;
 
                     if (rows < 2) { rows = 2; }
@@ -175,7 +169,8 @@ public class WorldCreator : MonoBehaviour
                             pt.transform.localPosition = new Vector3(j * columnSpacing, 0f, 0f);
                             pt.transform.localEulerAngles = Vector3.zero;
                             _pointsTransforms[index] = pt.transform;
-                            _pointsMeshRenderer[index] = pt.GetComponent<MeshRenderer>();
+                            MeshRenderer mr = pt.GetComponent<MeshRenderer>();
+                            mr.sharedMaterial = pointMaterial;
                             index++;
                         }
                     }
@@ -203,12 +198,10 @@ public class WorldCreator : MonoBehaviour
                     _mapGraphic.transform.SetParent(transform);
                     _mapGraphic.transform.localPosition = Vector3.zero;
                     _mapGraphic.transform.localEulerAngles = Vector3.zero;
+                    MeshRenderer _mapMeshRenderer = _mapGraphic.GetComponent<MeshRenderer>();
+                    _mapMeshRenderer.sharedMaterial = mapMaterial;
                 }
                 _mapGraphic.transform.localScale = new Vector3(width, height, 1);
-                _mapMeshRenderer = _mapGraphic.GetComponent<MeshRenderer>();
-                Material mat = new Material(mapMaterial);
-                mat.mainTexture = mapSourceImage;
-                _mapMeshRenderer.sharedMaterial = mat;
 
                 // get all meshrenderers in map points container 
                 if (resetType == ResetType.Full || _lastPointSize != pointSize)
@@ -218,19 +211,9 @@ public class WorldCreator : MonoBehaviour
                         t.localScale = new Vector3(pointSize, pointSize, 0.02f);
                     }
                 }
-                if (resetType == ResetType.Full || _lastPointMaterial != pointMaterial)
-                {
-                    foreach (MeshRenderer mr in _pointsMeshRenderer)
-                    {
-                        mr.sharedMaterial = pointMaterial;
-                    }
-                }
 
                 // reset values 
-                _lastMapSourceImage = mapSourceImage;
                 _lastPointSize = pointSize;
-                _lastMapMaterial = mapMaterial;
-                _lastPointMaterial = pointMaterial;
                 break;
 
             case ResetType.None:
