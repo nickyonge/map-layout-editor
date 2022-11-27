@@ -40,6 +40,18 @@ public class WorldCreator : MonoBehaviour
     [Range(MIN_SPACING, MAX_SPACING)] public float vertSpacing = 0.5f;
     [Range(0.1f, 2f)] public float spacingMultiplier = 1f;
 
+
+    public bool showLand = true;
+    public bool showWater = false;
+
+    public Color[] waterColors;
+    private Color[] _compressedWaterColors;
+    [Range(0, 1)] public float waterCutoff = 0.3f;
+
+    [Range(0, 5)] public int colorAverageOffset = 0;
+
+
+
     public MeshType meshType;
 
     public Material mapMaterial;
@@ -60,6 +72,11 @@ public class WorldCreator : MonoBehaviour
     private float _lastHeight;
     private float _lastPointSizeMultiplier;
     private bool _lastDynamicPointSize;
+    private bool _lastShowLand;
+    private bool _lastShowWater;
+    private int _lastColorAverageOffset;
+    private Color[] _lastWaterColors;
+    private float _lastWaterCutoff;
     private int _lastMaterialCompression;
     private float _lastHorzSpacing;
     private float _lastVertSpacing;
@@ -100,14 +117,6 @@ public class WorldCreator : MonoBehaviour
     void OnEnable()
     {
         GenerateMap();
-
-        // Debug.Log("A: " + ColorComparator.GetColorDifference(Color.black, Color.white));
-        // Debug.Log("b: " + ColorComparator.GetColorDifference(Color.white, Color.black));
-        // Debug.Log("c: " + ColorComparator.GetColorDifference(Color.white, Color.white));
-        // Debug.Log("d: " + ColorComparator.GetColorDifference(Color.black, Color.black));
-        // Debug.Log("e: " + ColorComparator.GetColorDifference(Color.black, Color.red));
-        // Debug.Log("f: " + ColorComparator.GetColorDifference(Color.white, Color.red));
-        // Debug.Log("g: " + ColorComparator.GetColorDifference(Color.green, Color.magenta));
 
 
     }
@@ -179,6 +188,11 @@ public class WorldCreator : MonoBehaviour
             else if (
                 pointSizeMultiplier != _lastPointSizeMultiplier ||
                 dynamicPointSize != _lastDynamicPointSize ||
+                showLand != _lastShowLand ||
+                colorAverageOffset != _lastColorAverageOffset ||
+                showWater != _lastShowWater ||
+                waterColors != _lastWaterColors ||
+                waterCutoff != _lastWaterCutoff ||
                 materialCompression != _lastMaterialCompression ||
                 meshType != _lastMeshType)
             {
@@ -288,19 +302,20 @@ public class WorldCreator : MonoBehaviour
                 _mapGraphic.transform.localScale = new Vector3(width, height, 1);
 
                 // get all meshrenderers in map points container 
-                if (forceRedraw || resetType == ResetType.Full || 
-                    _lastPointSizeMultiplier != pointSizeMultiplier || 
+                if (forceRedraw || resetType == ResetType.Full ||
+                    _lastPointSizeMultiplier != pointSizeMultiplier ||
                     _lastDynamicPointSize != dynamicPointSize)
                 {
                     float horz = pointSizeMultiplier;
                     float vert = pointSizeMultiplier;
 
-                    if (dynamicPointSize) {
+                    if (dynamicPointSize)
+                    {
                         horz *= _columnSpacing;
                         vert *= _rowSpacing;
                     }
 
-                    Vector3 size = new Vector3(horz, vert, Mathf.Min(horz,vert));
+                    Vector3 size = new Vector3(horz, vert, Mathf.Min(horz, vert));
                     foreach (Transform t in _pointsTransforms)
                     {
                         t.localScale = size;
@@ -308,26 +323,49 @@ public class WorldCreator : MonoBehaviour
                 }
 
                 if (forceRedraw || newMap || resetType == ResetType.Full ||
+                    showLand != _lastShowLand || showWater != _lastShowWater ||
+                    colorAverageOffset != _lastColorAverageOffset ||
+                    waterColors != _lastWaterColors || waterCutoff != _lastWaterCutoff ||
                     _lastMeshType != meshType || materialCompression != _lastMaterialCompression)
                 {
-                    if (materialCompression != _lastMaterialCompression)
-                    {
-
-                    }
                     bool visible = meshType != MeshType.None;
                     Texture2D texture = (Texture2D)mapMaterial.mainTexture;
+                    _compressedWaterColors = new Color[waterColors.Length];
+                    for (int i = 0; i < _compressedWaterColors.Length; i++)
+                    {
+                        _compressedWaterColors[i] = CompressColor(waterColors[i]);
+                    }
                     for (int i = 0; i < _pointsMeshFilters.Length; i++)
                     {
-                        Color color = TestPixel(texture, _pointsPositions[i].x, _pointsPositions[i].y);
-                        _pointsMeshFilters[i].sharedMesh = GetMeshType(meshType, color);
-                        _pointsMeshRenderers[i].enabled = visible;
-                        _pointsMeshRenderers[i].sharedMaterial = GetMaterialByColor(color);
+                        if (visible)
+                        {
+                            // yep, visible quad type, determine if surface type is visible 
+                            Color color = TestPixel(texture, _pointsPositions[i].x, _pointsPositions[i].y, out bool isWater);
+                            if (isWater ? showWater : showLand)
+                            {
+                                // yep, visible point 
+                                _pointsMeshFilters[i].sharedMesh = GetMeshType(meshType, color);
+                                _pointsMeshRenderers[i].sharedMaterial = GetMaterialByColor(color);
+                                _pointsTransforms[i].gameObject.name += isWater ? " W" : " L";
+                                _pointsMeshRenderers[i].enabled = true;
+                                continue;
+                            }
+                        }
+                        // not visible
+                        _pointsMeshFilters[i].sharedMesh = null;
+                        _pointsMeshRenderers[i].sharedMaterial = null;
+                        _pointsMeshRenderers[i].enabled = false;
                     }
                 }
 
                 // reset values 
                 _lastPointSizeMultiplier = pointSizeMultiplier;
                 _lastDynamicPointSize = dynamicPointSize;
+                _lastShowLand = showLand;
+                _lastColorAverageOffset = colorAverageOffset;
+                _lastShowWater = showWater;
+                _lastWaterColors = waterColors;
+                _lastWaterCutoff = waterCutoff;
                 _lastMaterialCompression = materialCompression;
                 _lastMeshType = meshType;
                 break;
@@ -478,13 +516,8 @@ public class WorldCreator : MonoBehaviour
         }
     }
 
-    private Color TestPixel(Texture2D texture, float widthPercent, float heightPercent)
+    private Color CompressColor(Color color)
     {
-        int x = Mathf.FloorToInt(texture.width * Mathf.Clamp01(widthPercent));
-        int y = Mathf.FloorToInt(texture.height * Mathf.Clamp01(heightPercent));
-        if (widthPercent == 0) { Debug.Log($"X:{x}, Y:{y}"); }
-        Color color = texture.GetPixel(x, y);
-        // limit RGB channels 
         if (materialCompression > 0 && materialCompression < MAX_MATERIAL_COMPRESSION)
         {
             color.r = Mathf.Round(color.r * materialCompression) / materialCompression;
@@ -494,8 +527,68 @@ public class WorldCreator : MonoBehaviour
         return color;
     }
 
+    private Color TestPixel(Texture2D texture, float widthPercent, float heightPercent, out bool isWater)
+    {
+        int x = Mathf.FloorToInt(texture.width * Mathf.Clamp01(widthPercent));
+        int y = Mathf.FloorToInt(texture.height * Mathf.Clamp01(heightPercent));
+        Color color = texture.GetPixel(x, y);
+        if (colorAverageOffset > 0)
+        {
+            List<Color> colors = new List<Color>();
+            colors.Add(color);
+            colors.Add(texture.GetPixel(x - colorAverageOffset, y - colorAverageOffset));
+            colors.Add(texture.GetPixel(x - colorAverageOffset, y + colorAverageOffset));
+            colors.Add(texture.GetPixel(x + colorAverageOffset, y - colorAverageOffset));
+            colors.Add(texture.GetPixel(x + colorAverageOffset, y + colorAverageOffset));
+            color = ColorComparator.AverageColor(colors.ToArray());
+        }
+        return GetTestedColor(color, out isWater);
+    }
+    private Color GetTestedColor(Color color, out bool isWater)
+    {
+        // limit RGB channels 
+        CompressColor(color);
+        // determine if water color 
+        if (_waterColorsList.Contains(color))
+        {
+            isWater = true;
+        }
+        else
+        {
+            isWater = false;
+            if (!_landColorsList.Contains(color))
+            {
+                // new color, determine if water or land 
+                for (int i = 0; i < _compressedWaterColors.Length; i++)
+                {
+                    float colorDiff = ColorComparator.GetColorDifference(color, _compressedWaterColors[i]);
+
+                    if (colorDiff <= waterCutoff)
+                    {
+                        isWater = true;
+                        break;
+                    }
+                }
+                if (isWater)
+                {
+                    _waterColorsList.Add(color);
+                }
+                else
+                {
+                    _landColorsList.Add(color);
+                }
+            }
+        }
+        return color;
+    }
+
+    private List<Color> _waterColorsList = new List<Color>();
+    private List<Color> _landColorsList = new List<Color>();
+
     void ClearMap()
     {
+        _waterColorsList.Clear();
+        _landColorsList.Clear();
         _pointMaterialsByColor.Clear();
         _meshDicts.Clear();
         for (int i = this.transform.childCount; i > 0; --i)

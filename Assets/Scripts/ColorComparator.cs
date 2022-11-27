@@ -30,4 +30,18 @@ public static class ColorComparator
     }
 
 
+    public static Color AverageColor(params Color[] colors) {
+        if (colors.Length == 0) { return Color.black; }
+        float r = 0f;
+        float g = 0f;
+        float b = 0f;
+        foreach (Color c in colors) {
+            r += c.r;
+            g += c.g;
+            b += c.b;
+        }
+        return new Color(r / colors.Length, g / colors.Length, b / colors.Length);
+    }
+
+
 }
