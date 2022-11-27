@@ -366,6 +366,7 @@ public class WorldCreator : MonoBehaviour
                                 _pointsMeshRenderers[i].sharedMaterial = GetMaterialByColor(color);
                                 _pointsTransforms[i].gameObject.name += isWater ? " W" : " L";
                                 _pointsMeshRenderers[i].enabled = true;
+                                _pointsTransforms[i].gameObject.SetActive(true);
                                 continue;
                             }
                         }
@@ -373,6 +374,7 @@ public class WorldCreator : MonoBehaviour
                         _pointsMeshFilters[i].sharedMesh = null;
                         _pointsMeshRenderers[i].sharedMaterial = null;
                         _pointsMeshRenderers[i].enabled = false;
+                        _pointsTransforms[i].gameObject.SetActive(false);
                     }
                 }
 
