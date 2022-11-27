@@ -38,7 +38,7 @@ public class WorldCreator : MonoBehaviour
 
     [Range(MIN_SPACING, MAX_SPACING)] public float horzSpacing = 0.5f;
     [Range(MIN_SPACING, MAX_SPACING)] public float vertSpacing = 0.5f;
-    [Range(0.1f, 2f)] public float spacingMultiplier = 1f;
+    [Range(0.2f, 2f)] public float spacingMultiplier = 1f;
 
 
     public bool showLand = true;
