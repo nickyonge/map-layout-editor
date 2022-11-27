@@ -344,10 +344,14 @@ public class WorldCreator : MonoBehaviour
                 {
                     bool visible = meshType != MeshType.None;
                     Texture2D texture = (Texture2D)mapMaterial.mainTexture;
-                    _compressedWaterColors = new Color[waterColors.Length];
-                    for (int i = 0; i < _compressedWaterColors.Length; i++)
+                    _compressedWaterColors = new Color[waterColors.Length * 2];
+                    for (int i = 0; i < waterColors.Length; i++)
                     {
-                        _compressedWaterColors[i] = CompressColor(waterColors[i]);
+                        _compressedWaterColors[i] = waterColors[i];
+                    }
+                    for (int i = waterColors.Length; i < waterColors.Length * 2; i++)
+                    {
+                        _compressedWaterColors[i] = CompressColor(waterColors[i - waterColors.Length]);
                     }
                     for (int i = 0; i < _pointsMeshFilters.Length; i++)
                     {
