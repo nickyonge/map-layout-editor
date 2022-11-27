@@ -43,6 +43,7 @@ public class WorldCreator : MonoBehaviour
 
     public bool showLand = true;
     public bool showWater = false;
+    public bool showBorder = false;
 
     public Color[] waterColors;
     private Color[] _compressedWaterColors;
@@ -70,6 +71,7 @@ public class WorldCreator : MonoBehaviour
 
     private float _lastWidth;
     private float _lastHeight;
+    private bool _lastShowBorder;
     private float _lastPointSizeMultiplier;
     private bool _lastDynamicPointSize;
     private bool _lastShowLand;
@@ -158,6 +160,7 @@ public class WorldCreator : MonoBehaviour
             bool hardRedraw =
                 _mapPointsContainer == null ||
                 transform.childCount != 2 ||
+                showBorder != _lastShowBorder ||
                 _pointsMeshFilters == null || _pointsMeshFilters.Length == 0 ||
                 _pointsMeshRenderers == null || _pointsMeshRenderers.Length == 0 ||
                 _pointsTransforms == null || _pointsTransforms.Length == 0 ||
@@ -211,10 +214,14 @@ public class WorldCreator : MonoBehaviour
                 int rows = Mathf.RoundToInt(height / (vertSpacing * spacingMultiplier)) + 1;
                 int columns = Mathf.RoundToInt(width / (horzSpacing * spacingMultiplier)) + 1;
 
+                if (rows < 2) { rows = 2; }
+                if (columns < 2) { columns = 2; }
+
                 // determine if recalculation is ACTUALLY needed 
 
                 if (forceRedraw ||
                     width != _lastWidth ||
+                    showBorder != _lastShowBorder ||
                     height != _lastHeight ||
                     rows != _lastRows ||
                     columns != _lastColumns)
@@ -230,27 +237,33 @@ public class WorldCreator : MonoBehaviour
                     _mapPointsContainer.transform.localEulerAngles = Vector3.zero;
                     _mapPointsContainer.transform.localScale = Vector3.one;
 
-                    _pointsTransforms = new Transform[rows * columns];
-                    _pointsMeshFilters = new MeshFilter[rows * columns];
-                    _pointsMeshRenderers = new MeshRenderer[rows * columns];
-                    _pointsPositions = new Vector2[rows * columns];
-                    int index = 0;
+                    int totalCount = showBorder ?
+                        rows * columns :
+                        (rows - 2) * (columns - 2);
 
-                    if (rows < 2) { rows = 2; }
-                    if (columns < 2) { columns = 2; }
+                    _pointsTransforms = new Transform[totalCount];
+                    _pointsMeshFilters = new MeshFilter[totalCount];
+                    _pointsMeshRenderers = new MeshRenderer[totalCount];
+                    _pointsPositions = new Vector2[totalCount];
+                    int index = 0;
 
                     _columnSpacing = width / (columns - 1);
                     _rowSpacing = height / (rows - 1);
 
+                    int rowStart = showBorder ? 0 : 1;
+                    int rowEnd = showBorder ? rows : rows - 1;
+                    int columnStart = showBorder ? 0 : 1;
+                    int columnEnd = showBorder ? columns : columns - 1;
+
                     // create points 
-                    for (int i = 0; i < rows; i++)
+                    for (int i = rowStart; i < rowEnd; i++)
                     {
                         GameObject r = new GameObject($"Row {i}");
                         r.transform.SetParent(_mapPointsContainer.transform);
                         r.transform.localPosition = new Vector3(0, (_rowSpacing * i), 0);
                         r.transform.localEulerAngles = Vector3.zero;
                         r.transform.localScale = Vector3.one;
-                        for (int j = 0; j < columns; j++)
+                        for (int j = columnStart; j < columnEnd; j++)
                         {
                             GameObject pt = new GameObject($"Point {i}:{j}");
                             pt.transform.SetParent(r.transform);
@@ -273,6 +286,7 @@ public class WorldCreator : MonoBehaviour
                 // reset values 
                 _lastWidth = width;
                 _lastHeight = height;
+                _lastShowBorder = showBorder;
                 _lastHorzSpacing = horzSpacing;
                 _lastVertSpacing = vertSpacing;
                 _lastSpacingMultiplier = spacingMultiplier;
