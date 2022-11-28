@@ -24,14 +24,15 @@ public class WorldCreator : MonoBehaviour
     private static bool _updating = false;
 
     [Header("Generation Properties")]
-    [SerializeField] private bool GenerateOnAwake = true;
+    [SerializeField] private bool GenerateOnStartAndAwake = true;
     [SerializeField] private bool GenerateOnValidate = true;
     [SerializeField] private bool GenerateOnEnable = true;
     [SerializeField] private bool ClearOnDisable = true;
-    [SerializeField] private bool AllowGeneratedContentSave = false;
+    [SerializeField, Space(5)] private bool AllowGeneratedContentSave = false;
     [SerializeField, Space(5)] private bool ForceReGenerate = false;
 
-    
+
+    [Header("Map and Grid Size")]
 
     [Delayed] public float width = 20f;
     [Delayed] public float height = 10f;
@@ -117,20 +118,25 @@ public class WorldCreator : MonoBehaviour
     [ExecuteInEditMode]
     void Start()
     {
-        GenerateMap();
+        if (GenerateOnStartAndAwake) { GenerateMap(); }
     }
-    
+    [ExecuteInEditMode]
+    void Awake()
+    {
+        if (GenerateOnStartAndAwake) { GenerateMap(); }
+    }
+
     void OnEnable()
     {
-        GenerateMap();
+        if (GenerateOnEnable) { GenerateMap(); }
     }
     void OnDisable()
     {
-        ClearMap();
+        if (ClearOnDisable) { ClearMap(); }
     }
 
     [ExecuteInEditMode]
-    void Update()
+    private void Update()
     {
         if (ForceReGenerate)
         {
@@ -141,7 +147,10 @@ public class WorldCreator : MonoBehaviour
 #if UNITY_EDITOR
     private void OnValidate()
     {
-        UnityEditor.EditorApplication.delayCall += GenerateMap;
+        if (GenerateOnValidate || ForceReGenerate)
+        {
+            UnityEditor.EditorApplication.delayCall += GenerateMap;
+        }
     }
 #endif
 
@@ -241,7 +250,8 @@ public class WorldCreator : MonoBehaviour
 
                     // create container 
                     _mapPointsContainer = new GameObject("Map Points Container");
-                    _mapPointsContainer.hideFlags = HideFlags.DontSave;
+                    _mapPointsContainer.hideFlags = AllowGeneratedContentSave ?
+                        HideFlags.None : HideFlags.DontSave;
                     _mapPointsContainer.transform.SetParent(transform);
                     _mapPointsContainer.transform.localPosition = new Vector3(
                         width * -0.5f, height * -0.5f, 0);
@@ -270,7 +280,8 @@ public class WorldCreator : MonoBehaviour
                     for (int i = rowStart; i < rowEnd; i++)
                     {
                         GameObject r = new GameObject($"Row {i}");
-                        r.hideFlags = HideFlags.DontSave;
+                        r.hideFlags = AllowGeneratedContentSave ?
+                            HideFlags.None : HideFlags.DontSave;
                         r.transform.SetParent(_mapPointsContainer.transform);
                         r.transform.localPosition = new Vector3(0, (_rowSpacing * i), 0);
                         r.transform.localEulerAngles = Vector3.zero;
@@ -278,7 +289,8 @@ public class WorldCreator : MonoBehaviour
                         for (int j = columnStart; j < columnEnd; j++)
                         {
                             GameObject pt = new GameObject($"Point {i}:{j}");
-                            pt.hideFlags = HideFlags.DontSave;
+                            pt.hideFlags = AllowGeneratedContentSave ?
+                                HideFlags.None : HideFlags.DontSave;
                             pt.transform.SetParent(r.transform);
                             pt.transform.localPosition = new Vector3(j * _columnSpacing, 0f, 0f);
                             pt.transform.localEulerAngles = Vector3.zero;
@@ -318,7 +330,8 @@ public class WorldCreator : MonoBehaviour
                 {
                     newMap = true;
                     _mapGraphic = GameObject.Instantiate(_quadPrimitive);
-                    _mapGraphic.hideFlags = HideFlags.DontSave;
+                    _mapGraphic.hideFlags = AllowGeneratedContentSave ?
+                        HideFlags.None : HideFlags.DontSave;
                     _mapGraphic.SetActive(true);
                     _mapGraphic.name = "Map Graphic";
                     _mapGraphic.transform.SetParent(transform);
@@ -505,7 +518,8 @@ public class WorldCreator : MonoBehaviour
             _quadPrimitive = GameObject.CreatePrimitive(PrimitiveType.Quad);
             if (_quadPrimitive.TryGetComponent(out Collider collider)) { DestroyGivenObject(collider); }
             _quadPrimitive.name = "Quad Primitive";
-            _quadPrimitive.hideFlags = HideFlags.HideAndDontSave;
+            _quadPrimitive.hideFlags = AllowGeneratedContentSave ?
+                HideFlags.HideInHierarchy : HideFlags.HideAndDontSave;
             _quadPrimitive.transform.position = Vector3.zero;
             _quadPrimitive.transform.eulerAngles = Vector3.zero;
             _quadPrimitive.transform.localScale = Vector3.one;
@@ -521,7 +535,8 @@ public class WorldCreator : MonoBehaviour
             _cubePrimitive = GameObject.CreatePrimitive(PrimitiveType.Cube);
             if (_cubePrimitive.TryGetComponent(out Collider collider)) { DestroyGivenObject(collider); }
             _cubePrimitive.name = "Cube Primitive";
-            _cubePrimitive.hideFlags = HideFlags.HideAndDontSave;
+            _cubePrimitive.hideFlags = AllowGeneratedContentSave ?
+                HideFlags.HideInHierarchy : HideFlags.HideAndDontSave;
             _cubePrimitive.transform.position = Vector3.zero;
             _cubePrimitive.transform.eulerAngles = Vector3.zero;
             _cubePrimitive.transform.localScale = Vector3.one;
@@ -537,7 +552,8 @@ public class WorldCreator : MonoBehaviour
             _spherePrimitive = GameObject.CreatePrimitive(PrimitiveType.Sphere);
             if (_spherePrimitive.TryGetComponent(out Collider collider)) { DestroyGivenObject(collider); }
             _spherePrimitive.name = "Sphere Primitive";
-            _spherePrimitive.hideFlags = HideFlags.HideAndDontSave;
+            _spherePrimitive.hideFlags = AllowGeneratedContentSave ?
+                HideFlags.HideInHierarchy : HideFlags.HideAndDontSave;
             _spherePrimitive.transform.position = Vector3.zero;
             _spherePrimitive.transform.eulerAngles = Vector3.zero;
             _spherePrimitive.transform.localScale = Vector3.one;
