@@ -436,7 +436,7 @@ public class WorldCreator : MonoBehaviour
                     colorCompressionLevel != _lastColorCompressionLevel)
                 {
                     bool meshTypeIsVisible = pointMeshType != MeshType.None;
-                    _compressedWaterColors = new Color[waterColors.Length * 2];
+                    _compressedWaterColors = new Color[(waterColors.Length * 2) + 1];
                     for (int i = 0; i < waterColors.Length; i++)
                     {
                         _compressedWaterColors[i] = waterColors[i];
@@ -445,6 +445,7 @@ public class WorldCreator : MonoBehaviour
                     {
                         _compressedWaterColors[i] = CompressColor(waterColors[i - waterColors.Length]);
                     }
+                    _compressedWaterColors[_compressedWaterColors.Length - 1] = Color.black;// add black to very end of array 
                     for (int i = 0; i < _pointIsVisible.Length; i++)
                     {
                         if (_pointIsVisible[i])
@@ -659,19 +660,25 @@ public class WorldCreator : MonoBehaviour
     {
         int x = Mathf.FloorToInt(texture.width * Mathf.Clamp01(widthPercent));
         int y = Mathf.FloorToInt(texture.height * Mathf.Clamp01(heightPercent));
+
+        // TODO: this line is EXPENSIVE, find a better way 
         Color color = texture.GetPixel(x, y);
+
         if (colorAverageOffset > 0)
         {
-            List<Color> colors = new List<Color>();
-            colors.Add(color);
-            colors.Add(texture.GetPixel(x - colorAverageOffset, y - colorAverageOffset));
-            colors.Add(texture.GetPixel(x - colorAverageOffset, y + colorAverageOffset));
-            colors.Add(texture.GetPixel(x + colorAverageOffset, y - colorAverageOffset));
-            colors.Add(texture.GetPixel(x + colorAverageOffset, y + colorAverageOffset));
+            List<Color> colors = new()
+            {
+                color,
+                texture.GetPixel(x - colorAverageOffset, y - colorAverageOffset),
+                texture.GetPixel(x - colorAverageOffset, y + colorAverageOffset),
+                texture.GetPixel(x + colorAverageOffset, y - colorAverageOffset),
+                texture.GetPixel(x + colorAverageOffset, y + colorAverageOffset)
+            };
             color = ColorComparator.AverageColor(colors.ToArray());
         }
         return GetTestedColor(color, out isWater);
     }
+
     private Color GetTestedColor(Color color, out bool isWater)
     {
         // limit RGB channels 
