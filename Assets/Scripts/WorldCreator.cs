@@ -55,6 +55,7 @@ public class WorldCreator : MonoBehaviour
     public bool showLand = true;
     public bool showWater = false;
     public bool showBorder = false;
+    public bool generateHiddenSurfaces = false;
 
 
 
@@ -81,10 +82,13 @@ public class WorldCreator : MonoBehaviour
     private GameObject _mapPointsContainer;
     private GameObject _mapGraphic;
 
+    private bool[] _pointIsVisible = new bool[0];
     private Transform[] _pointsTransforms = new Transform[0];
     private MeshFilter[] _pointsMeshFilters = new MeshFilter[0];
     private MeshRenderer[] _pointsMeshRenderers = new MeshRenderer[0];
     private Vector2[] _pointsPositions = new Vector2[0];
+    private Color[] _pointsColor = new Color[0];
+    private bool[] _pointIsWater = new bool[0];
 
 
 
@@ -95,6 +99,7 @@ public class WorldCreator : MonoBehaviour
     private bool _lastDynamicPointSize;
     private bool _lastShowLand;
     private bool _lastShowWater;
+    private bool _lastGenerateHiddenSurfaces = false;
     private int _lastColorAverageOffset;
     private Color[] _lastWaterColors;
     private float _lastWaterCutoff;
@@ -104,6 +109,14 @@ public class WorldCreator : MonoBehaviour
     private float _lastVertSpacing;
     private float _lastSpacingMultiplier;
     private MeshType _lastPointMeshType;
+
+
+    private readonly List<Color> _waterColorsList = new();
+    private readonly List<Color> _landColorsList = new();
+
+    private Dictionary<Color, Material> _pointMaterialsByColor = new();
+    private Dictionary<MeshType, Dictionary<Color, Mesh>> _meshDicts = new Dictionary<MeshType, Dictionary<Color, Mesh>>();
+
 
     private int _lastRows;
     private int _lastColumns;
@@ -190,14 +203,23 @@ public class WorldCreator : MonoBehaviour
             bool hardRedraw =
                 _mapPointsContainer == null ||
                 transform.childCount != 2 ||
+                showLand != _lastShowLand ||
+                showWater != _lastShowWater ||
                 showBorder != _lastShowBorder ||
+                generateHiddenSurfaces != _lastGenerateHiddenSurfaces ||
+                _pointIsVisible == null || _pointIsVisible.Length == 0 ||
                 _pointsMeshFilters == null || _pointsMeshFilters.Length == 0 ||
                 _pointsMeshRenderers == null || _pointsMeshRenderers.Length == 0 ||
                 _pointsTransforms == null || _pointsTransforms.Length == 0 ||
                 _pointsPositions == null || _pointsPositions.Length == 0 ||
+                _pointIsWater == null || _pointIsWater.Length == 0 ||
+                _pointsColor == null || _pointsColor.Length == 0 ||
 
+                _pointIsVisible.Length != _pointsMeshRenderers.Length ||
                 _pointsMeshFilters.Length != _pointsMeshRenderers.Length ||
                 _pointsPositions.Length != _pointsMeshRenderers.Length ||
+                _pointIsWater.Length != _pointsMeshRenderers.Length ||
+                _pointsColor.Length != _pointsMeshRenderers.Length ||
                 _pointsTransforms.Length != _pointsMeshRenderers.Length;
 
             bool softRedraw = hardRedraw ||
@@ -221,9 +243,7 @@ public class WorldCreator : MonoBehaviour
             else if (
                 pointSizeMultiplier != _lastPointSizeMultiplier ||
                 dynamicPointSize != _lastDynamicPointSize ||
-                showLand != _lastShowLand ||
                 colorAverageOffset != _lastColorAverageOffset ||
-                showWater != _lastShowWater ||
                 waterColors != _lastWaterColors ||
                 waterCutoff != _lastWaterCutoff ||
                 colorCompressionLevel != _lastColorCompressionLevel ||
@@ -278,7 +298,11 @@ public class WorldCreator : MonoBehaviour
                     _pointsMeshFilters = new MeshFilter[totalCount];
                     _pointsMeshRenderers = new MeshRenderer[totalCount];
                     _pointsPositions = new Vector2[totalCount];
-                    int index = 0;
+                    _pointIsVisible = new bool[totalCount];
+                    _pointIsWater = new bool[totalCount];
+                    _pointsColor = new Color[totalCount];
+
+                    int index = -1;// start at -1, because it gets incremented at START of the loop 
 
                     _columnSpacing = width / (columns - 1);
                     _rowSpacing = height / (rows - 1);
@@ -288,9 +312,15 @@ public class WorldCreator : MonoBehaviour
                     int columnStart = showBorder ? 0 : 1;
                     int columnEnd = showBorder ? columns : columns - 1;
 
+                    // get reference to texture 
+                    Texture2D texture = (Texture2D)mapMaterial.mainTexture;
+
                     // create points 
                     for (int i = rowStart; i < rowEnd; i++)
                     {
+                        index++;
+
+                        // generate the ROW object 
                         GameObject r = new GameObject($"Row {i}");
                         r.hideFlags = AllowGeneratedContentSave ?
                             HideFlags.None : HideFlags.DontSave;
@@ -298,24 +328,39 @@ public class WorldCreator : MonoBehaviour
                         r.transform.localPosition = new Vector3(0, (_rowSpacing * i), 0);
                         r.transform.localEulerAngles = Vector3.zero;
                         r.transform.localScale = Vector3.one;
+
                         for (int j = columnStart; j < columnEnd; j++)
                         {
-                            GameObject pt = new GameObject($"Point {i}:{j}");
-                            pt.hideFlags = AllowGeneratedContentSave ?
-                                HideFlags.None : HideFlags.DontSave;
-                            pt.transform.SetParent(r.transform);
-                            pt.transform.localPosition = new Vector3(j * _columnSpacing, 0f, 0f);
-                            pt.transform.localEulerAngles = Vector3.zero;
-                            MeshFilter mf = pt.AddComponent<MeshFilter>();
-                            // mf.sharedMesh = GetMeshType(meshType);
-                            MeshRenderer mr = pt.AddComponent<MeshRenderer>();
-                            // mr.sharedMaterial = pointMaterial;
-                            _pointsTransforms[index] = pt.transform;
-                            _pointsMeshFilters[index] = mf;
-                            _pointsMeshRenderers[index] = mr;
+                            // generate the POINT object (in place of the column)
+
+                            Color color = TestPixel(texture, _pointsPositions[i].x, _pointsPositions[i].y, out bool isWater);
+                            bool showSurface = isWater ? showWater : showLand;
+
+                            // properties that are always present 
                             _pointsPositions[index] = new Vector2((float)j / (columns - 1), (float)i / (rows - 1));
-                            mr.enabled = pointMeshType != MeshType.None;
-                            index++;
+                            _pointsColor[index] = color;
+                            _pointIsWater[index] = isWater;
+
+                            bool ptVis = showSurface || generateHiddenSurfaces;
+                            _pointIsVisible[index] = ptVis;
+
+                            if (ptVis)
+                            {
+                            Debug.Log("ptVIs: " + ptVis + ", isWater: " + isWater);
+                                // generate object if necessary 
+                                GameObject pt = new GameObject($"Point {i}:{j}");
+                                pt.hideFlags = AllowGeneratedContentSave ?
+                                    HideFlags.None : HideFlags.DontSave;
+                                pt.transform.SetParent(r.transform);
+                                pt.transform.localPosition = new Vector3(j * _columnSpacing, 0f, 0f);
+                                pt.transform.localEulerAngles = Vector3.zero;
+                                MeshFilter mf = pt.AddComponent<MeshFilter>();
+                                MeshRenderer mr = pt.AddComponent<MeshRenderer>();
+                                _pointsTransforms[index] = pt.transform;
+                                _pointsMeshFilters[index] = mf;
+                                _pointsMeshRenderers[index] = mr;
+
+                            }
                         }
                     }
                 }
@@ -369,21 +414,24 @@ public class WorldCreator : MonoBehaviour
                     }
 
                     Vector3 size = new Vector3(horz, vert, Mathf.Min(horz, vert));
-                    foreach (Transform t in _pointsTransforms)
+                    for (int i = 0; i < _pointIsVisible.Length; i++)
                     {
-                        t.localScale = size;
+                        if (_pointIsVisible[i])
+                        {
+                            _pointsTransforms[i].localScale = size;
+                        }
                     }
                 }
 
                 if (ForceReGenerate || newMap || resetType == ResetType.Full ||
                     showLand != _lastShowLand || showWater != _lastShowWater ||
+                    generateHiddenSurfaces != _lastGenerateHiddenSurfaces ||
                     colorAverageOffset != _lastColorAverageOffset ||
                     waterColors != _lastWaterColors || waterCutoff != _lastWaterCutoff ||
                     _lastPointMeshType != pointMeshType || useColorCompression != _lastUseColorCompression ||
                     colorCompressionLevel != _lastColorCompressionLevel)
                 {
-                    bool visible = pointMeshType != MeshType.None;
-                    Texture2D texture = (Texture2D)mapMaterial.mainTexture;
+                    bool meshTypeIsVisible = pointMeshType != MeshType.None;
                     _compressedWaterColors = new Color[waterColors.Length * 2];
                     for (int i = 0; i < waterColors.Length; i++)
                     {
@@ -393,28 +441,30 @@ public class WorldCreator : MonoBehaviour
                     {
                         _compressedWaterColors[i] = CompressColor(waterColors[i - waterColors.Length]);
                     }
-                    for (int i = 0; i < _pointsMeshFilters.Length; i++)
+                    for (int i = 0; i < _pointIsVisible.Length; i++)
                     {
-                        if (visible)
+                        if (_pointIsVisible[i])
                         {
-                            // yep, visible quad type, determine if surface type is visible 
-                            Color color = TestPixel(texture, _pointsPositions[i].x, _pointsPositions[i].y, out bool isWater);
-                            if (isWater ? showWater : showLand)
+                            if (meshTypeIsVisible)
                             {
-                                // yep, visible point 
-                                _pointsMeshFilters[i].sharedMesh = GetMeshType(pointMeshType, color);
-                                _pointsMeshRenderers[i].sharedMaterial = GetMaterialByColor(color);
-                                _pointsTransforms[i].gameObject.name += isWater ? " W" : " L";
-                                _pointsMeshRenderers[i].enabled = true;
-                                _pointsTransforms[i].gameObject.SetActive(true);
-                                continue;
+                                // yep, visible quad type, determine if surface type is visible 
+                                if (_pointIsWater[i] ? showWater : showLand)
+                                {
+                                    // yep, visible point 
+                                    Color color = _pointsColor[i];
+                                    _pointsMeshFilters[i].sharedMesh = GetMeshType(pointMeshType, color);
+                                    _pointsMeshRenderers[i].sharedMaterial = GetMaterialByColor(color);
+                                    _pointsMeshRenderers[i].enabled = true;
+                                    _pointsTransforms[i].gameObject.SetActive(true);
+                                    continue;
+                                }
                             }
+                            // not visible
+                            _pointsMeshFilters[i].sharedMesh = null;
+                            _pointsMeshRenderers[i].sharedMaterial = null;
+                            _pointsMeshRenderers[i].enabled = false;
+                            _pointsTransforms[i].gameObject.SetActive(false);
                         }
-                        // not visible
-                        _pointsMeshFilters[i].sharedMesh = null;
-                        _pointsMeshRenderers[i].sharedMaterial = null;
-                        _pointsMeshRenderers[i].enabled = false;
-                        _pointsTransforms[i].gameObject.SetActive(false);
                     }
                 }
 
@@ -422,6 +472,7 @@ public class WorldCreator : MonoBehaviour
                 _lastPointSizeMultiplier = pointSizeMultiplier;
                 _lastDynamicPointSize = dynamicPointSize;
                 _lastShowLand = showLand;
+                _lastGenerateHiddenSurfaces = generateHiddenSurfaces;
                 _lastColorAverageOffset = colorAverageOffset;
                 _lastShowWater = showWater;
                 _lastWaterColors = waterColors;
@@ -446,10 +497,9 @@ public class WorldCreator : MonoBehaviour
 
     }
 
-    private Dictionary<Color, Material> _pointMaterialsByColor = new Dictionary<Color, Material>();
     private Material GetMaterialByColor(Color color)
     {
-        if (_pointMaterialsByColor == null) { _pointMaterialsByColor = new Dictionary<Color, Material>(); }
+        if (_pointMaterialsByColor == null) { _pointMaterialsByColor = new(); }
         if (_pointMaterialsByColor.ContainsKey(color))
         {
             return _pointMaterialsByColor[color];
@@ -510,12 +560,11 @@ public class WorldCreator : MonoBehaviour
         }
         else
         {
-            _meshDicts.Add(type, new Dictionary<Color, Mesh>());
+            _meshDicts.Add(type, new());
             return GetMeshType(type, color);
         }
     }
 
-    private Dictionary<MeshType, Dictionary<Color, Mesh>> _meshDicts = new Dictionary<MeshType, Dictionary<Color, Mesh>>();
 
     void CheckPrimitives(bool forceReset = false)
     {
@@ -657,18 +706,26 @@ public class WorldCreator : MonoBehaviour
         return color;
     }
 
-    private List<Color> _waterColorsList = new List<Color>();
-    private List<Color> _landColorsList = new List<Color>();
 
     void ClearMap()
     {
+        // clear lists 
         _waterColorsList.Clear();
         _landColorsList.Clear();
         _pointMaterialsByColor.Clear();
         _meshDicts.Clear();
-        for (int i = this.transform.childCount; i > 0; --i)
+        // clear arrays 
+        _pointIsVisible = new bool[0];
+        _pointsTransforms = new Transform[0];
+        _pointsMeshFilters = new MeshFilter[0];
+        _pointsMeshRenderers = new MeshRenderer[0];
+        _pointsPositions = new Vector2[0];
+        _pointsColor = new Color[0];
+        _pointIsWater = new bool[0];
+        // destroy children 
+        for (int i = transform.childCount; i > 0; --i)
         {
-            DestroyGivenObject(this.transform.GetChild(0).gameObject);
+            DestroyGivenObject(transform.GetChild(0).gameObject);
         }
     }
     void DestroyGivenObject(Object obj)
