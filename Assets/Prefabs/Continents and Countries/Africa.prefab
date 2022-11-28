@@ -55,10 +55,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: Nigeria
       objectReference: {fileID: 0}
-    - target: {fileID: 6176246078717100523, guid: 8853e457a81b2e5489bbdf6b15823226, type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8853e457a81b2e5489bbdf6b15823226, type: 3}
 --- !u!1001 &3316402702495729622
@@ -115,10 +111,6 @@ PrefabInstance:
     - target: {fileID: 6176246078717100523, guid: ae5c89d5cf0b6d340a393519730de4d6, type: 3}
       propertyPath: m_Name
       value: Sudan
-      objectReference: {fileID: 0}
-    - target: {fileID: 6176246078717100523, guid: ae5c89d5cf0b6d340a393519730de4d6, type: 3}
-      propertyPath: m_IsActive
-      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ae5c89d5cf0b6d340a393519730de4d6, type: 3}
@@ -177,10 +169,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: Democratic Republic of the Congo
       objectReference: {fileID: 0}
-    - target: {fileID: 6176246078717100523, guid: e97515c99bfde50408d6a6000c335b52, type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e97515c99bfde50408d6a6000c335b52, type: 3}
 --- !u!1001 &6957731591347271031
@@ -237,10 +225,6 @@ PrefabInstance:
     - target: {fileID: 6176246078717100523, guid: 13a0f8f6731669747999a84c06f7e2b3, type: 3}
       propertyPath: m_Name
       value: Egypt
-      objectReference: {fileID: 0}
-    - target: {fileID: 6176246078717100523, guid: 13a0f8f6731669747999a84c06f7e2b3, type: 3}
-      propertyPath: m_IsActive
-      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 13a0f8f6731669747999a84c06f7e2b3, type: 3}
@@ -355,10 +339,6 @@ PrefabInstance:
     - target: {fileID: 6176246078717100523, guid: 34faddf8cfb58bb4db074aa8c32d0bc2, type: 3}
       propertyPath: m_Name
       value: South Africa
-      objectReference: {fileID: 0}
-    - target: {fileID: 6176246078717100523, guid: 34faddf8cfb58bb4db074aa8c32d0bc2, type: 3}
-      propertyPath: m_IsActive
-      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 34faddf8cfb58bb4db074aa8c32d0bc2, type: 3}
@@ -494,10 +474,6 @@ PrefabInstance:
     - target: {fileID: 6176246078717100523, guid: c59bf92a0bab6c1439bd17315e76b41d, type: 3}
       propertyPath: m_Name
       value: Tanzania
-      objectReference: {fileID: 0}
-    - target: {fileID: 6176246078717100523, guid: c59bf92a0bab6c1439bd17315e76b41d, type: 3}
-      propertyPath: m_IsActive
-      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c59bf92a0bab6c1439bd17315e76b41d, type: 3}

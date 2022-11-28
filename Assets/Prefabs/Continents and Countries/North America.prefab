@@ -135,68 +135,7 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 8946513083090724848, guid: e1b169a3833352d499475b984130aebe, type: 3}
   m_PrefabInstance: {fileID: 2005827609383059975}
   m_PrefabAsset: {fileID: 0}
---- !u!1001 &6661844239851662193
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    m_TransformParent: {fileID: 7493505628715034103}
-    m_Modifications:
-    - target: {fileID: 659263974289156976, guid: ae06b0619c5fc1848a7db3ab494af928, type: 3}
-      propertyPath: m_Name
-      value: United States
-      objectReference: {fileID: 0}
-    - target: {fileID: 659263974289156976, guid: ae06b0619c5fc1848a7db3ab494af928, type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6318210836701514345, guid: ae06b0619c5fc1848a7db3ab494af928, type: 3}
-      propertyPath: m_RootOrder
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 6318210836701514345, guid: ae06b0619c5fc1848a7db3ab494af928, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6318210836701514345, guid: ae06b0619c5fc1848a7db3ab494af928, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6318210836701514345, guid: ae06b0619c5fc1848a7db3ab494af928, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6318210836701514345, guid: ae06b0619c5fc1848a7db3ab494af928, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 6318210836701514345, guid: ae06b0619c5fc1848a7db3ab494af928, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6318210836701514345, guid: ae06b0619c5fc1848a7db3ab494af928, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6318210836701514345, guid: ae06b0619c5fc1848a7db3ab494af928, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6318210836701514345, guid: ae06b0619c5fc1848a7db3ab494af928, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6318210836701514345, guid: ae06b0619c5fc1848a7db3ab494af928, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6318210836701514345, guid: ae06b0619c5fc1848a7db3ab494af928, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: ae06b0619c5fc1848a7db3ab494af928, type: 3}
---- !u!1001 &6733470207426898292
+--- !u!1001 &3669613129266116422
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
@@ -206,10 +145,6 @@ PrefabInstance:
     - target: {fileID: 659263974289156976, guid: 0841b12d6d7742b4785175aa3b83e9c4, type: 3}
       propertyPath: m_Name
       value: Mexico
-      objectReference: {fileID: 0}
-    - target: {fileID: 659263974289156976, guid: 0841b12d6d7742b4785175aa3b83e9c4, type: 3}
-      propertyPath: m_IsActive
-      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6318210836701514345, guid: 0841b12d6d7742b4785175aa3b83e9c4, type: 3}
       propertyPath: m_RootOrder
@@ -257,3 +192,60 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0841b12d6d7742b4785175aa3b83e9c4, type: 3}
+--- !u!1001 &6733470207426898292
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 7493505628715034103}
+    m_Modifications:
+    - target: {fileID: 659263974289156976, guid: ae06b0619c5fc1848a7db3ab494af928, type: 3}
+      propertyPath: m_Name
+      value: United States
+      objectReference: {fileID: 0}
+    - target: {fileID: 6318210836701514345, guid: ae06b0619c5fc1848a7db3ab494af928, type: 3}
+      propertyPath: m_RootOrder
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6318210836701514345, guid: ae06b0619c5fc1848a7db3ab494af928, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6318210836701514345, guid: ae06b0619c5fc1848a7db3ab494af928, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6318210836701514345, guid: ae06b0619c5fc1848a7db3ab494af928, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6318210836701514345, guid: ae06b0619c5fc1848a7db3ab494af928, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6318210836701514345, guid: ae06b0619c5fc1848a7db3ab494af928, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6318210836701514345, guid: ae06b0619c5fc1848a7db3ab494af928, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6318210836701514345, guid: ae06b0619c5fc1848a7db3ab494af928, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6318210836701514345, guid: ae06b0619c5fc1848a7db3ab494af928, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6318210836701514345, guid: ae06b0619c5fc1848a7db3ab494af928, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6318210836701514345, guid: ae06b0619c5fc1848a7db3ab494af928, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: ae06b0619c5fc1848a7db3ab494af928, type: 3}

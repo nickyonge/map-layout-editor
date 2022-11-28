@@ -13,11 +13,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8942809763949955308, guid: 81ad5c6b2483fc44d9dea463b5ebe8a8, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: -0.3909999
       objectReference: {fileID: 0}
     - target: {fileID: 8942809763949955308, guid: 81ad5c6b2483fc44d9dea463b5ebe8a8, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1
+      value: -2.2980003
       objectReference: {fileID: 0}
     - target: {fileID: 8942809763949955308, guid: 81ad5c6b2483fc44d9dea463b5ebe8a8, type: 3}
       propertyPath: m_LocalPosition.z
@@ -123,6 +123,10 @@ PrefabInstance:
     - target: {fileID: 8141846284613562433, guid: 2afb8f90a98902240b07a4d3ee8940e2, type: 3}
       propertyPath: m_Name
       value: Egypt
+      objectReference: {fileID: 0}
+    - target: {fileID: 8141846284613562433, guid: 2afb8f90a98902240b07a4d3ee8940e2, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 2afb8f90a98902240b07a4d3ee8940e2, type: 3}

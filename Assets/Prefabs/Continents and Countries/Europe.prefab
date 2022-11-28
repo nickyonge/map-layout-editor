@@ -55,10 +55,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: Portugal
       objectReference: {fileID: 0}
-    - target: {fileID: 6176246078717100523, guid: cd6a205d14b813c46a872a603728b040, type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: cd6a205d14b813c46a872a603728b040, type: 3}
 --- !u!1001 &2042000729560429496
@@ -115,10 +111,6 @@ PrefabInstance:
     - target: {fileID: 6176246078717100523, guid: 2a93f9cd25d1cbc43a59f6be0855debb, type: 3}
       propertyPath: m_Name
       value: France
-      objectReference: {fileID: 0}
-    - target: {fileID: 6176246078717100523, guid: 2a93f9cd25d1cbc43a59f6be0855debb, type: 3}
-      propertyPath: m_IsActive
-      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 2a93f9cd25d1cbc43a59f6be0855debb, type: 3}
@@ -255,10 +247,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: Spain
       objectReference: {fileID: 0}
-    - target: {fileID: 6176246078717100523, guid: 8e4fb35832561fc4d8b1f7591f10fb09, type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8e4fb35832561fc4d8b1f7591f10fb09, type: 3}
 --- !u!1001 &8522405199014013075
@@ -315,10 +303,6 @@ PrefabInstance:
     - target: {fileID: 6176246078717100523, guid: 1a0f3c0172eb13542aaeae043e0c0fdb, type: 3}
       propertyPath: m_Name
       value: United Kingdom
-      objectReference: {fileID: 0}
-    - target: {fileID: 6176246078717100523, guid: 1a0f3c0172eb13542aaeae043e0c0fdb, type: 3}
-      propertyPath: m_IsActive
-      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 1a0f3c0172eb13542aaeae043e0c0fdb, type: 3}
