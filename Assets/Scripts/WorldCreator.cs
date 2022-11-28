@@ -23,6 +23,16 @@ public class WorldCreator : MonoBehaviour
 
     private static bool _updating = false;
 
+    [Header("Generation Properties")]
+    [SerializeField] private bool GenerateOnAwake = true;
+    [SerializeField] private bool GenerateOnValidate = true;
+    [SerializeField] private bool GenerateOnEnable = true;
+    [SerializeField] private bool ClearOnDisable = true;
+    [SerializeField] private bool AllowGeneratedContentSave = false;
+    [SerializeField, Space(5)] private bool ForceReGenerate = false;
+
+    
+
     [Delayed] public float width = 20f;
     [Delayed] public float height = 10f;
 
@@ -103,30 +113,26 @@ public class WorldCreator : MonoBehaviour
     private bool _initialized = false;
 
 
-    [SerializeField] private bool forceRedraw = false;
-
 
     [ExecuteInEditMode]
     void Start()
     {
         GenerateMap();
     }
-
-    void OnInspectorGUI()
-    {
-        GenerateMap();
-    }
+    
     void OnEnable()
     {
         GenerateMap();
-
-
+    }
+    void OnDisable()
+    {
+        ClearMap();
     }
 
     [ExecuteInEditMode]
     void Update()
     {
-        if (forceRedraw)
+        if (ForceReGenerate)
         {
             GenerateMap();
         }
@@ -142,18 +148,22 @@ public class WorldCreator : MonoBehaviour
 
     void GenerateMap()
     {
-        // Debug.Log("Generating map...");
+        if (!gameObject.activeInHierarchy)
+        {
+            // will not generate while inactive 
+            return;
+        }
 
         if (_updating) { return; }
         _updating = true;
 
         ResetType resetType = ResetType.None;
 
-        if (!_initialized || forceRedraw)
+        if (!_initialized || ForceReGenerate)
         {
             resetType = ResetType.Full;
             _initialized = true;
-            forceRedraw = true;
+            ForceReGenerate = true;
         }
         else
         {
@@ -183,7 +193,7 @@ public class WorldCreator : MonoBehaviour
                 // check for parenting issue 
                 if (hardRedraw)
                 {
-                    forceRedraw = true;// gotta recreate the hierarchy, force redraw 
+                    ForceReGenerate = true;// gotta recreate the hierarchy, force redraw 
                 }
                 // scale changed
                 resetType = ResetType.Full;
@@ -204,7 +214,7 @@ public class WorldCreator : MonoBehaviour
             }
         }
 
-        CheckPrimitives(forceRedraw);
+        CheckPrimitives(ForceReGenerate);
 
         switch (resetType)
         {
@@ -219,7 +229,7 @@ public class WorldCreator : MonoBehaviour
 
                 // determine if recalculation is ACTUALLY needed 
 
-                if (forceRedraw ||
+                if (ForceReGenerate ||
                     width != _lastWidth ||
                     showBorder != _lastShowBorder ||
                     height != _lastHeight ||
@@ -231,6 +241,7 @@ public class WorldCreator : MonoBehaviour
 
                     // create container 
                     _mapPointsContainer = new GameObject("Map Points Container");
+                    _mapPointsContainer.hideFlags = HideFlags.DontSave;
                     _mapPointsContainer.transform.SetParent(transform);
                     _mapPointsContainer.transform.localPosition = new Vector3(
                         width * -0.5f, height * -0.5f, 0);
@@ -259,6 +270,7 @@ public class WorldCreator : MonoBehaviour
                     for (int i = rowStart; i < rowEnd; i++)
                     {
                         GameObject r = new GameObject($"Row {i}");
+                        r.hideFlags = HideFlags.DontSave;
                         r.transform.SetParent(_mapPointsContainer.transform);
                         r.transform.localPosition = new Vector3(0, (_rowSpacing * i), 0);
                         r.transform.localEulerAngles = Vector3.zero;
@@ -266,6 +278,7 @@ public class WorldCreator : MonoBehaviour
                         for (int j = columnStart; j < columnEnd; j++)
                         {
                             GameObject pt = new GameObject($"Point {i}:{j}");
+                            pt.hideFlags = HideFlags.DontSave;
                             pt.transform.SetParent(r.transform);
                             pt.transform.localPosition = new Vector3(j * _columnSpacing, 0f, 0f);
                             pt.transform.localEulerAngles = Vector3.zero;
@@ -305,6 +318,7 @@ public class WorldCreator : MonoBehaviour
                 {
                     newMap = true;
                     _mapGraphic = GameObject.Instantiate(_quadPrimitive);
+                    _mapGraphic.hideFlags = HideFlags.DontSave;
                     _mapGraphic.SetActive(true);
                     _mapGraphic.name = "Map Graphic";
                     _mapGraphic.transform.SetParent(transform);
@@ -316,7 +330,7 @@ public class WorldCreator : MonoBehaviour
                 _mapGraphic.transform.localScale = new Vector3(width, height, 1);
 
                 // get all meshrenderers in map points container 
-                if (forceRedraw || resetType == ResetType.Full ||
+                if (ForceReGenerate || resetType == ResetType.Full ||
                     _lastPointSizeMultiplier != pointSizeMultiplier ||
                     _lastDynamicPointSize != dynamicPointSize)
                 {
@@ -336,7 +350,7 @@ public class WorldCreator : MonoBehaviour
                     }
                 }
 
-                if (forceRedraw || newMap || resetType == ResetType.Full ||
+                if (ForceReGenerate || newMap || resetType == ResetType.Full ||
                     showLand != _lastShowLand || showWater != _lastShowWater ||
                     colorAverageOffset != _lastColorAverageOffset ||
                     waterColors != _lastWaterColors || waterCutoff != _lastWaterCutoff ||
@@ -400,7 +414,7 @@ public class WorldCreator : MonoBehaviour
                 break;
         }
 
-        forceRedraw = false;
+        ForceReGenerate = false;
         _updating = false;
 
     }
@@ -491,7 +505,7 @@ public class WorldCreator : MonoBehaviour
             _quadPrimitive = GameObject.CreatePrimitive(PrimitiveType.Quad);
             if (_quadPrimitive.TryGetComponent(out Collider collider)) { DestroyGivenObject(collider); }
             _quadPrimitive.name = "Quad Primitive";
-            _quadPrimitive.hideFlags = HideFlags.HideInHierarchy;
+            _quadPrimitive.hideFlags = HideFlags.HideAndDontSave;
             _quadPrimitive.transform.position = Vector3.zero;
             _quadPrimitive.transform.eulerAngles = Vector3.zero;
             _quadPrimitive.transform.localScale = Vector3.one;
@@ -507,7 +521,7 @@ public class WorldCreator : MonoBehaviour
             _cubePrimitive = GameObject.CreatePrimitive(PrimitiveType.Cube);
             if (_cubePrimitive.TryGetComponent(out Collider collider)) { DestroyGivenObject(collider); }
             _cubePrimitive.name = "Cube Primitive";
-            _cubePrimitive.hideFlags = HideFlags.HideInHierarchy;
+            _cubePrimitive.hideFlags = HideFlags.HideAndDontSave;
             _cubePrimitive.transform.position = Vector3.zero;
             _cubePrimitive.transform.eulerAngles = Vector3.zero;
             _cubePrimitive.transform.localScale = Vector3.one;
@@ -523,7 +537,7 @@ public class WorldCreator : MonoBehaviour
             _spherePrimitive = GameObject.CreatePrimitive(PrimitiveType.Sphere);
             if (_spherePrimitive.TryGetComponent(out Collider collider)) { DestroyGivenObject(collider); }
             _spherePrimitive.name = "Sphere Primitive";
-            _spherePrimitive.hideFlags = HideFlags.HideInHierarchy;
+            _spherePrimitive.hideFlags = HideFlags.HideAndDontSave;
             _spherePrimitive.transform.position = Vector3.zero;
             _spherePrimitive.transform.eulerAngles = Vector3.zero;
             _spherePrimitive.transform.localScale = Vector3.one;
