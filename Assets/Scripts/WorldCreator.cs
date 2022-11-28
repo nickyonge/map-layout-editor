@@ -21,7 +21,9 @@ public class WorldCreator : MonoBehaviour
         None,
     }
 
-    private static bool _updating = false;
+
+    const float MIN_SPACING = 0.5f;
+    const float MAX_SPACING = 2f;
 
     [Header("Generation Properties")]
     [SerializeField] private bool GenerateOnStartAndAwake = true;
@@ -37,35 +39,41 @@ public class WorldCreator : MonoBehaviour
     [Delayed] public float width = 20f;
     [Delayed] public float height = 10f;
 
-
-    [Range(0.001f, 2f)] public float pointSizeMultiplier = 0.75f;
-    public bool dynamicPointSize = true;
-
-    private const int MAX_MATERIAL_COMPRESSION = 101;
-    [Range(1, MAX_MATERIAL_COMPRESSION)] public int materialCompression = 20;
-
-    const float MIN_SPACING = 0.5f;
-    const float MAX_SPACING = 2f;
-
     [Range(MIN_SPACING, MAX_SPACING)] public float horzSpacing = 0.5f;
     [Range(MIN_SPACING, MAX_SPACING)] public float vertSpacing = 0.5f;
-    [Range(0.2f, 2f)] public float spacingMultiplier = 1f;
+    [Range(0.2f, 2f)] public float spacingUniformMultiplier = 1f;
 
 
+
+    [Header("Point Display Properties")]
+    [Range(0.001f, 2f)] public float pointSizeMultiplier = 0.75f;
+    public bool dynamicPointSize = true;
+    public MeshType pointMeshType;
+
+
+    [Header("Surface Display Options")]
     public bool showLand = true;
     public bool showWater = false;
     public bool showBorder = false;
 
-    public Color[] waterColors;
-    private Color[] _compressedWaterColors;
-    [Range(0, 1)] public float waterCutoff = 0.3f;
 
+
+    [Header("Color Compression")]
+    private const int MAX_COLOR_COMPRESSION = 32;
+    public bool useColorCompression = false;
+    [Range(0, MAX_COLOR_COMPRESSION)] public int colorCompressionLevel = 20;
     [Range(0, 5)] public int colorAverageOffset = 0;
 
 
 
-    public MeshType meshType;
+    [Header("Water Color Detection")]
+    [Space(5)] public Color[] waterColors;
+    private Color[] _compressedWaterColors;
+    [Range(0, 1)] public float waterCutoff = 0.3f;
 
+
+
+    [Header("Materials References")]
     public Material mapMaterial;
     public Material pointMaterial;
 
@@ -90,11 +98,12 @@ public class WorldCreator : MonoBehaviour
     private int _lastColorAverageOffset;
     private Color[] _lastWaterColors;
     private float _lastWaterCutoff;
-    private int _lastMaterialCompression;
+    private int _lastColorCompressionLevel;
+    private bool _lastUseColorCompression;
     private float _lastHorzSpacing;
     private float _lastVertSpacing;
     private float _lastSpacingMultiplier;
-    private MeshType _lastMeshType;
+    private MeshType _lastPointMeshType;
 
     private int _lastRows;
     private int _lastColumns;
@@ -112,6 +121,8 @@ public class WorldCreator : MonoBehaviour
 
 
     private bool _initialized = false;
+
+    private static bool _updating = false;
 
 
 
@@ -194,7 +205,7 @@ public class WorldCreator : MonoBehaviour
                 height != _lastHeight ||
                 horzSpacing != _lastHorzSpacing ||
                 vertSpacing != _lastVertSpacing ||
-                spacingMultiplier != _lastSpacingMultiplier;
+                spacingUniformMultiplier != _lastSpacingMultiplier;
 
 
             if (softRedraw || hardRedraw)
@@ -215,8 +226,9 @@ public class WorldCreator : MonoBehaviour
                 showWater != _lastShowWater ||
                 waterColors != _lastWaterColors ||
                 waterCutoff != _lastWaterCutoff ||
-                materialCompression != _lastMaterialCompression ||
-                meshType != _lastMeshType)
+                colorCompressionLevel != _lastColorCompressionLevel ||
+                useColorCompression != _lastUseColorCompression ||
+                pointMeshType != _lastPointMeshType)
             {
                 // just appearance changed, point size or source image 
                 resetType = ResetType.AppearanceOnly;
@@ -230,8 +242,8 @@ public class WorldCreator : MonoBehaviour
             case ResetType.Full:
 
                 // determine rows and columns
-                int rows = Mathf.RoundToInt(height / (vertSpacing * spacingMultiplier)) + 1;
-                int columns = Mathf.RoundToInt(width / (horzSpacing * spacingMultiplier)) + 1;
+                int rows = Mathf.RoundToInt(height / (vertSpacing * spacingUniformMultiplier)) + 1;
+                int columns = Mathf.RoundToInt(width / (horzSpacing * spacingUniformMultiplier)) + 1;
 
                 if (rows < 2) { rows = 2; }
                 if (columns < 2) { columns = 2; }
@@ -302,7 +314,7 @@ public class WorldCreator : MonoBehaviour
                             _pointsMeshFilters[index] = mf;
                             _pointsMeshRenderers[index] = mr;
                             _pointsPositions[index] = new Vector2((float)j / (columns - 1), (float)i / (rows - 1));
-                            mr.enabled = meshType != MeshType.None;
+                            mr.enabled = pointMeshType != MeshType.None;
                             index++;
                         }
                     }
@@ -314,7 +326,7 @@ public class WorldCreator : MonoBehaviour
                 _lastShowBorder = showBorder;
                 _lastHorzSpacing = horzSpacing;
                 _lastVertSpacing = vertSpacing;
-                _lastSpacingMultiplier = spacingMultiplier;
+                _lastSpacingMultiplier = spacingUniformMultiplier;
                 _lastRows = rows;
                 _lastColumns = columns;
 
@@ -367,9 +379,10 @@ public class WorldCreator : MonoBehaviour
                     showLand != _lastShowLand || showWater != _lastShowWater ||
                     colorAverageOffset != _lastColorAverageOffset ||
                     waterColors != _lastWaterColors || waterCutoff != _lastWaterCutoff ||
-                    _lastMeshType != meshType || materialCompression != _lastMaterialCompression)
+                    _lastPointMeshType != pointMeshType || useColorCompression != _lastUseColorCompression ||
+                    colorCompressionLevel != _lastColorCompressionLevel)
                 {
-                    bool visible = meshType != MeshType.None;
+                    bool visible = pointMeshType != MeshType.None;
                     Texture2D texture = (Texture2D)mapMaterial.mainTexture;
                     _compressedWaterColors = new Color[waterColors.Length * 2];
                     for (int i = 0; i < waterColors.Length; i++)
@@ -389,7 +402,7 @@ public class WorldCreator : MonoBehaviour
                             if (isWater ? showWater : showLand)
                             {
                                 // yep, visible point 
-                                _pointsMeshFilters[i].sharedMesh = GetMeshType(meshType, color);
+                                _pointsMeshFilters[i].sharedMesh = GetMeshType(pointMeshType, color);
                                 _pointsMeshRenderers[i].sharedMaterial = GetMaterialByColor(color);
                                 _pointsTransforms[i].gameObject.name += isWater ? " W" : " L";
                                 _pointsMeshRenderers[i].enabled = true;
@@ -413,8 +426,9 @@ public class WorldCreator : MonoBehaviour
                 _lastShowWater = showWater;
                 _lastWaterColors = waterColors;
                 _lastWaterCutoff = waterCutoff;
-                _lastMaterialCompression = materialCompression;
-                _lastMeshType = meshType;
+                _lastColorCompressionLevel = colorCompressionLevel;
+                _lastUseColorCompression = useColorCompression;
+                _lastPointMeshType = pointMeshType;
                 break;
 
             case ResetType.None:
@@ -568,11 +582,22 @@ public class WorldCreator : MonoBehaviour
 
     private Color CompressColor(Color color)
     {
-        if (materialCompression > 0 && materialCompression < MAX_MATERIAL_COMPRESSION)
+        if (useColorCompression &&
+            colorCompressionLevel >= 0 && colorCompressionLevel <= MAX_COLOR_COMPRESSION)
         {
-            color.r = Mathf.Round(color.r * materialCompression) / materialCompression;
-            color.g = Mathf.Round(color.g * materialCompression) / materialCompression;
-            color.b = Mathf.Round(color.b * materialCompression) / materialCompression;
+            if (colorCompressionLevel == 0)
+            {
+                int c = Mathf.RoundToInt((color.r + color.g + color.b) / 3);
+                color.r = c;
+                color.g = c;
+                color.b = c;
+            }
+            else
+            {
+                color.r = Mathf.Round(color.r * colorCompressionLevel) / colorCompressionLevel;
+                color.g = Mathf.Round(color.g * colorCompressionLevel) / colorCompressionLevel;
+                color.b = Mathf.Round(color.b * colorCompressionLevel) / colorCompressionLevel;
+            }
         }
         return color;
     }
