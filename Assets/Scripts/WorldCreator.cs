@@ -682,7 +682,7 @@ public class WorldCreator : MonoBehaviour
     private Color GetTestedColor(Color color, out bool isWater)
     {
         // limit RGB channels 
-        CompressColor(color);
+        color = CompressColor(color);
         // determine if water color 
         if (_waterColorsList.Contains(color))
         {
