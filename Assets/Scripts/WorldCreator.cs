@@ -204,10 +204,17 @@ public class WorldCreator : MonoBehaviour
             bool hardRedraw =
                 _mapPointsContainer == null ||
                 transform.childCount != 2 ||
-                showLand != _lastShowLand ||
-                showWater != _lastShowWater ||
-                showBorder != _lastShowBorder ||
                 generateHiddenSurfaces != _lastGenerateHiddenSurfaces ||
+                useColorCompression != _lastUseColorCompression ||
+                showBorder != _lastShowBorder ||
+
+                (!generateHiddenSurfaces &&
+                    (showLand != _lastShowLand ||
+                    showWater != _lastShowWater)
+                ) ||
+                (useColorCompression && colorCompressionLevel != _lastColorCompressionLevel) ||
+
+
                 _pointIsVisible == null || _pointIsVisible.Length == 0 ||
                 _pointsMeshFilters == null || _pointsMeshFilters.Length == 0 ||
                 _pointsMeshRenderers == null || _pointsMeshRenderers.Length == 0 ||
@@ -228,6 +235,7 @@ public class WorldCreator : MonoBehaviour
                 height != _lastHeight ||
                 horzSpacing != _lastHorzSpacing ||
                 vertSpacing != _lastVertSpacing ||
+                colorAverageOffset != _lastColorAverageOffset ||
                 spacingUniformMultiplier != _lastSpacingMultiplier;
 
 
@@ -247,8 +255,12 @@ public class WorldCreator : MonoBehaviour
                 colorAverageOffset != _lastColorAverageOffset ||
                 waterColors != _lastWaterColors ||
                 waterCutoff != _lastWaterCutoff ||
-                colorCompressionLevel != _lastColorCompressionLevel ||
-                useColorCompression != _lastUseColorCompression ||
+
+                (generateHiddenSurfaces &&
+                    (showLand != _lastShowLand ||
+                    showWater != _lastShowWater)
+                ) ||
+
                 pointMeshType != _lastPointMeshType)
             {
                 // just appearance changed, point size or source image 
