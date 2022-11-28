@@ -134,7 +134,7 @@ Material:
     - _ColorAddSubDiff: {r: -1, g: 0, b: 0, a: 0}
     - _EmisColor: {r: 0.2, g: 0.2, b: 0.2, a: 0}
     - _Emission: {r: 0, g: 0, b: 0, a: 0}
-    - _EmissionColor: {r: 0.16470589, g: 0.16078432, b: 0.16862746, a: 1}
+    - _EmissionColor: {r: 0.3301887, g: 0.28865552, b: 0.31357545, a: 1}
     - _Flip: {r: 1, g: 1, b: 1, a: 1}
     - _RendererColor: {r: 1, g: 1, b: 1, a: 1}
     - _SoftParticleFadeParams: {r: 0, g: 0, b: 0, a: 0}
