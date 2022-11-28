@@ -329,6 +329,18 @@ public class WorldCreator : MonoBehaviour
 
                     // get reference to texture 
                     Texture2D texture = (Texture2D)mapMaterial.mainTexture;
+                    
+                    // generate compressed water colors array 
+                    _compressedWaterColors = new Color[(waterColors.Length * 2) + 1];
+                    for (int i = 0; i < waterColors.Length; i++)
+                    {
+                        _compressedWaterColors[i] = waterColors[i];
+                    }
+                    for (int i = waterColors.Length; i < waterColors.Length * 2; i++)
+                    {
+                        _compressedWaterColors[i] = CompressColor(waterColors[i - waterColors.Length]);
+                    }
+                    _compressedWaterColors[_compressedWaterColors.Length - 1] = Color.black;// add black to very end of array 
 
                     // create points 
                     for (int i = rowStart; i < rowEnd; i++)
@@ -451,16 +463,6 @@ public class WorldCreator : MonoBehaviour
                     colorCompressionLevel != _lastColorCompressionLevel)
                 {
                     bool meshTypeIsVisible = pointMeshType != MeshType.None;
-                    _compressedWaterColors = new Color[(waterColors.Length * 2) + 1];
-                    for (int i = 0; i < waterColors.Length; i++)
-                    {
-                        _compressedWaterColors[i] = waterColors[i];
-                    }
-                    for (int i = waterColors.Length; i < waterColors.Length * 2; i++)
-                    {
-                        _compressedWaterColors[i] = CompressColor(waterColors[i - waterColors.Length]);
-                    }
-                    _compressedWaterColors[_compressedWaterColors.Length - 1] = Color.black;// add black to very end of array 
                     for (int i = 0; i < _pointIsVisible.Length; i++)
                     {
                         if (_pointIsVisible[i])
