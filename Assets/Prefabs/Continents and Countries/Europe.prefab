@@ -114,6 +114,63 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 17aa7e2c4d2f4784380bb4a38e9767a5, type: 3}
+--- !u!1001 &280899857
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 5619289192040562897}
+    m_Modifications:
+    - target: {fileID: 810235914541113586, guid: d90f8dc6076781b4a9fe88029d0f561a, type: 3}
+      propertyPath: m_RootOrder
+      value: 25
+      objectReference: {fileID: 0}
+    - target: {fileID: 810235914541113586, guid: d90f8dc6076781b4a9fe88029d0f561a, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 810235914541113586, guid: d90f8dc6076781b4a9fe88029d0f561a, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 810235914541113586, guid: d90f8dc6076781b4a9fe88029d0f561a, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 810235914541113586, guid: d90f8dc6076781b4a9fe88029d0f561a, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 810235914541113586, guid: d90f8dc6076781b4a9fe88029d0f561a, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 810235914541113586, guid: d90f8dc6076781b4a9fe88029d0f561a, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 810235914541113586, guid: d90f8dc6076781b4a9fe88029d0f561a, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 810235914541113586, guid: d90f8dc6076781b4a9fe88029d0f561a, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 810235914541113586, guid: d90f8dc6076781b4a9fe88029d0f561a, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 810235914541113586, guid: d90f8dc6076781b4a9fe88029d0f561a, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6176246078717100523, guid: d90f8dc6076781b4a9fe88029d0f561a, type: 3}
+      propertyPath: m_Name
+      value: Iceland
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: d90f8dc6076781b4a9fe88029d0f561a, type: 3}
 --- !u!1001 &843280871
 PrefabInstance:
   m_ObjectHideFlags: 0

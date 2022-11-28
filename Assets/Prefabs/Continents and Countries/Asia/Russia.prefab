@@ -359,6 +359,63 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 81ad5c6b2483fc44d9dea463b5ebe8a8, type: 3}
+--- !u!1001 &7065870929075060492
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 1654105805436484622}
+    m_Modifications:
+    - target: {fileID: 8942809763949955308, guid: 81ad5c6b2483fc44d9dea463b5ebe8a8, type: 3}
+      propertyPath: m_RootOrder
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 8942809763949955308, guid: 81ad5c6b2483fc44d9dea463b5ebe8a8, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 1.665
+      objectReference: {fileID: 0}
+    - target: {fileID: 8942809763949955308, guid: 81ad5c6b2483fc44d9dea463b5ebe8a8, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.673
+      objectReference: {fileID: 0}
+    - target: {fileID: 8942809763949955308, guid: 81ad5c6b2483fc44d9dea463b5ebe8a8, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8942809763949955308, guid: 81ad5c6b2483fc44d9dea463b5ebe8a8, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8942809763949955308, guid: 81ad5c6b2483fc44d9dea463b5ebe8a8, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8942809763949955308, guid: 81ad5c6b2483fc44d9dea463b5ebe8a8, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8942809763949955308, guid: 81ad5c6b2483fc44d9dea463b5ebe8a8, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8942809763949955308, guid: 81ad5c6b2483fc44d9dea463b5ebe8a8, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8942809763949955308, guid: 81ad5c6b2483fc44d9dea463b5ebe8a8, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8942809763949955308, guid: 81ad5c6b2483fc44d9dea463b5ebe8a8, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8942809763949955309, guid: 81ad5c6b2483fc44d9dea463b5ebe8a8, type: 3}
+      propertyPath: m_Name
+      value: Belushya Guba
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 81ad5c6b2483fc44d9dea463b5ebe8a8, type: 3}
 --- !u!1001 &7065870929166697243
 PrefabInstance:
   m_ObjectHideFlags: 0

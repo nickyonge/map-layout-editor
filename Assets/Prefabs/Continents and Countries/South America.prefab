@@ -373,13 +373,25 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 638454363230578930, guid: 0dd827be0ea98884bb24582c39065946, type: 3}
+      propertyPath: m_Name
+      value: Lima
+      objectReference: {fileID: 0}
+    - target: {fileID: 638454363230578931, guid: 0dd827be0ea98884bb24582c39065946, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -4.884
+      objectReference: {fileID: 0}
+    - target: {fileID: 638454363230578931, guid: 0dd827be0ea98884bb24582c39065946, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 1.988
+      objectReference: {fileID: 0}
     - target: {fileID: 6655560292384752510, guid: 0dd827be0ea98884bb24582c39065946, type: 3}
       propertyPath: m_Name
       value: Peru
       objectReference: {fileID: 0}
     - target: {fileID: 6655560292384752510, guid: 0dd827be0ea98884bb24582c39065946, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0dd827be0ea98884bb24582c39065946, type: 3}
