@@ -156,6 +156,7 @@ public class WorldCreator : MonoBehaviour
     }
     void OnDisable()
     {
+        if (this == null || gameObject == null) { return; }// failsafe in case of deletion out of order
         if (ClearOnDisable) { ClearMap(); }
     }
 
@@ -346,7 +347,7 @@ public class WorldCreator : MonoBehaviour
 
                             if (ptVis)
                             {
-                            Debug.Log("ptVIs: " + ptVis + ", isWater: " + isWater);
+                                Debug.Log("ptVIs: " + ptVis + ", isWater: " + isWater);
                                 // generate object if necessary 
                                 GameObject pt = new GameObject($"Point {i}:{j}");
                                 pt.hideFlags = AllowGeneratedContentSave ?
@@ -723,9 +724,12 @@ public class WorldCreator : MonoBehaviour
         _pointsColor = new Color[0];
         _pointIsWater = new bool[0];
         // destroy children 
-        for (int i = transform.childCount; i > 0; --i)
+        if (this != null && transform != null)
         {
-            DestroyGivenObject(transform.GetChild(0).gameObject);
+            for (int i = transform.childCount; i > 0; --i)
+            {
+                DestroyGivenObject(transform.GetChild(0).gameObject);
+            }
         }
     }
     void DestroyGivenObject(Object obj)
