@@ -42,6 +42,7 @@ public class WorldCreator : MonoBehaviour
     [Range(MIN_SPACING, MAX_SPACING)] public float horzSpacing = 0.5f;
     [Range(MIN_SPACING, MAX_SPACING)] public float vertSpacing = 0.5f;
     [Range(0.2f, 2f)] public float spacingUniformMultiplier = 1f;
+    public float mapZDepth = 0.1f;
 
 
 
@@ -107,6 +108,7 @@ public class WorldCreator : MonoBehaviour
     private bool _lastUseColorCompression;
     private float _lastHorzSpacing;
     private float _lastVertSpacing;
+    private float _lastMapZDepth;
     private float _lastSpacingMultiplier;
     private MeshType _lastPointMeshType;
 
@@ -252,9 +254,9 @@ public class WorldCreator : MonoBehaviour
             else if (
                 pointSizeMultiplier != _lastPointSizeMultiplier ||
                 dynamicPointSize != _lastDynamicPointSize ||
-                colorAverageOffset != _lastColorAverageOffset ||
                 waterColors != _lastWaterColors ||
                 waterCutoff != _lastWaterCutoff ||
+                mapZDepth != _lastMapZDepth ||
 
                 (generateHiddenSurfaces &&
                     (showLand != _lastShowLand ||
@@ -344,7 +346,7 @@ public class WorldCreator : MonoBehaviour
                         for (int j = columnStart; j < columnEnd; j++)
                         {
                             index++;
-                            
+
                             // generate the POINT object (in place of the column)
 
                             float x = (float)j / (columns - 1);
@@ -413,6 +415,7 @@ public class WorldCreator : MonoBehaviour
                     MeshRenderer _mapMeshRenderer = _mapGraphic.GetComponent<MeshRenderer>();
                     _mapMeshRenderer.sharedMaterial = mapMaterial;
                 }
+                _mapGraphic.transform.localPosition = new Vector3(0f, 0f, mapZDepth);
                 _mapGraphic.transform.localScale = new Vector3(width, height, 1);
 
                 // get all meshrenderers in map points container 
@@ -491,6 +494,7 @@ public class WorldCreator : MonoBehaviour
                 _lastShowLand = showLand;
                 _lastGenerateHiddenSurfaces = generateHiddenSurfaces;
                 _lastColorAverageOffset = colorAverageOffset;
+                _lastMapZDepth = mapZDepth;
                 _lastShowWater = showWater;
                 _lastWaterColors = waterColors;
                 _lastWaterCutoff = waterCutoff;
