@@ -319,7 +319,6 @@ public class WorldCreator : MonoBehaviour
                     // create points 
                     for (int i = rowStart; i < rowEnd; i++)
                     {
-                        index++;
 
                         // generate the ROW object 
                         GameObject r = new GameObject($"Row {i}");
@@ -332,13 +331,17 @@ public class WorldCreator : MonoBehaviour
 
                         for (int j = columnStart; j < columnEnd; j++)
                         {
+                            index++;
+                            
                             // generate the POINT object (in place of the column)
 
-                            Color color = TestPixel(texture, _pointsPositions[i].x, _pointsPositions[i].y, out bool isWater);
+                            float x = (float)j / (columns - 1);
+                            float y = (float)i / (rows - 1);
+                            _pointsPositions[index] = new Vector2(x, y);
+                            Color color = TestPixel(texture, x, y, out bool isWater);
                             bool showSurface = isWater ? showWater : showLand;
 
                             // properties that are always present 
-                            _pointsPositions[index] = new Vector2((float)j / (columns - 1), (float)i / (rows - 1));
                             _pointsColor[index] = color;
                             _pointIsWater[index] = isWater;
 
