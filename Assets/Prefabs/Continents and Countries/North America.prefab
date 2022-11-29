@@ -57,6 +57,63 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: fb918797b46fe5349a3e66e6c4d9ae21, type: 3}
+--- !u!1001 &2005827608191736228
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 782742592806003485}
+    m_Modifications:
+    - target: {fileID: 8942809763949955308, guid: 81ad5c6b2483fc44d9dea463b5ebe8a8, type: 3}
+      propertyPath: m_RootOrder
+      value: 27
+      objectReference: {fileID: 0}
+    - target: {fileID: 8942809763949955308, guid: 81ad5c6b2483fc44d9dea463b5ebe8a8, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 8.66
+      objectReference: {fileID: 0}
+    - target: {fileID: 8942809763949955308, guid: 81ad5c6b2483fc44d9dea463b5ebe8a8, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 3.42
+      objectReference: {fileID: 0}
+    - target: {fileID: 8942809763949955308, guid: 81ad5c6b2483fc44d9dea463b5ebe8a8, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8942809763949955308, guid: 81ad5c6b2483fc44d9dea463b5ebe8a8, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8942809763949955308, guid: 81ad5c6b2483fc44d9dea463b5ebe8a8, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8942809763949955308, guid: 81ad5c6b2483fc44d9dea463b5ebe8a8, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8942809763949955308, guid: 81ad5c6b2483fc44d9dea463b5ebe8a8, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8942809763949955308, guid: 81ad5c6b2483fc44d9dea463b5ebe8a8, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8942809763949955308, guid: 81ad5c6b2483fc44d9dea463b5ebe8a8, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8942809763949955308, guid: 81ad5c6b2483fc44d9dea463b5ebe8a8, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8942809763949955309, guid: 81ad5c6b2483fc44d9dea463b5ebe8a8, type: 3}
+      propertyPath: m_Name
+      value: Honolulu
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 81ad5c6b2483fc44d9dea463b5ebe8a8, type: 3}
 --- !u!1001 &2005827609383059975
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -260,6 +317,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: United States
       objectReference: {fileID: 0}
+    - target: {fileID: 4233112028151448385, guid: ae06b0619c5fc1848a7db3ab494af928, type: 3}
+      propertyPath: m_Name
+      value: Sacramento
+      objectReference: {fileID: 0}
     - target: {fileID: 6318210836701514345, guid: ae06b0619c5fc1848a7db3ab494af928, type: 3}
       propertyPath: m_RootOrder
       value: 1
@@ -306,3 +367,8 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ae06b0619c5fc1848a7db3ab494af928, type: 3}
+--- !u!4 &782742592806003485 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 6318210836701514345, guid: ae06b0619c5fc1848a7db3ab494af928, type: 3}
+  m_PrefabInstance: {fileID: 6733470207426898292}
+  m_PrefabAsset: {fileID: 0}
