@@ -564,6 +564,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4350886817165491753, guid: 6832e729cd007724cbe2cee75308adf3, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 2.644
+      objectReference: {fileID: 0}
+    - target: {fileID: 4350886817165491753, guid: 6832e729cd007724cbe2cee75308adf3, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -1.294
+      objectReference: {fileID: 0}
     - target: {fileID: 5223179581893795095, guid: 6832e729cd007724cbe2cee75308adf3, type: 3}
       propertyPath: m_Name
       value: India
