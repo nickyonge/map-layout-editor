@@ -1140,6 +1140,120 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b0187a3dd5ee0b3429a8f590df9c97bf, type: 3}
+--- !u!1001 &9172435660933113140
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 244161526523825189}
+    m_Modifications:
+    - target: {fileID: 3550354871354131628, guid: eb949386076ab52488a6dfd8c5c599e1, type: 3}
+      propertyPath: m_RootOrder
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 3550354871354131628, guid: eb949386076ab52488a6dfd8c5c599e1, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3550354871354131628, guid: eb949386076ab52488a6dfd8c5c599e1, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3550354871354131628, guid: eb949386076ab52488a6dfd8c5c599e1, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3550354871354131628, guid: eb949386076ab52488a6dfd8c5c599e1, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3550354871354131628, guid: eb949386076ab52488a6dfd8c5c599e1, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3550354871354131628, guid: eb949386076ab52488a6dfd8c5c599e1, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3550354871354131628, guid: eb949386076ab52488a6dfd8c5c599e1, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3550354871354131628, guid: eb949386076ab52488a6dfd8c5c599e1, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3550354871354131628, guid: eb949386076ab52488a6dfd8c5c599e1, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3550354871354131628, guid: eb949386076ab52488a6dfd8c5c599e1, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8056238937587164597, guid: eb949386076ab52488a6dfd8c5c599e1, type: 3}
+      propertyPath: m_Name
+      value: Bhutan
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: eb949386076ab52488a6dfd8c5c599e1, type: 3}
+--- !u!1001 &9172435661487132979
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 244161526523825189}
+    m_Modifications:
+    - target: {fileID: 3550354871354131628, guid: b9bb951ab5247bf48a62147f0c6ba436, type: 3}
+      propertyPath: m_RootOrder
+      value: 21
+      objectReference: {fileID: 0}
+    - target: {fileID: 3550354871354131628, guid: b9bb951ab5247bf48a62147f0c6ba436, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3550354871354131628, guid: b9bb951ab5247bf48a62147f0c6ba436, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3550354871354131628, guid: b9bb951ab5247bf48a62147f0c6ba436, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3550354871354131628, guid: b9bb951ab5247bf48a62147f0c6ba436, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3550354871354131628, guid: b9bb951ab5247bf48a62147f0c6ba436, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3550354871354131628, guid: b9bb951ab5247bf48a62147f0c6ba436, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3550354871354131628, guid: b9bb951ab5247bf48a62147f0c6ba436, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3550354871354131628, guid: b9bb951ab5247bf48a62147f0c6ba436, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3550354871354131628, guid: b9bb951ab5247bf48a62147f0c6ba436, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3550354871354131628, guid: b9bb951ab5247bf48a62147f0c6ba436, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8056238937587164597, guid: b9bb951ab5247bf48a62147f0c6ba436, type: 3}
+      propertyPath: m_Name
+      value: Nepal
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: b9bb951ab5247bf48a62147f0c6ba436, type: 3}
 --- !u!1001 &9172435661624765397
 PrefabInstance:
   m_ObjectHideFlags: 0
