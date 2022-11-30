@@ -45,8 +45,6 @@ public class MapDataCollector : MonoBehaviour
         {
             CollectData();
         }
-
-
     }
 
     private void OnDestroy()
