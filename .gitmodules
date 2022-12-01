@@ -1,3 +1,6 @@
 [submodule "Assets/Scripts/JSONObject"]
 	path = Assets/Scripts/JSONObject
 	url = https://github.com/mtschoen/JSONObject
+[submodule "Assets/Scripts/CSVUtil"]
+	path = Assets/Scripts/CSVUtil
+	url = https://github.com/sinbad/UnityCsvUtil
