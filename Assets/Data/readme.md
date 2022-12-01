@@ -1,6 +1,6 @@
 # Attribution
 
-Listed here are all data sources used in this project.
+Listed here are all data sources used in this project.[^citations]
 
 
 ## Databases
@@ -14,7 +14,7 @@ The Organisation for Economic Co-operation and Development (OECD)
 https://data.oecd.org/  
 
 #### Energy
-**oecd/energy/** 
+**oecd/energy/**  
 Topics related to the energy sector (generation, consumption, import, export, etc)  
 https://data.oecd.org/energy.htm  
 
@@ -34,6 +34,24 @@ https://data.oecd.org/energy.htm
   12-01-2022, https://data.oecd.org/energy/renewable-energy.htm
 - **renewable_ttoe:** Renewable energy production per country, measured in thousands [TOE](https://en.wikipedia.org/wiki/Tonne_of_oil_equivalent)  
   12-01-2022, https://data.oecd.org/energy/renewable-energy.htm
+  
+#### Economic
+**oecd/economic/**  
+Topics related to the economic sector (GDP, income/expense, investment, debt, productivity, etc)  
+https://data.oecd.org/economy.htm
+
+- **gdp_usdpcap:** Gross Domestic Product per country, measured in $USD[^oecdusd] per capita  
+  12-01-2022, https://data.oecd.org/gdp/gross-domestic-product-gdp.htm
+- **gdp_usdmil:** Gross Domestic Product per country, measured in millions of $USD[^oecdusd]  
+  12-01-2022, https://data.oecd.org/gdp/gross-domestic-product-gdp.htm
+- **net_lendborrow_corp:** Net lending/borrowing (corporate sector) per country, measured as a percent of GDP  
+  12-01-2022, https://data.oecd.org/natincome/net-lending-borrowing-by-sector.htm
+- **net_lendborrow_govt:** Net lending/borrowing (government sector) per country, measured as a percent of GDP  
+  12-01-2022, https://data.oecd.org/natincome/net-lending-borrowing-by-sector.htm
+- **net_lendborrow_house:** Net lending/borrowing (household sector) per country, measured as a percent of GDP  
+  12-01-2022, https://data.oecd.org/natincome/net-lending-borrowing-by-sector.htm
+- **net_lendborrow_total:** Net lending/borrowing (total) per country, measured as a percent of GDP  
+  12-01-2022, https://data.oecd.org/natincome/net-lending-borrowing-by-sector.htm
 
 
 ## Individual Datasets
@@ -54,5 +72,7 @@ Single datasets, or databases from which only one set of data was retrieved
 ### Format
 **[Folder]:** [Data Provider], "[Data/Dataset Name or ID]", [Date of download MM-DD-YYYY], [Data Source URL]
 
+[^citations]: Attribution/citation. While data sources are attributed and linked, formal citations as required by the datasets have not yet been integrated. These will be added as soon as possible, but currently you can view the linked source website for citation information.
 [^solid_biofuels]: Per [OECD](https://data.oecd.org/energy/renewable-energy.htm) definition,  
   "Biofuels are defined as fuels derived directly or indirectly from biomass (material obtained from living or recently living organisms). This includes wood, vegetal waste (including wood waste and crops used for energy production), ethanol, animal materials/wastes and sulphite lyes. Municipal waste comprises wastes produced by the residential, commercial and public service sectors that are collected by local authorities for disposal in a central location for the production of heat and/or power."
+[^oecdusd]: OECD $USD financial measurements are made in US dollars and US dollars per capita (current [PPPs](https://en.wikipedia.org/wiki/Purchasing_power_parity)). For further information, refer to the OECD's [Economy Data Portal](https://data.oecd.org/economy.htm), or refer to the [OECD Economic Outlook](https://www.oecd-ilibrary.org/economics/oecd-economic-outlook_16097408) publication.
