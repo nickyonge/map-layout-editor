@@ -65,7 +65,12 @@ Single datasets, or databases from which only one set of data was retrieved
 
 ## Other Data
 
-**countries:** @mledoze/countries, "World countries in JSON, CSV, XML and YAML.", 12-01-2022, https://github.com/mledoze/countries
+- **countries:** @mledoze/countries, "World countries in JSON, CSV, XML and YAML.", 12-01-2022, https://github.com/mledoze/countries
+
+## Unsorted Data
+Data that has been collected, but has yet to be formatted into the sorted lists above. 
+
+
 
 --- 
 
