@@ -70,7 +70,116 @@ Single datasets, or databases from which only one set of data was retrieved
 ## Unsorted Data
 Data that has been collected, but has yet to be formatted into the sorted lists above. 
 
-
+- oecd/economy https://data.oecd.org/energy.htm dec1 
+  - fincorp_debt_equity_ratio https://data.oecd.org/corporate/financial-corporations-debt-to-equity-ratio.htm
+  - fdi_stocks_in/out_pergdp/usdmil-country-latest https://data.oecd.org/fdi/fdi-stocks.htm
+  - fdi_in/out_usdpcap/usdmil-country-latest https://data.oecd.org/fdi/fdi-flows.htm
+  - fdi_restrictiveness-country-latest https://data.oecd.org/fdi/fdi-restrictiveness.htm
+- dec1 oecd/agricultural https://data.oecd.org/agriculture.htm dec1 
+  - crop_production-country-total https://data.oecd.org/agroutput/crop-production.htm
+  - meat_consumption-country-total https://data.oecd.org/agroutput/meat-consumption.htm
+  - agripolicy_support_total_pergdp-country-latest https://data.oecd.org/agrpolicy/agricultural-support.htm (TSE, %)
+  - agripolicy_prodprot-country-latest https://data.oecd.org/agrpolicy/producer-protection.htm
+  - fish_landings_total_usd/tonnes-country https://data.oecd.org/fish/fish-landings.htm
+  - aqua_prod_usd/tonnes-country-latest https://data.oecd.org/fish/aquaculture-production.htm
+  - nutrientbalance_n/p_kgh-country-latest https://data.oecd.org/agrland/nutrient-balance.htm
+  - agriland_total-country-latest https://data.oecd.org/agrland/agricultural-land.htm
+- dec1 oecd/education https://data.oecd.org/education.htm dec1 
+  - eduleveladult_e1/e2/e3_per25to64-country-latest https://data.oecd.org/eduatt/adult-education-level.htm
+  - eduspend_pub_e1e2e3_pergdp-country-latest https://data.oecd.org/eduresource/private-spending-on-education.htm
+  - eduspend_pvt_e1e2e3_pergdp-country-latest https://data.oecd.org/eduresource/private-spending-on-education.htm
+  - readingperf_mean-country-latest https://data.oecd.org/pisa/reading-performance-pisa.htm
+  - mathperf_mean-country-latest https://data.oecd.org/pisa/mathematics-performance-pisa.htm
+  - scienceperf_mean-country-latest https://data.oecd.org/pisa/science-performance-pisa.htm
+  - gradrate_e2_mwt-country-latest https://data.oecd.org/students/secondary-graduation-rate.htm
+  - gradrate_e3_doc/mas/bac/total_mw/mwt-country-latest https://data.oecd.org/students/tertiary-graduation-rate.htm
+  - enrolment_e0_3y4y5y-country-total https://data.oecd.org/students/enrolment-rate-in-early-childhood-education.htm
+  - enrolment_e2e3_17y18y19y-country-total https://data.oecd.org/students/enrolment-rate-in-secondary-and-tertiary-education.htm
+  - enrolment_e3_per_intl-country-latest https://data.oecd.org/students/international-student-mobility.htm
+  - teacher_salary_e0/e1/e2/e3-country-latest https://data.oecd.org/teachers/teachers-salaries.htm
+  - teacher_studentsperstaff https://data.oecd.org/teachers/students-per-teaching-staff.htm
+  - teacher_perwomen https://data.oecd.org/teachers/women-teachers.htm
+  - teacher_perage_e1/e2/e3 https://data.oecd.org/teachers/teachers-by-age.htm
+  - teacher_hrsperyr https://data.oecd.org/teachers/teaching-hours.htm
+  - teacher_staff https://data.oecd.org/teachers/teaching-staff.htm
+  - teacher_principals_avgage/perwomen/yrsexp https://data.oecd.org/teachers/school-principals.htm
+  - youth_neet_total/m/w-country-latest https://data.oecd.org/youthinac/youth-not-in-employment-education-or-training-neet.htm
+- dec1 environment https://data.oecd.org/environment.htm dec1 
+  - airpoll_exposure-country-latest https://data.oecd.org/air/air-pollution-exposure.htm
+  - airpoll_mortper1m-country-latest https://data.oecd.org/air/air-pollution-effects.htm
+  - emm_co2/conoxsoxvoc/ghg_milton/toncap/kgpcap/thouton/thoutonco2eq https://data.oecd.org/air/air-and-ghg-emissions.htm
+  - biodiv_landcoverchange_s2004/s1992 https://data.oecd.org/biodiver/land-cover-change.htm
+  - biodiv_protectedarea_land/water https://data.oecd.org/biodiver/protected-areas.htm
+  - biodiv_threatenedspecies https://data.oecd.org/biodiver/threatened-species.htm
+  - forest_treefellings https://data.oecd.org/forest/forest-resources.htm
+  - mats_cons https://data.oecd.org/materials/material-consumption.htm
+  - mats_prod https://data.oecd.org/materials/material-productivity.htm
+  - muniwaste_kgpcap/thouton https://data.oecd.org/waste/municipal-waste.htm
+  - water_withdrawal_m3mil/m3pcap https://data.oecd.org/water/water-withdrawals.htm
+  - water_wastewatertreatment https://data.oecd.org/water/wastewater-treatment.htm
+- govt https://data.oecd.org/government.htm dec1 
+  - govt_trust https://data.oecd.org/gga/trust-in-government.htm
+  - govt_deficit https://data.oecd.org/gga/general-government-deficit.htm
+  - govt_revenue_pergdp/thouusdpcap https://data.oecd.org/gga/general-government-revenue.htm
+  - govt_spend_bydestination https://data.oecd.org/gga/general-government-spending-by-destination.htm
+  - govt_spend_general_pergdp/thouusdpcap_pg1/pg2/total https://data.oecd.org/gga/general-government-spending.htm
+  - govt_spend_central_pg1/pg2 https://data.oecd.org/gga/central-government-spending.htm
+  - govt_debt https://data.oecd.org/gga/general-government-debt.htm
+  - govt_wealth https://data.oecd.org/gga/general-government-financial-wealth.htm
+  - govt_productioncosts https://data.oecd.org/gga/government-production-costs.htm
+  - tax_revenue_pergdp/milusd https://data.oecd.org/tax/tax-revenue.htm
+  - tax_persincome_pergdp/pertax https://data.oecd.org/tax/tax-on-personal-income.htm
+  - tax_corp_pergdp/pertax https://data.oecd.org/tax/tax-on-corporate-profits.htm
+  - tax_socsec_pergdp/pertax https://data.oecd.org/tax/social-security-contributions.htm
+  - tax_payroll_pergdp/pertax https://data.oecd.org/tax/tax-on-payroll.htm
+  - tax_prop_pergdp/pertax https://data.oecd.org/tax/tax-on-property.htm
+  - tax_goods_pergdp/pertax https://data.oecd.org/tax/tax-on-goods-and-services.htm
+- health dec1 https://data.oecd.org/health.htm
+  - health_use_docvisitspcap https://data.oecd.org/healthcare/doctors-consultations.htm
+  - health_use_childvaccrates https://data.oecd.org/healthcare/child-vaccination-rates.htm
+  - health_use_fluvacc65plus https://data.oecd.org/healthcare/influenza-vaccination-rates.htm
+  - health_use_hospitalstaylength https://data.oecd.org/healthcare/length-of-hospital-stay.htm
+  - health_use_hospitaldischarge https://data.oecd.org/healthcare/hospital-discharge-rates.htm
+  - health_csecsper1k https://data.oecd.org/healthcare/caesarean-sections.htm
+  - health_equip_hospitalbedsper1k https://data.oecd.org/healtheqt/hospital-beds.htm
+  - health_res_spending_pergdp/usdpcap/pertotal https://data.oecd.org/healthres/health-spending.htm
+  - health_res_doctorsper1k https://data.oecd.org/healthres/doctors.htm
+  - health_res_nursesper1k https://data.oecd.org/healthres/nurses.htm
+  - health_res_medgradsper100k https://data.oecd.org/healthres/medical-graduates.htm
+  - health_res_nursinggradsper100k https://data.oecd.org/healthres/nursing-graduates.htm
+  - health_risk_dailysmokers https://data.oecd.org/healthrisk/daily-smokers.htm
+  - health_risk_alcohol https://data.oecd.org/healthrisk/alcohol-consumption.htm
+  - health_risk_obesity https://data.oecd.org/healthrisk/overweight-or-obese-population.htm
+  - health_risk_socsupp_total/gender/edu/age https://data.oecd.org/healthrisk/social-support.htm
+  - health_stat_lifeexpect https://data.oecd.org/healthstat/life-expectancy-at-birth.htm
+  - health_stat_lifeexpect65 https://data.oecd.org/healthstat/life-expectancy-at-65.htm
+  - health_stat_infantmort https://data.oecd.org/healthstat/infant-mortality-rates.htm
+  - health_stat_pyll https://data.oecd.org/healthstat/potential-years-of-life-lost.htm
+  - health_stat_cancerdeaths https://data.oecd.org/healthstat/deaths-from-cancer.htm
+  - health_stat_suicidesper100k https://data.oecd.org/healthstat/suicide-rates.htm
+- infotech dec2 https://data.oecd.org/innovation-and-technology.htm
+  - broadband_fixedsubs_per100 https://data.oecd.org/broadband/fixed-broadband-subscriptions.htm
+  - broadband_mobilesubs_per100 ttps://data.oecd.org/broadband/mobile-broadband-subscriptions.htm
+  - broadband_houseaccess https://data.oecd.org/broadband/households-with-broadband-access.htm
+  - employ_empbybusinesssize_total/bynumofemp https://data.oecd.org/entrepreneur/employees-by-business-size.htm
+  - employ_selfemployed_20to29mw https://data.oecd.org/entrepreneur/young-self-employed.htm
+  - employ_selfemp_withemp https://data.oecd.org/entrepreneur/self-employed-with-employees.htm
+  - employ_selfemp_withoutemp https://data.oecd.org/entrepreneur/self-employed-without-employees.htm
+  - employ_runningabusiness https://data.oecd.org/entrepreneur/running-a-business.htm
+  - tourism_pergdp/pergva https://data.oecd.org/industry/tourism-gdp.htm
+  - ict_homeinternetaccess https://data.oecd.org/ict/internet-access.htm
+  - itc_homecomputeraccess https://data.oecd.org/ict/access-to-computers-from-home.htm
+  - ict_valueadd https://data.oecd.org/ict/ict-value-added.htm
+  - ict_employment https://data.oecd.org/ict/ict-employment.htm
+  - ict_investment https://data.oecd.org/ict/ict-investment.htm
+  - ict_goodsexport https://data.oecd.org/ict/ict-goods-exports.htm
+  - research_rdspend_pergdp/usdmil https://data.oecd.org/rd/gross-domestic-spending-on-r-d.htm
+  - research_researchers_total/women_per1k/count/percent https://data.oecd.org/rd/researchers.htm
+  - research_govt_count/percent https://data.oecd.org/rd/government-researchers.htm
+- jobs dec2 https://data.oecd.org/jobs.htm
+  - jobs_adequacyofminben https://data.oecd.org/benwage/adequacy-of-minimum-income-benefits.htm
+- society dec2 https://data.oecd.org/society.htm
+  - 
 
 --- 
 
