@@ -177,7 +177,26 @@ Data that has been collected, but has yet to be formatted into the sorted lists 
   - research_researchers_total/women_per1k/count/percent https://data.oecd.org/rd/researchers.htm
   - research_govt_count/percent https://data.oecd.org/rd/government-researchers.htm
 - jobs dec2 https://data.oecd.org/jobs.htm
-  - jobs_adequacyofminben https://data.oecd.org/benwage/adequacy-of-minimum-income-benefits.htm
+  - ben_adequacyofminben https://data.oecd.org/benwage/adequacy-of-minimum-income-benefits.htm
+  - ben_workhrspoverty_min/67avg/avg https://data.oecd.org/benwage/working-hours-needed-to-exit-poverty.htm
+  - ben_disincentiveworkhours https://data.oecd.org/benwage/financial-disincentive-to-increase-working-hours.htm
+  - ben_childcarecost_peravg/perhouse https://data.oecd.org/benwage/net-childcare-costs.htm
+  - ben_disincentive_jobwithchildcare https://data.oecd.org/benwage/financial-disincentive-to-enter-employment-with-childcare-costs.htm
+  - earn_avgwages https://data.oecd.org/earnwage/average-wages.htm
+  - earn_compenactivity https://data.oecd.org/earnwage/employee-compensation-by-activity.htm
+  - earn_wagegap https://data.oecd.org/earnwage/gender-wage-gap.htm
+  - earn_levels https://data.oecd.org/earnwage/wage-levels.htm
+  - employ_rate_percent/thou https://data.oecd.org/emp/employment-rate.htm
+  - employ_byage https://data.oecd.org/emp/employment-rate-by-age-group.htm
+  - employ_byedu https://data.oecd.org/emp/employment-by-education-level.htm
+  - employ_parttime https://data.oecd.org/emp/part-time-employment-rate.htm
+  - employ_self https://data.oecd.org/emp/self-employment-rate.htm
+  - employ_labourforce https://data.oecd.org/emp/labour-force.htm
+  - ump_rate https://data.oecd.org/unemp/unemployment-rate.htm
+  - ump_rateage https://data.oecd.org/unemp/unemployment-rate-by-age-group.htm
+  - ump_rateedu https://data.oecd.org/unemp/unemployment-rates-by-education-level.htm
+  - ump_longterm https://data.oecd.org/unemp/long-term-unemployment-rate.htm
+  - ump_youth https://data.oecd.org/unemp/youth-unemployment-rate.htm
 - society dec2 https://data.oecd.org/society.htm
   - 
 
