@@ -51,8 +51,5 @@
         "ProjectSettings/":true,
         "temp/":true,
         "Temp/":true
-    },
-    "git.ignoredRepositories": [
-        "Assets/Scripts/CSVUtil"
-    ]
+    }
 }
