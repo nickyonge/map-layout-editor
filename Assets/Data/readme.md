@@ -198,7 +198,6 @@ Data that has been collected, but has yet to be formatted into the sorted lists 
   - ump_longterm https://data.oecd.org/unemp/long-term-unemployment-rate.htm
   - ump_youth https://data.oecd.org/unemp/youth-unemployment-rate.htm
 - society dec2 https://data.oecd.org/society.htm
-  - 
 
 --- 
 
