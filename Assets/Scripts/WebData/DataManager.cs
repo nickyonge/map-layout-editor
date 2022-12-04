@@ -29,7 +29,8 @@ public class DataManager : DataDownloader
 
             Debug.Log("Filecount: " + files.Count);
         Debug.Log("Files:\n" + string.Join("\n", files));
-
     }
+
+    
 
 }
