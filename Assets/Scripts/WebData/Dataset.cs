@@ -5,12 +5,21 @@ using System.Collections.Generic;
 [Serializable]
 public class Dataset
 {
+    public enum DataFormat { CSV, JSON, XML, XLS, XLSX, ERROR }
+
     /// <summary> name of this dataset </summary>
-    public string name;
-    #if UNITY_EDITOR
+    public string fileName;
+
+    public DataFormat format = DataFormat.CSV;
+
+    public string actualName;
+
+#if UNITY_EDITOR
     [UnityEngine.Multiline]
-    #endif
+#endif
     public string description;
     
     public string[] identifiers;
+
+    public string filePath;
 }

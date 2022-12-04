@@ -8,6 +8,11 @@ public class DataManager : DataDownloader
 {
     public static DataManager instance;
 
+
+    public Dataset[] cityDatasets;
+    public Dataset[] countryDatasets;
+
+
     private MapDataCollector mapData;
 
     private void Start()
@@ -56,17 +61,75 @@ public class DataManager : DataDownloader
             .EnumerateFiles(path, "*.*", SearchOption.AllDirectories)
             .Where(file =>
                 file.ToLower().EndsWith("csv") ||
+                file.ToLower().EndsWith("xls") ||
+                file.ToLower().EndsWith("xlsx") ||
                 file.ToLower().EndsWith("json") ||
                 file.ToLower().EndsWith("xml")
                 ).ToList();
 
-        for (int i = 0; i < files.Count; i++)
+        List<Dataset> cityDatasets = new();
+        List<Dataset> countryDatasets = new();
+
+        foreach (string file in files)
         {
-            files[i] = files[i].Substring(files[i].LastIndexOf("\\") + 1);
-            files[i] = i.ToString() + " " + files[i];
+            bool isCity = file.IndexOf("CityData") >= 0;
+            if (!isCity)
+            {
+                if (file.IndexOf("CountryData") < 0)
+                {
+                    // improperly organized data, skip to next item 
+                    Debug.LogWarning("WARNING: found data file, not organized as either " +
+                        "city nor country. Consider organizing. File: " + file);
+                    continue;
+                }
+            }
+            int separator = Mathf.Max(file.LastIndexOf('\\'), file.LastIndexOf('/'));
+            string fileNameWithExtension = file.Substring(separator + 1);
+            int extensionIndex = fileNameWithExtension.LastIndexOf('.');
+            string type = fileNameWithExtension.Substring(extensionIndex + 1).ToLower();
+            string fileName = fileNameWithExtension.Substring(0, extensionIndex);
+            string containingFolder = file.Substring(0, separator);
+            separator = Mathf.Max(containingFolder.LastIndexOf('\\'),
+                containingFolder.LastIndexOf('/'));
+            containingFolder = containingFolder.Substring(separator + 1);
+            Dataset.DataFormat format = Dataset.DataFormat.CSV;
+            switch (type)
+            {
+                case "csv":
+                    format = Dataset.DataFormat.CSV;
+                    break;
+                case "xls":
+                    format = Dataset.DataFormat.XLS;
+                    break;
+                case "xlsx":
+                    format = Dataset.DataFormat.XLSX;
+                    break;
+                case "json":
+                    format = Dataset.DataFormat.JSON;
+                    break;
+                case "xml":
+                    format = Dataset.DataFormat.XML;
+                    break;
+                default:
+                    Debug.LogError($"ERROR: Invalid Dataset format, format: {type}, " +
+                        $"filepath: {file}, cannot parse file", gameObject);
+                    format = Dataset.DataFormat.ERROR;
+                    break;
+            }
+            Dataset dataset = new Dataset
+            {
+                fileName = string.Join(' ', containingFolder, ':', fileName),
+                format = format,
+                filePath = file,
+            };
+            if (isCity)
+                cityDatasets.Add(dataset);
+            else
+                countryDatasets.Add(dataset);
         }
 
-        Debug.Log(mapData.world.name);
+        this.cityDatasets = cityDatasets.ToArray();
+        this.countryDatasets = countryDatasets.ToArray();
     }
 
 
