@@ -1,6 +1,10 @@
 # Attribution
 
-Listed here are all data sources used in this project.[^citations]
+Listed here are all data sources used in this project.[^citations]  
+
+The data itself is located in the Resources folder, for edit-time loading in the Unity engine.  
+
+It is separated into City and Country subdirectories.
 
 
 ## Databases
