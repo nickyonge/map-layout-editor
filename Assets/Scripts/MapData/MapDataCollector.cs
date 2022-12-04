@@ -112,6 +112,78 @@ public class MapDataCollector : MonoBehaviour
 
     }
 
+    public Continent[] AllContinents
+    {
+        get { return world.continents; }
+
+    }
+    public Country[] AllCountries
+    {
+        get
+        {
+            List<Country> countries = new();
+            foreach (Continent continent in AllContinents)
+            {
+                countries.AddRange(continent.countries);
+            }
+            return countries.ToArray();
+        }
+    }
+    public City[] AllCities
+    {
+        get
+        {
+            List<City> cities = new();
+            foreach (Country country in AllCountries)
+            {
+                cities.AddRange(country.cities);
+            }
+            return cities.ToArray();
+        }
+    }
+    public Dictionary<Continent, Country[]> AllCountriesByContinent
+    {
+        get
+        {
+            Dictionary<Continent, Country[]> allCountriesByContinent = new();
+            foreach (Continent continent in AllContinents)
+            {
+                allCountriesByContinent.Add(continent, continent.countries);
+            }
+            return allCountriesByContinent;
+        }
+    }
+    public Dictionary<Country, City[]> AllCitiesByCountry
+    {
+        get
+        {
+            Dictionary<Country, City[]> allCitiesByCountry = new();
+            foreach (Country country in AllCountries)
+            {
+                allCitiesByCountry.Add(country, country.cities);
+            }
+            return allCitiesByCountry;
+        }
+    }
+    public Dictionary<Continent, Dictionary<Country, City[]>> AllCitiesByCountryByContinent
+    {
+        get
+        {
+            Dictionary<Continent, Dictionary<Country, City[]>> allCitiesByCountryByContinent = new();
+            foreach (Continent continent in AllContinents)
+            {
+                Dictionary<Country, City[]> allCitiesByCountry = new();
+                foreach (Country country in continent.countries)
+                {
+                    allCitiesByCountry.Add(country, country.cities);
+                }
+                allCitiesByCountryByContinent.Add(continent, allCitiesByCountry);
+            }
+            return allCitiesByCountryByContinent;
+        }
+    }
+
+
 
     [Serializable]
     public class SerializedMapData
@@ -160,6 +232,30 @@ public class MapDataCollector : MonoBehaviour
         public Continent[] continents;
         protected override void GeneratedPopulation(SerializedMapData[] childData) { continents = Array.ConvertAll(childData, i => (Continent)i); }
         protected override SerializedMapData CreateSerializedMapData(MapData mapData) { return new Continent(mapData); }
+        public Country[] countries
+        {
+            get
+            {
+                List<Country> countries = new();
+                foreach (Continent continent in continents)
+                {
+                    countries.AddRange(continent.countries);
+                }
+                return countries.ToArray();
+            }
+        }
+        public City[] cities
+        {
+            get
+            {
+                List<City> cities = new();
+                foreach (Country country in countries)
+                {
+                    cities.AddRange(country.cities);
+                }
+                return cities.ToArray();
+            }
+        }
     }
     [Serializable]
     public class Continent : SerializedMapData
@@ -168,6 +264,18 @@ public class MapDataCollector : MonoBehaviour
         public Country[] countries;
         protected override void GeneratedPopulation(SerializedMapData[] childData) { countries = Array.ConvertAll(childData, i => (Country)i); }
         protected override SerializedMapData CreateSerializedMapData(MapData mapData) { return new Country(mapData); }
+        public City[] cities
+        {
+            get
+            {
+                List<City> cities = new();
+                foreach (Country country in countries)
+                {
+                    cities.AddRange(country.cities);
+                }
+                return cities.ToArray();
+            }
+        }
     }
     [Serializable]
     public class Country : SerializedMapData
