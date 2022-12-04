@@ -14,20 +14,22 @@ public class MapDataCollector : MonoBehaviour
         {
             if (_instance == null)
             {
-                // GameObject[] objs = SceneManager.GetActiveScene().GetRootGameObjects()
-                //     .Where(obj => obj.transform.parent == null).ToArray();
-                GameObject[] objs = StaticMethods.GetSceneRootObjects().ToArray();
+                GameObject[] objs = SceneManager.GetActiveScene().GetRootGameObjects()
+                    .Where(obj => obj.transform.parent == null).ToArray();
 
-                for (int i = 0; i < objs.Length; i++) {
-                    Debug.Log(i + ": " + objs[i].name);
-                    if (objs[i].TryGetComponent(out MapDataCollector mdc)) {
+                for (int i = 0; i < objs.Length; i++)
+                {
+                    if (objs[i].TryGetComponent(out MapDataCollector mdc))
+                    {
                         mdc.Initialize();
-                        if (mdc != null && mdc == _instance) {
+                        if (mdc != null && mdc == _instance)
+                        {
                             return _instance;
                         }
                     }
                 }
-                if (_instance == null) {
+                if (_instance == null)
+                {
                     Debug.LogError("ERROR: could not find any MapDataCollector in scene, ensure that one exists, returning null");
                 }
             }
