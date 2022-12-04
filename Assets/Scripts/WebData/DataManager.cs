@@ -92,6 +92,10 @@ public class DataManager : DataDownloader
             separator = Mathf.Max(containingFolder.LastIndexOf('\\'),
                 containingFolder.LastIndexOf('/'));
             containingFolder = containingFolder.Substring(separator + 1);
+            string filePathDirectoryOnly = file.Substring(0, file.IndexOf(fileNameWithExtension) - 1);
+            int resourcesIndex = filePathDirectoryOnly.IndexOf("Resources");
+            string resourcesPath = filePathDirectoryOnly.Substring(resourcesIndex + 10);
+
             Dataset.DataFormat format = Dataset.DataFormat.CSV;
             switch (type)
             {
@@ -116,11 +120,15 @@ public class DataManager : DataDownloader
                     format = Dataset.DataFormat.ERROR;
                     break;
             }
+
+            TextAsset dataFile = Resources.Load(Path.Combine(resourcesPath, fileName)) as TextAsset;
+
             Dataset dataset = new Dataset
             {
                 fileName = string.Join(' ', containingFolder, ':', fileName),
                 format = format,
                 filePath = file,
+                dataFile = dataFile,
             };
             if (isCity)
                 cityDatasets.Add(dataset);

@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine;
 
 [Serializable]
 public class Dataset
@@ -11,6 +12,8 @@ public class Dataset
     public string fileName;
 
     public DataFormat format = DataFormat.CSV;
+
+    public TextAsset dataFile;
 
     public string actualName;
 
