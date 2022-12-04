@@ -7,10 +7,10 @@ using UnityEngine;
 [CustomEditor(typeof(DataDownloader))]
 public class DataDownloaderEditor : Editor {
 
-    private DataDownloader script;
+    private DataDownloader dataDownloader;
 
-    private void OnEnable() {
-        script = (DataDownloader)target;
+    protected virtual void OnEnable() {
+        dataDownloader = (DataDownloader)target;
     }
 
     public override void OnInspectorGUI() {
@@ -20,7 +20,7 @@ public class DataDownloaderEditor : Editor {
         GUILayout.Space(5);
 
         if (GUILayout.Button("Test Download")) {
-            script.TestDownload();
+            dataDownloader.TestDownload();
         }
     }
 

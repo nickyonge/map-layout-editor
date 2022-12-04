@@ -10,9 +10,10 @@ public class DataManagerEditor : DataDownloaderEditor
 
     private DataManager dataManager;
 
-    private void OnEnable()
+    protected override void OnEnable()
     {
         dataManager = (DataManager)target;
+        base.OnEnable();
     }
 
     public override void OnInspectorGUI()
