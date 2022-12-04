@@ -8,9 +8,13 @@ public class DataManager : DataDownloader
 {
     public static DataManager instance;
 
+    const bool DEBUG_UNIMPLEMENTED_FORMATS = false;
+    const bool SKIP_UNIMPLEMENTED_FORMATS = true;
+
 
     public Dataset[] cityDatasets;
     public Dataset[] countryDatasets;
+
 
 
     private MapDataCollector mapData;
@@ -79,10 +83,21 @@ public class DataManager : DataDownloader
                 {
                     // improperly organized data, skip to next item 
                     Debug.LogWarning("WARNING: found data file, not organized as either " +
-                        "city nor country. Consider organizing. File: " + file);
+                        $"city nor country. Consider organizing. File: {file}", gameObject);
                     continue;
                 }
             }
+
+            // generate streamreader, ensure file exists 
+            StreamReader streamReader = new StreamReader(file);
+            if (streamReader.Peek() < 0)
+            {
+                Debug.LogWarning("WARNING: was unable to generate StreamReader from file " +
+                    $"{file}, skipping", gameObject);
+                continue;
+            }
+            string firstLine = streamReader.ReadLine();
+
             int separator = Mathf.Max(file.LastIndexOf('\\'), file.LastIndexOf('/'));
             string fileNameWithExtension = file.Substring(separator + 1);
             int extensionIndex = fileNameWithExtension.LastIndexOf('.');
@@ -97,22 +112,33 @@ public class DataManager : DataDownloader
             string resourcesPath = filePathDirectoryOnly.Substring(resourcesIndex + 10);
 
             Dataset.DataFormat format = Dataset.DataFormat.CSV;
+            string[] indicators = new string[0];
+            #pragma warning disable CS0162
             switch (type)
             {
                 case "csv":
                     format = Dataset.DataFormat.CSV;
+                    indicators = firstLine.Split(',');
                     break;
                 case "xls":
                     format = Dataset.DataFormat.XLS;
+                    if (DEBUG_UNIMPLEMENTED_FORMATS) Debug.LogWarning("WARNING: TEST XLS FOR FUNCTION");
+                    if (SKIP_UNIMPLEMENTED_FORMATS) continue;
                     break;
                 case "xlsx":
                     format = Dataset.DataFormat.XLSX;
+                    if (DEBUG_UNIMPLEMENTED_FORMATS) Debug.LogWarning("WARNING: TEST XLSX FOR FUNCTION");
+                    if (SKIP_UNIMPLEMENTED_FORMATS) continue;
                     break;
                 case "json":
                     format = Dataset.DataFormat.JSON;
+                    if (DEBUG_UNIMPLEMENTED_FORMATS) Debug.LogWarning("WARNING: TEST JSON FOR FUNCTION");
+                    if (SKIP_UNIMPLEMENTED_FORMATS) continue;
                     break;
                 case "xml":
                     format = Dataset.DataFormat.XML;
+                    if (DEBUG_UNIMPLEMENTED_FORMATS) Debug.LogWarning("WARNING: TEST XML FOR FUNCTION");
+                    if (SKIP_UNIMPLEMENTED_FORMATS) continue;
                     break;
                 default:
                     Debug.LogError($"ERROR: Invalid Dataset format, format: {type}, " +
@@ -120,8 +146,10 @@ public class DataManager : DataDownloader
                     format = Dataset.DataFormat.ERROR;
                     break;
             }
+            #pragma warning restore CS0162
 
             TextAsset dataFile = Resources.Load(Path.Combine(resourcesPath, fileName)) as TextAsset;
+
 
             Dataset dataset = new Dataset
             {
@@ -129,6 +157,7 @@ public class DataManager : DataDownloader
                 format = format,
                 filePath = file,
                 dataFile = dataFile,
+                indicators = indicators,
             };
             if (isCity)
                 cityDatasets.Add(dataset);

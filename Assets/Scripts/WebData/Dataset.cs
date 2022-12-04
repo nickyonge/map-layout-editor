@@ -22,7 +22,7 @@ public class Dataset
 #endif
     public string description;
     
-    public string[] identifiers;
+    public string[] indicators;
 
     public string filePath;
 }
