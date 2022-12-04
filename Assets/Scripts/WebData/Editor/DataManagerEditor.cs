@@ -23,10 +23,28 @@ public class DataManagerEditor : DataDownloaderEditor
 
         GUILayout.Space(5);
 
-        if (GUILayout.Button("Load All Data"))
+        if (Btn("Load Data Files"))
         {
             dataManager.LoadAllDataFiles();
         }
+
+        if (Btn("Generate All Data")) {
+            dataManager.GenerateNewEntries();
+        }
+
+        GUILayout.BeginHorizontal();
+        if (Btn("Generate Countries")) {
+            dataManager.GenerateNewCountryEntries();
+        }
+        if (Btn("Generate Cities")) {
+            dataManager.GenerateNewCityEntries();
+        }
+        GUILayout.EndHorizontal();
+
+    }
+
+    private bool Btn(string label) {
+        return GUILayout.Button(label);
     }
 
 }
