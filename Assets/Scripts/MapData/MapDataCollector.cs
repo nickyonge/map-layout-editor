@@ -1,13 +1,44 @@
 using System;
-using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 [ExecuteInEditMode]
 public class MapDataCollector : MonoBehaviour
 {
-    public static MapDataCollector instance;
+    public static MapDataCollector instance
+    {
+        get
+        {
+            if (_instance == null)
+            {
+                // GameObject[] objs = SceneManager.GetActiveScene().GetRootGameObjects()
+                //     .Where(obj => obj.transform.parent == null).ToArray();
+                GameObject[] objs = StaticMethods.GetSceneRootObjects().ToArray();
+
+                for (int i = 0; i < objs.Length; i++) {
+                    Debug.Log(i + ": " + objs[i].name);
+                    if (objs[i].TryGetComponent(out MapDataCollector mdc)) {
+                        mdc.Initialize();
+                        if (mdc != null && mdc == _instance) {
+                            return _instance;
+                        }
+                    }
+                }
+                if (_instance == null) {
+                    Debug.LogError("ERROR: could not find any MapDataCollector in scene, ensure that one exists, returning null");
+                }
+            }
+            return _instance;
+        }
+        private set { _instance = value; }
+    }
+    /// <summary>
+    /// Internal ref only, use <see cref="instance">"instance"</see>, without the underscore
+    /// </summary>
+    private static MapDataCollector _instance;
 
 
     public World world;
@@ -21,7 +52,7 @@ public class MapDataCollector : MonoBehaviour
     {
         Initialize();
     }
-    private void Initialize()
+    internal void Initialize()
     {
         // ensure only one  instance exists 
         if (instance != null)
