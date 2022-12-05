@@ -128,9 +128,7 @@ public class Dataset
                         if (!string.IsNullOrWhiteSpace(data[i]))
                         {
                             // yup, data found :)
-                            Debug.Log("CleanIndexL: " + cleanIndices.Length + ", i: " + i + ", filename: " + fileName, dataFile);
                             int cleanIndex = cleanIndices[i];
-                            Debug.Log("CleanIndex: " + cleanIndex + ", sampleDataL: " + sampleData.Length + ", FORMAT: " + format);
                             sampleData[cleanIndex].value = data[i];
                             loadedData[i] = true;
                             // check if all data is fulfilled 
@@ -143,18 +141,8 @@ public class Dataset
                     }
                     catch
                     {
-                        Debug.LogError("ERR: Line" + currentLine + " dataLen, " + data.Length + ", i: " + i + ", file: " + fileName, dataFile);
-                        Debug.LogError("DataLine: " + dataLine, dataFile);
-                        for (int j = 0; j <= i; j++)
-                        {
-                            if (j < data.Length) {
-                                Debug.LogError("yep, " + j + "/" + i + ": " + data[j]);
-
-                            } else {
-                                Debug.LogError("nope " + j + "/" + i);
-                            }
-                        }
-                        throw new Exception();
+                        Debug.LogError($"ERROR: Failed to read line {currentLine}: {dataLine}\n" +
+                            $"Columns (data.Length): {data.Length}, loadedData.Length: {loadedData.Length}, current index: {i}", dataFile);
                     }
                 }
             }
