@@ -89,7 +89,18 @@ public class DataManager : DataDownloader
             }
 
             // generate streamreader, ensure file exists 
-            StreamReader streamReader = new StreamReader(file);
+            StreamReader streamReader = null;
+            try
+            {
+                streamReader = new StreamReader(file);
+            }
+            catch (IOException e)
+            {
+                // IO Exception
+                Debug.LogError("ERROR: IOException. If Excel is open, try closing it! " +
+                    "(Or any app that might be using the data files)");
+                throw e;
+            }
             if (streamReader.Peek() < 0)
             {
                 Debug.LogWarning("WARNING: was unable to generate StreamReader from file " +
