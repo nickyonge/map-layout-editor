@@ -99,7 +99,8 @@ public class DataManager : DataDownloader
             string fileName = fileNameWithExtension.Substring(0, extensionIndex);
 
             // check if filename should be skipped 
-            if (loadingParams.skipDatasets.ContainsAnyByIndex(fileName)) {
+            if (loadingParams.skipDatasets.ContainsAnyByIndex(fileName))
+            {
                 // skip this filename! 
                 continue;
             }
@@ -107,9 +108,10 @@ public class DataManager : DataDownloader
             // get containing folders 
             string[] containingFolders = GetContainingFolders(file);
             // check if containing folders should be ignored 
-            if ((containingFolders.Length == 1 && 
-                    loadingParams.skipDatasets.ContainsAnyByIndex(containingFolders[0])) || 
-                    loadingParams.skipContainerFolders.ContainsAnyByIndex(containingFolders)) {
+            if ((containingFolders.Length == 1 &&
+                    loadingParams.skipDatasets.ContainsAnyByIndex(containingFolders[0])) ||
+                    loadingParams.skipContainerFolders.ContainsAnyByIndex(containingFolders))
+            {
                 // yup! skip this folder 
                 continue;
             }
@@ -172,7 +174,8 @@ public class DataManager : DataDownloader
 #pragma warning restore CS0162
 
             // define containing folder text
-            string containingFolder = string.Join(" / ", containingFolders);
+            string containingFolder = containingFolders[0];
+            string containingFolderPathTitle = string.Join(" / ", containingFolders);
 
             // directory and resource loading refs 
             string filePathDirectoryOnly = file.Substring(0, file.IndexOf(fileNameWithExtension) - 1);
@@ -197,11 +200,12 @@ public class DataManager : DataDownloader
             // create the dataset 
             Dataset dataset = new Dataset
             {
-                fileName = string.Join(' ', containingFolder, ':', fileName),
+                fileName = string.Join(' ', containingFolderPathTitle, ':', fileName),
                 format = format,
                 filePath = file,
                 dataFile = dataFile,
                 entries = entries,
+                containingFolder = containingFolder,
             };
             // regenerate streamreader to load data 
             streamReader = new StreamReader(file);
@@ -218,7 +222,7 @@ public class DataManager : DataDownloader
         this.cityDatasets = cityDatasets.ToArray();
         this.countryDatasets = countryDatasets.ToArray();
     }
-    
+
 
     private string[] GetContainingFolders(string filePath)
     {
@@ -274,10 +278,40 @@ public class DataManager : DataDownloader
 
 
     [Serializable]
-    public class DatasetLoadingParams {
+    public class DatasetLoadingParams
+    {
 
         public string[] skipDatasets;
         public string[] skipContainerFolders;
+
+        public CustomDatasetProperties[] customProperties;
+
+        [Serializable]
+        public struct CustomDatasetProperties
+        {
+            public string dataset;
+            public int initialDataLine;
+        }
+
+        public int GetInitialDataLine(Dataset dataset)
+        {
+            return GetInitialDataLine(dataset.fileName, dataset.containingFolder);
+        }
+        public int GetInitialDataLine(string dataset, string containingFolder)
+        {
+            dataset = dataset.ToLower();
+            containingFolder = containingFolder.ToLower();
+            foreach (CustomDatasetProperties cdp in customProperties)
+            {
+                if (cdp.initialDataLine > 0 &&
+                    (cdp.dataset.ToLower().StartsWith(dataset) ||
+                    cdp.dataset.ToLower().StartsWith(containingFolder)))
+                {
+                    return cdp.initialDataLine + 1;
+                }
+            }
+            return 1;
+        }
 
     }
 

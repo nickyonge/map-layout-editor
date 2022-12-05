@@ -28,6 +28,8 @@ public class Dataset
 
     public int entries;
 
+    public string containingFolder;
+
     private bool _errorGenerated = false;
 
 
@@ -47,6 +49,8 @@ public class Dataset
     {
         // get indicators 
         int currentLine = 0;
+
+        // get indicator line 
         string unformattedIndicatorLine = streamReader.ReadLine();
         string[] rawIndicators = ParseLine(unformattedIndicatorLine);
         // remove invalid indicators 
