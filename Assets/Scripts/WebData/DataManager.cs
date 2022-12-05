@@ -21,7 +21,7 @@ public class DataManager : DataDownloader
 
     private void Start()
     {
-
+        Initialize();
     }
 
     public void Initialize()
@@ -108,18 +108,6 @@ public class DataManager : DataDownloader
                 continue;
             }
 
-            // count line entries (designed for CSV, need to modify for other types)
-            int entries = -1;// start at -1 for the indicators line 
-            while (streamReader.ReadLine() != null)
-            {
-                entries++;
-                if (entries > 999999)
-                {
-                    Debug.LogError("ERROR: dataset too large! Over a million entries, yikes");
-                }
-            }
-            streamReader.Close();
-
             // get all necessary text info, filenames, extensions, etc 
             int separator = Mathf.Max(file.LastIndexOf('\\'), file.LastIndexOf('/'));
             string fileNameWithExtension = file.Substring(separator + 1);
@@ -172,9 +160,22 @@ public class DataManager : DataDownloader
             }
 #pragma warning restore CS0162
 
+            // use streamreader to count line entries (designed for CSV, need to modify for other types)
+            int entries = -1;// start at -1 for the indicators line 
+            while (streamReader.ReadLine() != null)
+            {
+                entries++;
+                if (entries > 999999)
+                {
+                    Debug.LogError("ERROR: dataset too large! Over a million entries, yikes");
+                }
+            }
+            streamReader.Close();
+
+            // load data file textasset 
             TextAsset dataFile = Resources.Load(Path.Combine(resourcesPath, fileName)) as TextAsset;
 
-
+            // create the dataset 
             Dataset dataset = new Dataset
             {
                 fileName = string.Join(' ', containingFolder, ':', fileName),
@@ -183,7 +184,6 @@ public class DataManager : DataDownloader
                 dataFile = dataFile,
                 entries = entries,
             };
-
             // regenerate streamreader to load data 
             streamReader = new StreamReader(file);
             dataset.LoadData(streamReader);
@@ -195,6 +195,7 @@ public class DataManager : DataDownloader
                 countryDatasets.Add(dataset);
         }
 
+        // assign local datasets 
         this.cityDatasets = cityDatasets.ToArray();
         this.countryDatasets = countryDatasets.ToArray();
     }
