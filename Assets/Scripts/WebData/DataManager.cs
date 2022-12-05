@@ -8,8 +8,8 @@ public class DataManager : DataDownloader
 {
     public static DataManager instance;
 
-    const bool DEBUG_UNIMPLEMENTED_FORMATS = false;
-    const bool SKIP_UNIMPLEMENTED_FORMATS = true;
+    public const bool DEBUG_UNIMPLEMENTED_FORMATS = false;
+    public const bool SKIP_UNIMPLEMENTED_FORMATS = true;
 
 
     public Dataset[] cityDatasets;
@@ -96,7 +96,17 @@ public class DataManager : DataDownloader
                     $"{file}, skipping", gameObject);
                 continue;
             }
-            string firstLine = streamReader.ReadLine();
+
+            // count line entries (designed for CSV, need to modify for other types)
+            int entries = -1;// start at -1 for the indicators line 
+            while (streamReader.ReadLine() != null) {
+                entries++;
+                if (entries > 999999) {
+                    Debug.LogError("ERROR: dataset too large! Over a million entries, yikes");
+                }
+            }
+            streamReader.Close();
+
 
             int separator = Mathf.Max(file.LastIndexOf('\\'), file.LastIndexOf('/'));
             string fileNameWithExtension = file.Substring(separator + 1);
@@ -112,13 +122,11 @@ public class DataManager : DataDownloader
             string resourcesPath = filePathDirectoryOnly.Substring(resourcesIndex + 10);
 
             Dataset.DataFormat format = Dataset.DataFormat.CSV;
-            string[] indicators = new string[0];
-            #pragma warning disable CS0162
+#pragma warning disable CS0162
             switch (type)
             {
                 case "csv":
                     format = Dataset.DataFormat.CSV;
-                    indicators = firstLine.Split(',');
                     break;
                 case "xls":
                     format = Dataset.DataFormat.XLS;
@@ -146,7 +154,7 @@ public class DataManager : DataDownloader
                     format = Dataset.DataFormat.ERROR;
                     break;
             }
-            #pragma warning restore CS0162
+#pragma warning restore CS0162
 
             TextAsset dataFile = Resources.Load(Path.Combine(resourcesPath, fileName)) as TextAsset;
 
@@ -157,8 +165,14 @@ public class DataManager : DataDownloader
                 format = format,
                 filePath = file,
                 dataFile = dataFile,
-                indicators = indicators,
+                entries = entries,
             };
+            
+            // regenerate streamreader to load data 
+            streamReader = new StreamReader(file);
+            dataset.LoadData(streamReader);
+
+            // assign datasets 
             if (isCity)
                 cityDatasets.Add(dataset);
             else
