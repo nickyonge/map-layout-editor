@@ -110,9 +110,11 @@ public class DataManager : DataDownloader
 
             // count line entries (designed for CSV, need to modify for other types)
             int entries = -1;// start at -1 for the indicators line 
-            while (streamReader.ReadLine() != null) {
+            while (streamReader.ReadLine() != null)
+            {
                 entries++;
-                if (entries > 999999) {
+                if (entries > 999999)
+                {
                     Debug.LogError("ERROR: dataset too large! Over a million entries, yikes");
                 }
             }
@@ -178,7 +180,7 @@ public class DataManager : DataDownloader
                 dataFile = dataFile,
                 entries = entries,
             };
-            
+
             // regenerate streamreader to load data 
             streamReader = new StreamReader(file);
             dataset.LoadData(streamReader);

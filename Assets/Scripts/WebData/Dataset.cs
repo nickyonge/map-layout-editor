@@ -46,6 +46,7 @@ public class Dataset
     public void LoadData(StreamReader streamReader)
     {
         // get indicators 
+        int currentLine = 0;
         string unformattedIndicatorLine = streamReader.ReadLine();
         string[] rawIndicators = ParseLine(unformattedIndicatorLine);
         // remove invalid indicators 
@@ -59,7 +60,7 @@ public class Dataset
             if (string.IsNullOrWhiteSpace(rawIndicators[i]))
             {
                 isBlank = true;
-                Debug.LogWarning($"WARNING: Column {i} in {fileName} is blank, " + 
+                Debug.LogWarning($"WARNING: Column {i} in {fileName} is blank, " +
                     "consider naming this indicator");
             }
             // add unique values 
@@ -102,39 +103,58 @@ public class Dataset
                     $"{fileName}, this should be impossible, investigate data. Safely escaping while loop.");
                 break;
             }
-            string line = streamReader.ReadLine();
-            if (line == null)
+            string dataLine = streamReader.ReadLine();
+            currentLine++;
+            if (dataLine == null)
             {
                 // hit the end of the document 
                 break;
             }
-            if (string.IsNullOrWhiteSpace(line))
+            if (string.IsNullOrWhiteSpace(dataLine))
             {
                 // empty line 
                 continue;
             }
             // we've got a line! parse it 
-            string[] data = ParseLine(line);
+            string[] data = ParseLine(dataLine);
             // iterate through loaded data to apply parsed info 
             for (int i = 0; i < loadedData.Length; i++)
             {
                 if (!loadedData[i])
                 {
                     // data is not yet loaded, so check if we can load it! 
-                    if (!string.IsNullOrWhiteSpace(data[i]))
+                    try
                     {
-                        // yup, data found :)
-                        Debug.Log("CleanIndexL: " + cleanIndices.Length + ", i: " + i + ", filename: " + fileName, dataFile); 
-                        int cleanIndex = cleanIndices[i];
-                        Debug.Log("CleanIndex: " + cleanIndex + ", sampleDataL: " + sampleData.Length + ", FORMAT: " + format);
-                        sampleData[cleanIndex].value = data[i];
-                        loadedData[i] = true;
-                        // check if all data is fulfilled 
-                        if (!Array.Exists(loadedData, element => !element))
+                        if (!string.IsNullOrWhiteSpace(data[i]))
                         {
-                            // all data loaded! 
-                            break;
+                            // yup, data found :)
+                            Debug.Log("CleanIndexL: " + cleanIndices.Length + ", i: " + i + ", filename: " + fileName, dataFile);
+                            int cleanIndex = cleanIndices[i];
+                            Debug.Log("CleanIndex: " + cleanIndex + ", sampleDataL: " + sampleData.Length + ", FORMAT: " + format);
+                            sampleData[cleanIndex].value = data[i];
+                            loadedData[i] = true;
+                            // check if all data is fulfilled 
+                            if (!Array.Exists(loadedData, element => !element))
+                            {
+                                // all data loaded! 
+                                break;
+                            }
                         }
+                    }
+                    catch
+                    {
+                        Debug.LogError("ERR: Line" + currentLine + " dataLen, " + data.Length + ", i: " + i + ", file: " + fileName, dataFile);
+                        Debug.LogError("DataLine: " + dataLine, dataFile);
+                        for (int j = 0; j <= i; j++)
+                        {
+                            if (j < data.Length) {
+                                Debug.LogError("yep, " + j + "/" + i + ": " + data[j]);
+
+                            } else {
+                                Debug.LogError("nope " + j + "/" + i);
+                            }
+                        }
+                        throw new Exception();
                     }
                 }
             }
@@ -145,7 +165,8 @@ public class Dataset
             // some data is still false :( 
             Debug.LogWarning($"WARNING: some data is still false in the dataset {fileName}");
             string s = "Index : CleanIndex : LoadedData : RawIndicator\n\n";
-            for (int i = 0; i < rawIndicators.Length; i++) {
+            for (int i = 0; i < rawIndicators.Length; i++)
+            {
                 s += "\n" + i.ToString() + " : " + cleanIndices[i] + " : " + loadedData[i] + " : " + rawIndicators[i];
             }
         }
