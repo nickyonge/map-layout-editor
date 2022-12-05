@@ -120,20 +120,23 @@ public class DataManager : DataDownloader
             }
             streamReader.Close();
 
-
+            // get all necessary text info, filenames, extensions, etc 
             int separator = Mathf.Max(file.LastIndexOf('\\'), file.LastIndexOf('/'));
             string fileNameWithExtension = file.Substring(separator + 1);
             int extensionIndex = fileNameWithExtension.LastIndexOf('.');
             string type = fileNameWithExtension.Substring(extensionIndex + 1).ToLower();
             string fileName = fileNameWithExtension.Substring(0, extensionIndex);
-            string containingFolder = file.Substring(0, separator);
-            separator = Mathf.Max(containingFolder.LastIndexOf('\\'),
-                containingFolder.LastIndexOf('/'));
-            containingFolder = containingFolder.Substring(separator + 1);
+
+            // get containing folders 
+            string[] containingFolders = GetContainingFolders(file);
+            string containingFolder = string.Join(" / ", containingFolders);
+
+            // directory and resource loading refs 
             string filePathDirectoryOnly = file.Substring(0, file.IndexOf(fileNameWithExtension) - 1);
             int resourcesIndex = filePathDirectoryOnly.IndexOf("Resources");
             string resourcesPath = filePathDirectoryOnly.Substring(resourcesIndex + 10);
 
+            // determine filetype format 
             Dataset.DataFormat format = Dataset.DataFormat.CSV;
 #pragma warning disable CS0162
             switch (type)
@@ -196,6 +199,41 @@ public class DataManager : DataDownloader
         this.countryDatasets = countryDatasets.ToArray();
     }
 
+    private string[] GetContainingFolders(string filePath)
+    {
+        int separator = Mathf.Max(filePath.LastIndexOf('\\'), filePath.LastIndexOf('/'));
+        List<string> containingFolders = new();
+        string origPath = filePath;
+        int failsafe = filePath.Length + 1;
+        while (failsafe > 0)
+        {
+            failsafe--;
+            if (failsafe == 0)
+            {
+                Debug.LogError("ERROR: Failsafe hit zero getting parent folders for path " +
+                    $"{origPath}, this should be impossible investigate", gameObject);
+                break;
+            }
+            string containingFolder = filePath.Substring(0, separator);
+            separator = Mathf.Max(containingFolder.LastIndexOf('\\'),
+                containingFolder.LastIndexOf('/'));
+            containingFolder = containingFolder.Substring(separator + 1).Trim();
+            // check if containing folder is valid
+            switch (containingFolder)
+            {
+                case "CityData":
+                case "CountryData":
+                    // done, hop out of the city/country data folders 
+                    failsafe = 0;
+                    break;
+                default:
+                    filePath = filePath.Substring(0, separator);
+                    containingFolders.Insert(0, containingFolder);
+                    break;
+            }
+        }
+        return containingFolders.ToArray();
+    }
 
     public void GenerateNewEntries()
     {
