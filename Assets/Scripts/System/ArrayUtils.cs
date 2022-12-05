@@ -12,7 +12,7 @@ public static class ArrayUtils
     public static bool Contains<T>(this T[] array, T value)
     {
         // check if generic elements exist within array 
-        return Array.Exists(array, element =>
+        return array != null && array.Length > 0 && Array.Exists(array, element =>
             EqualityComparer<T>.Default.Equals(element, value));
     }
     public static bool ContainsAnyByIndex(this string[] stringArray, string value)
