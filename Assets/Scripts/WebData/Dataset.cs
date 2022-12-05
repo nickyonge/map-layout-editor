@@ -102,10 +102,26 @@ public class Dataset
                 }
             }
         }
+        // ensure that indicators are properly formatted
+        for (int i = 0; i < indicators.Length; i++)
+        {
+            // ensure indicator doesn't start with invalid char 
+            while (
+                indicators[i].StartsWith('_') || indicators[i].StartsWith('-') || indicators[i].StartsWith('[') ||
+                indicators[i].StartsWith('{') || indicators[i].StartsWith('(') || indicators[i].StartsWith('"') ||
+                indicators[i].StartsWith("'") || indicators[i].StartsWith('.') || indicators[i].StartsWith(' '))
+            { indicators[i] = indicators[i].Substring(1); }
+            // ensure indicator doesn't end with invalid char 
+            while (
+                indicators[i].EndsWith('_') || indicators[i].EndsWith('-') || indicators[i].EndsWith(']') ||
+                indicators[i].EndsWith('}') || indicators[i].EndsWith(')') || indicators[i].EndsWith('"') ||
+                indicators[i].EndsWith("'") || indicators[i].EndsWith('.') || indicators[i].EndsWith(' '))
+            { indicators[i] = indicators[i].Substring(0, indicators[i].Length - 1); }
+        }
 
         // get indicator line 
-        string unformattedIndicatorLine = string.Join(',', indicators);
-        indicators = ParseLine(unformattedIndicatorLine);
+        // string unformattedIndicatorLine = string.Join(',', indicators);
+        // indicators = ParseLine(unformattedIndicatorLine);
         // remove invalid indicators 
         List<string> listIndicators = new();
         // generate sample data 
@@ -175,14 +191,78 @@ public class Dataset
         // presumably done loading data, check if all data is true 
         if (Array.Exists(loadedData, element => !element))
         {
-            // some data is still false :( 
-            string s = "Index : LoadedData : Indicator";
-            for (int i = 0; i < indicators.Length; i++)
+            // some data is still false, check for soft field indicators 
+            // get false field indicators 
+            bool b = fileName.IndexOf("ump_rateedu") >= 0;
+            List<Tuple<string, int>> falseFieldIndicators = new();
+            for (int i = 0; i < loadedData.Length; i++)
             {
-                s += "\n" + i.ToString() + " : " + loadedData[i] + " : " + indicators[i];
+                if (!loadedData[i])
+                {
+                    if (b)
+                    {
+                        Debug.Log("INDICATOR FOUND BAD " + i + ":" + indicators[i]);
+                    }
+                    falseFieldIndicators.Add(new Tuple<string, int>(indicators[i], i));
+                }
             }
-            Debug.LogWarning($"WARNING: some data is still false in the dataset {fileName}" + 
-                $"\nFurther details in this warning message \n{s}", dataFile);
+            // got false indicators, check if they're listed 
+            List<int> removeIndicators = new();
+            if (b) Debug.Log("FFI TUPS LENGTH: " + falseFieldIndicators.Count);
+            foreach (Tuple<string, int> indicator in falseFieldIndicators)
+            {
+                if (b) Debug.Log(1);
+                if (DataManager.instance.loadingParams.softIgnoreIndicators.Contains(indicator.Item1))
+                {
+                    if (b) Debug.Log(2 + ", Item1: " + indicator.Item1 + ", Item2: " + indicator.Item2);
+                    // yup! indicator is false field, slate it to be removed 
+                    removeIndicators.Add(indicator.Item2);
+                }
+            }
+            // check if any indicators are slated to be removed 
+            if (b) Debug.Log("REMOVE COUNT: " + removeIndicators.Count);
+            if (removeIndicators.Count > 0)
+            {
+                if (b) Debug.Log("COUNT0: " + removeIndicators[0]);
+                // iterate through and remove necessary indicators from: indicators, loadedData, sampleData
+                // create temp arrays to hold new data 
+                string[] newIndicators = new string[indicators.Length - removeIndicators.Count];
+                bool[] newLoadedData = new bool[loadedData.Length - removeIndicators.Count];
+                SampleData[] newSampleData = new SampleData[sampleData.Length - removeIndicators.Count];
+                index = 0;
+                // iterate thru old indicators 
+                for (int i = 0; i < indicators.Length; i++)
+                {
+                    // check for indicator to be removed, and if so, skip 
+                    if (removeIndicators.Contains(i))
+                    {
+                        removeIndicators.Remove(i);
+                        if (b) Debug.Log("SKIPPING: " + indicators[i] + "," + i);
+                        continue;
+                    }
+                    if (b) Debug.Log("ADDING: " + indicators[i] + "," + i);
+                    newIndicators[index] = indicators[i];
+                    newSampleData[index] = sampleData[i];
+                    newLoadedData[index] = loadedData[i];
+                    index++;
+                }
+                // update arrays 
+                indicators = newIndicators;
+                loadedData = newLoadedData;
+                sampleData = newSampleData;
+                newSampleData = new SampleData[0];// GC failsafe for struct 
+            }
+            // done, check again for non-soft false indicators 
+            if (Array.Exists(loadedData, element => !element))
+            {
+                string s = "Index : LoadedData : Indicator";
+                for (int i = 0; i < indicators.Length; i++)
+                {
+                    s += "\n" + i.ToString() + " : " + loadedData[i] + " : " + indicators[i];
+                }
+                Debug.LogWarning($"WARNING: some data is still false in the dataset {fileName}" +
+                    $"\nFurther details in this warning message \n{s}", dataFile);
+            }
         }
     }
 

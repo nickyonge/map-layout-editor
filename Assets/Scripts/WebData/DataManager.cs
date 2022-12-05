@@ -284,6 +284,13 @@ public class DataManager : DataDownloader
         public string[] skipDatasets;
         public string[] skipContainerFolders;
 
+        /// <summary>
+        /// these indicators will be dropped from tables if no fields are found for them 
+        /// </summary>
+        [Space(5)]
+        public string[] softIgnoreIndicators;
+
+        [Space(5)]
         public CustomDatasetProperties[] customProperties;
 
         [Serializable]
