@@ -290,7 +290,7 @@ public class DataManager : DataDownloader
         public struct CustomDatasetProperties
         {
             public string dataset;
-            public int initialDataLine;
+            public int dataLineCount;
         }
 
         public int GetInitialDataLine(Dataset dataset)
@@ -301,18 +301,20 @@ public class DataManager : DataDownloader
         {
             dataset = dataset.ToLower();
             containingFolder = containingFolder.ToLower();
-            foreach (CustomDatasetProperties cdp in customProperties)
+            if (customProperties != null && customProperties.Length > 0)
             {
-                if (cdp.initialDataLine > 0 &&
-                    (cdp.dataset.ToLower().StartsWith(dataset) ||
-                    cdp.dataset.ToLower().StartsWith(containingFolder)))
+                foreach (CustomDatasetProperties cdp in customProperties)
                 {
-                    return cdp.initialDataLine + 1;
+                    if (cdp.dataLineCount > 0 &&
+                        (cdp.dataset.ToLower().StartsWith(dataset) ||
+                        cdp.dataset.ToLower().StartsWith(containingFolder)))
+                    {
+                        return cdp.dataLineCount - 1;
+                    }
                 }
             }
-            return 1;
+            return 0;
         }
-
     }
 
 }

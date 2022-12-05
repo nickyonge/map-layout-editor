@@ -24,6 +24,7 @@ public class Dataset
     public string description;
 
     public string[] indicators;
+
     public SampleData[] sampleData;
 
     public int entries;
@@ -48,39 +49,65 @@ public class Dataset
     public void LoadData(StreamReader streamReader)
     {
         // get indicators 
-        int currentLine = 0;
+        int currentLine = DataManager.instance.loadingParams.GetInitialDataLine(this);
+
+        string[] preDataText = new string[currentLine + 1];
+        List<string[]> preDataLinesList = new();
+        int columns = -1;
+        for (int i = 0; i < preDataText.Length; i++)
+        {
+            preDataText[i] = streamReader.ReadLine();
+            // ensure we didn't overrun the file 
+            if (preDataText[i] == null)
+            {
+                Debug.LogError("ERROR: readline returned null, presumably we've already exceeded the dataset height. \n" +
+                    $"FileName: {fileName}, PreDataLines: {currentLine}, ErrorLine: {i}", dataFile);
+                return;
+            }
+            string[] newData = preDataText[i].Split(',');
+            preDataLinesList.Add(newData);
+            if (i == 0 || columns == -1)
+            {
+                columns = newData.Length;
+            }
+            else if (newData.Length != columns)
+            {
+                Debug.LogError($"ERROR: Column count mismatch on line {i} in file {fileName}\n" +
+                    $"Col:{columns},LineCount:{newData.Length}, investigate", dataFile);
+                return;
+            }
+        }
+        // 2D array index corner references (L = length) 
+        // 0/0=top-left, L/0=bottom-left, 0/L=top-right, L/L=bottom-right 
+        indicators = new string[columns];
+        if (currentLine <= 0)
+        {
+            // single line of info, read indicators directly 
+            currentLine = 1;
+            indicators = preDataLinesList[0];
+        }
+        else
+        {
+            string[][] preData = preDataLinesList.ToArray();
+            for (int i = 0; i < columns; i++)
+            {
+                indicators[i] = "";
+                for (int j = preData.Length - 1; j >= 0; j--)
+                {
+                    if (!string.IsNullOrWhiteSpace(preData[j][i]))
+                    {
+                        indicators[i] = preData[j][i];
+                        break;
+                    }
+                }
+            }
+        }
 
         // get indicator line 
-        string unformattedIndicatorLine = streamReader.ReadLine();
-        string[] rawIndicators = ParseLine(unformattedIndicatorLine);
+        string unformattedIndicatorLine = string.Join(',', indicators);
+        indicators = ParseLine(unformattedIndicatorLine);
         // remove invalid indicators 
         List<string> listIndicators = new();
-        int[] cleanIndices = new int[rawIndicators.Length];
-        for (int i = 0; i < rawIndicators.Length; i++)
-        {
-            cleanIndices[i] = -1;
-            // generate warning for empty IDs 
-            bool isBlank = false;
-            if (string.IsNullOrWhiteSpace(rawIndicators[i]))
-            {
-                isBlank = true;
-                Debug.LogWarning($"WARNING: Column {i} in {fileName} is blank, " +
-                    "consider naming this indicator");
-            }
-            // add unique values 
-            if (isBlank || !listIndicators.Contains(rawIndicators[i]))
-            {
-                cleanIndices[i] = listIndicators.Count;
-                listIndicators.Add(rawIndicators[i]);
-            }
-        }
-        if (listIndicators.Count == 0)
-        {
-            Debug.LogError($"ERROR: After cleaning, NO valid indicators in {format} dataset: "
-                + $"{fileName}, investigate or ignore this dataset. Raw Indicator line:\n{unformattedIndicatorLine}");
-            return;
-        }
-        indicators = listIndicators.ToArray();
         // generate sample data 
         sampleData = new SampleData[indicators.Length];
         int index = 0;
@@ -91,11 +118,6 @@ public class Dataset
         }
         // reference to data that's already been loaded 
         bool[] loadedData = new bool[sampleData.Length];
-        for (int i = 0; i < loadedData.Length; i++)
-        {
-            // use clean index reference to ignore unnecessary raw columns 
-            loadedData[i] = !Array.Exists(cleanIndices, element => element == i);
-        }
 
         int failsafe = Mathf.Max(entries, 0) + 1;// ensure we don't get stuck 
         while (failsafe > 0)
@@ -104,7 +126,7 @@ public class Dataset
             if (failsafe < 0)
             {
                 Debug.LogWarning("WARNING: exceeded entries while reading dataset: " +
-                    $"{fileName}, this should be impossible, investigate data. Safely escaping while loop.");
+                    $"{fileName}, this should be impossible, investigate data. Safely escaping while loop.", dataFile);
                 break;
             }
             string dataLine = streamReader.ReadLine();
@@ -132,8 +154,7 @@ public class Dataset
                         if (!string.IsNullOrWhiteSpace(data[i]))
                         {
                             // yup, data found :)
-                            int cleanIndex = cleanIndices[i];
-                            sampleData[cleanIndex].value = data[i];
+                            sampleData[i].value = data[i];
                             loadedData[i] = true;
                             // check if all data is fulfilled 
                             if (!Array.Exists(loadedData, element => !element))
@@ -155,12 +176,13 @@ public class Dataset
         if (Array.Exists(loadedData, element => !element))
         {
             // some data is still false :( 
-            Debug.LogWarning($"WARNING: some data is still false in the dataset {fileName}");
-            string s = "Index : CleanIndex : LoadedData : RawIndicator\n\n";
-            for (int i = 0; i < rawIndicators.Length; i++)
+            string s = "Index : LoadedData : Indicator";
+            for (int i = 0; i < indicators.Length; i++)
             {
-                s += "\n" + i.ToString() + " : " + cleanIndices[i] + " : " + loadedData[i] + " : " + rawIndicators[i];
+                s += "\n" + i.ToString() + " : " + loadedData[i] + " : " + indicators[i];
             }
+            Debug.LogWarning($"WARNING: some data is still false in the dataset {fileName}" + 
+                $"\nFurther details in this warning message \n{s}", dataFile);
         }
     }
 
@@ -180,7 +202,7 @@ public class Dataset
                     if (!_errorGenerated)
                     {
                         Debug.LogWarning($"WARNING: unimplemented DataFormat {format}, " +
-                            $"can't parse line data for dataset {fileName}, returning ',' split");
+                            $"can't parse line data for dataset {fileName}, returning ',' split", dataFile);
                         _errorGenerated = true;
                     }
                 }
@@ -190,7 +212,7 @@ public class Dataset
                 if (!_errorGenerated)
                 {
                     Debug.LogError($"ERROR: invalid DataFormat {format}, " +
-                        $"can't parse line data for dataset {fileName}, returning ',' split");
+                        $"can't parse line data for dataset {fileName}, returning ',' split", dataFile);
                     _errorGenerated = true;
                 }
                 return input.Split(',');
