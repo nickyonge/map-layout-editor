@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -11,6 +12,7 @@ public class DataManager : DataDownloader
     public const bool DEBUG_UNIMPLEMENTED_FORMATS = false;
     public const bool SKIP_UNIMPLEMENTED_FORMATS = true;
 
+    public DatasetLoadingParams loadingParams;
 
     public Dataset[] cityDatasets;
     public Dataset[] countryDatasets;
@@ -58,6 +60,8 @@ public class DataManager : DataDownloader
     {
         Initialize();
 
+        if (loadingParams == null) { loadingParams = new(); }
+
         string path = Path.Combine(Application.dataPath, "Data");
 
         List<string> files = Directory
@@ -88,6 +92,28 @@ public class DataManager : DataDownloader
                 }
             }
 
+            // get all necessary text info, filenames, extensions, etc 
+            int separator = Mathf.Max(file.LastIndexOf('\\'), file.LastIndexOf('/'));
+            string fileNameWithExtension = file.Substring(separator + 1);
+            int extensionIndex = fileNameWithExtension.LastIndexOf('.');
+            string fileName = fileNameWithExtension.Substring(0, extensionIndex);
+
+            // check if filename should be skipped 
+            if (loadingParams.skipDatasets.ContainsAnyByIndex(fileName)) {
+                // skip this filename! 
+                continue;
+            }
+
+            // get containing folders 
+            string[] containingFolders = GetContainingFolders(file);
+            // check if containing folders should be ignored 
+            if ((containingFolders.Length == 1 && 
+                    loadingParams.skipDatasets.ContainsAnyByIndex(containingFolders[0])) || 
+                    loadingParams.skipContainerFolders.ContainsAnyByIndex(containingFolders)) {
+                // yup! skip this folder 
+                continue;
+            }
+
             // generate streamreader, ensure file exists 
             StreamReader streamReader = null;
             try
@@ -108,23 +134,8 @@ public class DataManager : DataDownloader
                 continue;
             }
 
-            // get all necessary text info, filenames, extensions, etc 
-            int separator = Mathf.Max(file.LastIndexOf('\\'), file.LastIndexOf('/'));
-            string fileNameWithExtension = file.Substring(separator + 1);
-            int extensionIndex = fileNameWithExtension.LastIndexOf('.');
-            string type = fileNameWithExtension.Substring(extensionIndex + 1).ToLower();
-            string fileName = fileNameWithExtension.Substring(0, extensionIndex);
-
-            // get containing folders 
-            string[] containingFolders = GetContainingFolders(file);
-            string containingFolder = string.Join(" / ", containingFolders);
-
-            // directory and resource loading refs 
-            string filePathDirectoryOnly = file.Substring(0, file.IndexOf(fileNameWithExtension) - 1);
-            int resourcesIndex = filePathDirectoryOnly.IndexOf("Resources");
-            string resourcesPath = filePathDirectoryOnly.Substring(resourcesIndex + 10);
-
             // determine filetype format 
+            string type = fileNameWithExtension.Substring(extensionIndex + 1).ToLower();
             Dataset.DataFormat format = Dataset.DataFormat.CSV;
 #pragma warning disable CS0162
             switch (type)
@@ -159,6 +170,14 @@ public class DataManager : DataDownloader
                     break;
             }
 #pragma warning restore CS0162
+
+            // define containing folder text
+            string containingFolder = string.Join(" / ", containingFolders);
+
+            // directory and resource loading refs 
+            string filePathDirectoryOnly = file.Substring(0, file.IndexOf(fileNameWithExtension) - 1);
+            int resourcesIndex = filePathDirectoryOnly.IndexOf("Resources");
+            string resourcesPath = filePathDirectoryOnly.Substring(resourcesIndex + 10);
 
             // use streamreader to count line entries (designed for CSV, need to modify for other types)
             int entries = -1;// start at -1 for the indicators line 
@@ -199,6 +218,7 @@ public class DataManager : DataDownloader
         this.cityDatasets = cityDatasets.ToArray();
         this.countryDatasets = countryDatasets.ToArray();
     }
+    
 
     private string[] GetContainingFolders(string filePath)
     {
@@ -253,5 +273,12 @@ public class DataManager : DataDownloader
     }
 
 
+    [Serializable]
+    public class DatasetLoadingParams {
+
+        public string[] skipDatasets;
+        public string[] skipContainerFolders;
+
+    }
 
 }
