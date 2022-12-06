@@ -10,6 +10,14 @@ public class Dataset
     public enum DataFormat { CSV, JSON, XML, XLS, XLSX, ERROR }
 
     public enum DataScope { City = 0, Country = 1, Continent = 2, Other = 3 }
+    
+    public const bool WARN_CSV_QUOTE_SUS_VALUES = true;
+    private const bool WARN_CSV_QUOTE_MID_CELL_QUOTES = true;
+
+    /// <summary>
+    /// value that's used to temporarily replace delimiters while parsing CSVs 
+    /// </summary>
+    private const string REPLACE_DELIM = "[|DELIM|]";
 
     /// <summary> name of this dataset </summary>
     public string fileName;
@@ -70,7 +78,7 @@ public class Dataset
                     $"FileName: {fileName}, PreDataLines: {currentLine}, ErrorLine: {i}", dataFile);
                 return;
             }
-            string[] newData = preDataText[i].Split(delimiter);
+            string[] newData = ParseLine(preDataText[i],delimiter);
             preDataLinesList.Add(newData);
             if (i == 0 || columns == -1)
             {
@@ -277,6 +285,32 @@ public class Dataset
         switch (format)
         {
             case DataFormat.CSV:
+                // determine if there are any quoted values, which may include the delimiter
+                int index = input.IndexOf('"');
+                while (index >= 0) {
+                    int closing = input.IndexOf('"', index + 1);
+                    if (closing < 0) {
+                        // no closing quote, issue warning if needed 
+                        if (WARN_CSV_QUOTE_SUS_VALUES) {
+                            Debug.LogWarning($"WARNING: found a start quote but no closing quote in {fileName}, " +
+                                $"at index {index}, while parsing string [{input}], investigate", dataFile);
+                        }
+                        break;
+                    }
+                    // determine if the full value is quoted 
+                    bool fullValue =
+                        (index == 0 || input[index - 1] == delimiter) &&
+                        (closing == input.Length - 1 || input[closing + 1] == delimiter);
+                    if (!fullValue) {
+                        // only a partial amount of the value has a quote
+                        if (WARN_CSV_QUOTE_MID_CELL_QUOTES) {
+                            Debug.LogWarning("WARNING: found a value in {fileName} that is not immediatly " +
+                                $"preceded and proceeded by delimiter {delimiter}, start index: {index}, " + 
+                                $"closing index: {closing}, string input: {input}, investigate", dataFile);
+                        }
+                        break;
+                    }
+                }
                 return input.Split(delimiter);
             case DataFormat.JSON:
             case DataFormat.XML:
