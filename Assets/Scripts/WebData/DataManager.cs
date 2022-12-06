@@ -16,6 +16,7 @@ public class DataManager : DataDownloader
 
     public Dataset[] cityDatasets;
     public Dataset[] countryDatasets;
+    public Dataset[] continentDatasets;
 
 
 
@@ -77,19 +78,29 @@ public class DataManager : DataDownloader
 
         List<Dataset> cityDatasets = new();
         List<Dataset> countryDatasets = new();
+        List<Dataset> continentDatasets = new();
 
         foreach (string file in files)
         {
-            bool isCity = file.IndexOf("CityData") >= 0;
-            if (!isCity)
+            Dataset.DataScope scope = Dataset.DataScope.City;
+            if (file.IndexOf("CityData") >= 0)
             {
-                if (file.IndexOf("CountryData") < 0)
-                {
-                    // improperly organized data, skip to next item 
-                    Debug.LogWarning("WARNING: found data file, not organized as either " +
-                        $"city nor country. Consider organizing. File: {file}", gameObject);
-                    continue;
-                }
+                scope = Dataset.DataScope.City;
+            }
+            else if (file.IndexOf("CountryData") >= 0)
+            {
+                scope = Dataset.DataScope.Country;
+            }
+            else if (file.IndexOf("ContinentData") >= 0)
+            {
+                scope = Dataset.DataScope.Continent;
+            }
+            else
+            {
+                scope = Dataset.DataScope.Other;
+                Debug.LogWarning("WARNING: invalid data subdirectory, cannot determine scope. " +
+                    $"Consider organizing. File: {file}", gameObject);
+                continue;
             }
 
             // get all necessary text info, filenames, extensions, etc 
@@ -201,6 +212,7 @@ public class DataManager : DataDownloader
             Dataset dataset = new Dataset
             {
                 fileName = string.Join(' ', containingFolderPathTitle, ':', fileName),
+                scope = scope,
                 format = format,
                 filePath = file,
                 dataFile = dataFile,
@@ -212,19 +224,30 @@ public class DataManager : DataDownloader
             dataset.LoadData(streamReader);
 
             // assign datasets 
-            if (isCity)
-                cityDatasets.Add(dataset);
-            else
-                countryDatasets.Add(dataset);
+            switch (scope)
+            {
+                case Dataset.DataScope.City:
+                    cityDatasets.Add(dataset);
+                    break;
+                case Dataset.DataScope.Country:
+                    countryDatasets.Add(dataset);
+                    break;
+                case Dataset.DataScope.Continent:
+                    continentDatasets.Add(dataset);
+                    break;
+            }
         }
 
         // assign local datasets 
         this.cityDatasets = cityDatasets.ToArray();
         this.countryDatasets = countryDatasets.ToArray();
+        this.continentDatasets = continentDatasets.ToArray();
     }
-    public void ClearDataFiles() {
+    public void ClearDataFiles()
+    {
         cityDatasets = new Dataset[0];
         countryDatasets = new Dataset[0];
+        continentDatasets = new Dataset[0];
     }
 
 
@@ -280,7 +303,8 @@ public class DataManager : DataDownloader
         Debug.Log("Generating cities, " + mapData.AllCities.Length);
     }
 
-    public void ClearDataEntries() {
+    public void ClearDataEntries()
+    {
         Initialize();
     }
 

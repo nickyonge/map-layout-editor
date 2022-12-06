@@ -9,10 +9,14 @@ public class Dataset
 {
     public enum DataFormat { CSV, JSON, XML, XLS, XLSX, ERROR }
 
+    public enum DataScope { City = 0, Country = 1, Continent = 2, Other = 3 }
+
     /// <summary> name of this dataset </summary>
     public string fileName;
 
     public DataFormat format = DataFormat.CSV;
+
+    public DataScope scope;
 
     public TextAsset dataFile;
 
