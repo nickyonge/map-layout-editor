@@ -51,6 +51,8 @@ public class Dataset
         // get indicators 
         int currentLine = DataManager.instance.loadingParams.GetInitialDataLine(this);
 
+        char delimiter = fileName.ToLower().IndexOf("semicolon") > 0 ? ';' : ',';
+
         string[] preDataText = new string[currentLine + 1];
         List<string[]> preDataLinesList = new();
         int columns = -1;
@@ -64,7 +66,7 @@ public class Dataset
                     $"FileName: {fileName}, PreDataLines: {currentLine}, ErrorLine: {i}", dataFile);
                 return;
             }
-            string[] newData = preDataText[i].Split(',');
+            string[] newData = preDataText[i].Split(delimiter);
             preDataLinesList.Add(newData);
             if (i == 0 || columns == -1)
             {
@@ -109,19 +111,19 @@ public class Dataset
             while (
                 indicators[i].StartsWith('_') || indicators[i].StartsWith('-') || indicators[i].StartsWith('[') ||
                 indicators[i].StartsWith('{') || indicators[i].StartsWith('(') || indicators[i].StartsWith('"') ||
-                indicators[i].StartsWith("'") || indicators[i].StartsWith('.') || indicators[i].StartsWith(' '))
+                indicators[i].StartsWith("'") || indicators[i].StartsWith('.') || indicators[i].StartsWith(';') ||
+                indicators[i].StartsWith(' '))
             { indicators[i] = indicators[i].Substring(1); }
             // ensure indicator doesn't end with invalid char 
             while (
                 indicators[i].EndsWith('_') || indicators[i].EndsWith('-') || indicators[i].EndsWith(']') ||
                 indicators[i].EndsWith('}') || indicators[i].EndsWith(')') || indicators[i].EndsWith('"') ||
-                indicators[i].EndsWith("'") || indicators[i].EndsWith('.') || indicators[i].EndsWith(' '))
+                indicators[i].EndsWith("'") || indicators[i].EndsWith('.') || indicators[i].EndsWith(';') ||
+                indicators[i].EndsWith(' '))
             { indicators[i] = indicators[i].Substring(0, indicators[i].Length - 1); }
         }
 
         // get indicator line 
-        // string unformattedIndicatorLine = string.Join(',', indicators);
-        // indicators = ParseLine(unformattedIndicatorLine);
         // remove invalid indicators 
         List<string> listIndicators = new();
         // generate sample data 
@@ -158,7 +160,7 @@ public class Dataset
                 continue;
             }
             // we've got a line! parse it 
-            string[] data = ParseLine(dataLine);
+            string[] data = ParseLine(dataLine, delimiter);
             // iterate through loaded data to apply parsed info 
             for (int i = 0; i < loadedData.Length; i++)
             {
@@ -266,12 +268,12 @@ public class Dataset
         }
     }
 
-    public string[] ParseLine(string input)
+    public string[] ParseLine(string input, char delimiter = ',')
     {
         switch (format)
         {
             case DataFormat.CSV:
-                return input.Split(',');
+                return input.Split(delimiter);
             case DataFormat.JSON:
             case DataFormat.XML:
             case DataFormat.XLS:
@@ -282,20 +284,20 @@ public class Dataset
                     if (!_errorGenerated)
                     {
                         Debug.LogWarning($"WARNING: unimplemented DataFormat {format}, " +
-                            $"can't parse line data for dataset {fileName}, returning ',' split", dataFile);
+                            $"can't parse line data for dataset {fileName}, returning '{delimiter}' split", dataFile);
                         _errorGenerated = true;
                     }
                 }
-                return input.Split(',');
+                return input.Split(delimiter);
 #pragma warning restore CS0162
             default:
                 if (!_errorGenerated)
                 {
                     Debug.LogError($"ERROR: invalid DataFormat {format}, " +
-                        $"can't parse line data for dataset {fileName}, returning ',' split", dataFile);
+                        $"can't parse line data for dataset {fileName}, returning '{delimiter}' split", dataFile);
                     _errorGenerated = true;
                 }
-                return input.Split(',');
+                return input.Split(delimiter);
         }
     }
 
