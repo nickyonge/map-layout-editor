@@ -57,17 +57,17 @@ public class MapDataCollector : MonoBehaviour
     internal void Initialize()
     {
         // ensure only one  instance exists 
-        if (instance != null)
+        if (_instance != null)
         {
-            if (instance != this)
+            if (_instance != this)
             {
                 if (Application.isPlaying)
                 {
-                    Destroy(instance);
+                    Destroy(_instance);
                 }
                 else
                 {
-                    DestroyImmediate(instance);
+                    DestroyImmediate(_instance);
                 }
             }
             return;

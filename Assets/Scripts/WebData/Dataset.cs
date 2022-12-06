@@ -10,7 +10,7 @@ public class Dataset
     public enum DataFormat { CSV, JSON, XML, XLS, XLSX, ERROR }
 
     public enum DataScope { City = 0, Country = 1, Continent = 2, Other = 3 }
-    
+
     public const bool WARN_CSV_QUOTE_SUS_VALUES = true;
     private const bool WARN_CSV_QUOTE_MID_CELL_QUOTES = true;
 
@@ -78,7 +78,7 @@ public class Dataset
                     $"FileName: {fileName}, PreDataLines: {currentLine}, ErrorLine: {i}", dataFile);
                 return;
             }
-            string[] newData = ParseLine(preDataText[i],delimiter);
+            string[] newData = ParseLine(preDataText[i], delimiter);
             preDataLinesList.Add(newData);
             if (i == 0 || columns == -1)
             {
@@ -287,30 +287,78 @@ public class Dataset
             case DataFormat.CSV:
                 // determine if there are any quoted values, which may include the delimiter
                 int index = input.IndexOf('"');
-                while (index >= 0) {
-                    int closing = input.IndexOf('"', index + 1);
-                    if (closing < 0) {
-                        // no closing quote, issue warning if needed 
-                        if (WARN_CSV_QUOTE_SUS_VALUES) {
-                            Debug.LogWarning($"WARNING: found a start quote but no closing quote in {fileName}, " +
-                                $"at index {index}, while parsing string [{input}], investigate", dataFile);
+                if (index >= 0)
+                {
+                    int failsafe = input.Length + 1;
+                    while (index >= 0 && failsafe > 0)
+                    {
+                        failsafe--;
+                        int closing = input.IndexOf('"', index + 1);
+                        if (closing < 0)
+                        {
+                            // no closing quote, issue warning if needed 
+                            if (WARN_CSV_QUOTE_SUS_VALUES)
+                            {
+                                Debug.LogWarning($"WARNING: found a start quote but no closing quote in {fileName}, " +
+                                    $"at index {index}, while parsing string [{input}], investigate", dataFile);
+                            }
+                            break;
                         }
-                        break;
-                    }
-                    // determine if the full value is quoted 
-                    bool fullValue =
-                        (index == 0 || input[index - 1] == delimiter) &&
-                        (closing == input.Length - 1 || input[closing + 1] == delimiter);
-                    if (!fullValue) {
-                        // only a partial amount of the value has a quote
-                        if (WARN_CSV_QUOTE_MID_CELL_QUOTES) {
-                            Debug.LogWarning("WARNING: found a value in {fileName} that is not immediatly " +
-                                $"preceded and proceeded by delimiter {delimiter}, start index: {index}, " + 
-                                $"closing index: {closing}, string input: {input}, investigate", dataFile);
+                        // determine if the full value is quoted 
+                        bool validQuotes =
+                            (index == 0 || input[index - 1] == delimiter) &&
+                            (closing == input.Length - 1 || input[closing + 1] == delimiter);
+                        if (!validQuotes)
+                        {
+                            // only a partial amount of the value has a quote
+                            if (WARN_CSV_QUOTE_MID_CELL_QUOTES)
+                            {
+                                Debug.LogWarning("WARNING: found a value in {fileName} that is not immediatly " +
+                                    $"preceded and proceeded by delimiter {delimiter}, start index: {index}, " +
+                                    $"closing index: {closing}, string input: {input}, investigate", dataFile);
+                            }
+                            break;
                         }
-                        break;
+                        // substring the value and check if it contains a delimiter
+                        string value = input.Substring(index + 1, closing - (index + 1));
+                        if (value.IndexOf(delimiter) == -1)
+                        {
+                            // nope! no delimiter found, update index and carry on
+                            if (closing + 1 >= input.Length)
+                            {
+                                // done
+                                break;
+                            }
+                            index = closing + 1;
+                            continue;
+                        }
+                        string before = index == 0 ? "" : input.Substring(0, index);
+                        string after = closing >= input.Length - 1 ? "" : input.Substring(closing + 1);
+                        // we've got a full value quoted, check for and replace delimiter 
+                        int failsafe2 = value.Length + 1;
+                        while (value.IndexOf(delimiter) >= 0 && failsafe2 > 0)
+                        {
+                            failsafe2--;
+                            value = value.Replace(delimiter.ToString(), REPLACE_DELIM);
+                        }
+                        input = string.Concat(before, value, after);
+                        index = before.Length + value.Length;
                     }
+                    // done! split apart the input based on the delimiter 
+                    string[] split = input.Split(delimiter);
+                    // iterate thru split and replace delimited values 
+                    for (int i = 0; i < split.Length; i++)
+                    {
+                        int failsafe3 = split[i].Length;
+                        while (split[i].IndexOf(REPLACE_DELIM) >= 0)
+                        {
+                            split[i] = split[i].Replace(REPLACE_DELIM, delimiter.ToString());
+                        }
+                    }
+                    // done! 
+                    return split;
                 }
+                // no quotes found, assume correct delimiters 
                 return input.Split(delimiter);
             case DataFormat.JSON:
             case DataFormat.XML:
