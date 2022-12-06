@@ -69,12 +69,13 @@ Single datasets, or databases from which only one set of data was retrieved
 
 ## Other Data
 
-- **countries:** @mledoze/countries, "World countries in JSON, CSV, XML and YAML.", 12-01-2022, https://github.com/mledoze/countries
+- **countries:** @mledoze/countries, "World countries in JSON, CSV, XML and YAML.", 12-01-2022, https://github.com/mledoze/countries  
+- **continents:** datahub.io, "List of continent codes", 12-06-2022, https://datahub.io/core/continent-codes  
 
 ## Unsorted Data
 Data that has been collected, but has yet to be formatted into the sorted lists above. 
 
-- oecd/economy https://data.oecd.org/energy.htm dec1 
+- dec1 oecd/economy https://data.oecd.org/energy.htm 
   - fincorp_debt_equity_ratio https://data.oecd.org/corporate/financial-corporations-debt-to-equity-ratio.htm
   - fdi_stocks_in/out_pergdp/usdmil-country-latest https://data.oecd.org/fdi/fdi-stocks.htm
   - fdi_in/out_usdpcap/usdmil-country-latest https://data.oecd.org/fdi/fdi-flows.htm
