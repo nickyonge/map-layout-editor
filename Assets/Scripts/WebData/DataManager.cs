@@ -222,6 +222,10 @@ public class DataManager : DataDownloader
         this.cityDatasets = cityDatasets.ToArray();
         this.countryDatasets = countryDatasets.ToArray();
     }
+    public void ClearDataFiles() {
+        cityDatasets = new Dataset[0];
+        countryDatasets = new Dataset[0];
+    }
 
 
     private string[] GetContainingFolders(string filePath)
@@ -274,6 +278,10 @@ public class DataManager : DataDownloader
     {
         Initialize();
         Debug.Log("Generating cities, " + mapData.AllCities.Length);
+    }
+
+    public void ClearDataEntries() {
+        Initialize();
     }
 
 

@@ -17,13 +17,15 @@ public static class ArrayUtils
     }
     public static bool ContainsAnyByIndex(this string[] stringArray, string value)
     {
-        return Array.Exists(stringArray, element => element.IndexOf(value) >= 0);
+        return Array.Exists(stringArray, element => value.IndexOf(element) >= 0) ||
+            Array.Exists(stringArray, element => element.IndexOf(value) >= 0);
     }
     public static bool ContainsAnyByIndex(this string[] stringArray, string[] values)
     {
         foreach (string value in values)
         {
-            if (Array.Exists(stringArray, element => element.IndexOf(value) >= 0))
+            if (Array.Exists(stringArray, element => value.IndexOf(element) >= 0) ||
+                Array.Exists(stringArray, element => element.IndexOf(value) >= 0))
                 return true;
         }
         return false;
