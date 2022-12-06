@@ -56,6 +56,10 @@ public class DataManagerEditor : DataDownloaderEditor
         GUILayout.EndHorizontal();
 
         GUILayout.BeginHorizontal();
+        if (Btn("Generate Continents"))
+        {
+            dataManager.GenerateNewContinentEntries();
+        }
         if (Btn("Generate Countries"))
         {
             dataManager.GenerateNewCountryEntries();

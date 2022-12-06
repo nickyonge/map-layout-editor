@@ -289,19 +289,27 @@ public class DataManager : DataDownloader
 
     public void GenerateNewEntries()
     {
+        GenerateNewContinentEntries();
         GenerateNewCountryEntries();
         GenerateNewCityEntries();
     }
+
+    public void GenerateNewContinentEntries() {
+        GenerateEntries(Dataset.DataScope.Continent);
+    }
     public void GenerateNewCountryEntries()
     {
-        Initialize();
-        Debug.Log("Generating countries, " + mapData.AllCountries.Length);
+        GenerateEntries(Dataset.DataScope.Country);
     }
     public void GenerateNewCityEntries()
     {
-        Initialize();
-        Debug.Log("Generating cities, " + mapData.AllCities.Length);
+        GenerateEntries(Dataset.DataScope.City);
     }
+
+    private void GenerateEntries(Dataset.DataScope scope) {
+        Initialize();
+    }
+
 
     public void ClearDataEntries()
     {
@@ -313,6 +321,12 @@ public class DataManager : DataDownloader
     public class DatasetLoadingParams
     {
 
+        [Space(5)]
+        public TextAsset sourceDataCity;
+        public TextAsset sourceDataCountry;
+        public TextAsset sourceDataContinent;
+
+        [Space(5)]
         public string[] skipDatasets;
         public string[] skipContainerFolders;
 
