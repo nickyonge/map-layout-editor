@@ -104,7 +104,7 @@ public class DataManager : DataDownloader
             }
 
             // get all necessary text info, filenames, extensions, etc 
-            int separator = Mathf.Max(file.LastIndexOf('\\'), file.LastIndexOf('/'));
+            int separator = Mathf.Max(0, file.LastIndexOf('\\'), file.LastIndexOf('/'));
             string fileNameWithExtension = file.Substring(separator + 1);
             int extensionIndex = fileNameWithExtension.LastIndexOf('.');
             string fileName = fileNameWithExtension.Substring(0, extensionIndex);
@@ -254,6 +254,16 @@ public class DataManager : DataDownloader
     private string[] GetContainingFolders(string filePath)
     {
         int separator = Mathf.Max(filePath.LastIndexOf('\\'), filePath.LastIndexOf('/'));
+        // if separator is right at start, simply return path 
+        switch (separator)
+        {
+            case -1:
+                // no separator, return filepath
+                return new string[] { filePath };
+            case 0:
+                // only one separator right at start 
+                return new string[] { filePath.Substring(1) };
+        }
         List<string> containingFolders = new();
         string origPath = filePath;
         int failsafe = filePath.Length + 1;
@@ -267,7 +277,7 @@ public class DataManager : DataDownloader
                 break;
             }
             string containingFolder = filePath.Substring(0, separator);
-            separator = Mathf.Max(containingFolder.LastIndexOf('\\'),
+            separator = Mathf.Max(0, containingFolder.LastIndexOf('\\'),
                 containingFolder.LastIndexOf('/'));
             containingFolder = containingFolder.Substring(separator + 1).Trim();
             // check if containing folder is valid
@@ -294,7 +304,8 @@ public class DataManager : DataDownloader
         GenerateNewCityEntries();
     }
 
-    public void GenerateNewContinentEntries() {
+    public void GenerateNewContinentEntries()
+    {
         GenerateEntries(Dataset.DataScope.Continent);
     }
     public void GenerateNewCountryEntries()
@@ -306,7 +317,8 @@ public class DataManager : DataDownloader
         GenerateEntries(Dataset.DataScope.City);
     }
 
-    private void GenerateEntries(Dataset.DataScope scope) {
+    private void GenerateEntries(Dataset.DataScope scope)
+    {
         Initialize();
     }
 
