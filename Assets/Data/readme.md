@@ -70,6 +70,7 @@ Single datasets, or databases from which only one set of data was retrieved
 ## Other Data
 
 - **countries:** @mledoze/countries, "World countries in JSON, CSV, XML and YAML.", 12-01-2022, https://github.com/mledoze/countries  
+- **countryaliases:** Wikipedia, "List of alternative country names", 12-06-2022, https://en.wikipedia.org/wiki/List_of_alternative_country_names
 - **continents:** datahub.io, "List of continent codes", 12-06-2022, https://datahub.io/core/continent-codes  
 
 ## Unsorted Data
