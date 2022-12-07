@@ -76,10 +76,31 @@ public class DataManager : DataDownloader
                 file.ToLower().EndsWith("xml")
                 ).ToList();
 
+        // first, quick check if any file is currently open 
+        foreach (string file in files)
+        {
+            try
+            {
+                StreamReader testReader = new StreamReader(file);
+            }
+            catch (IOException e)
+            {
+                // IO Exception
+                string n = Path.GetFileName(file);
+                if (n == null) { n = "[NULL, see file path below]"; }
+                Debug.LogError($"File in use: <b>{n}</b>. " +
+                    "If Excel is open, try closing it! (Or any app that might be using this file) " +
+                    $"Exception to follow. \nFilepath: {file}");
+                throw e;
+            }
+        }
+
+        // prep dataset containers 
         List<Dataset> cityDatasets = new();
         List<Dataset> countryDatasets = new();
         List<Dataset> continentDatasets = new();
 
+        // iterate through all files 
         foreach (string file in files)
         {
             Dataset.DataScope scope = Dataset.DataScope.City;
@@ -128,22 +149,11 @@ public class DataManager : DataDownloader
             }
 
             // generate streamreader, ensure file exists 
-            StreamReader streamReader = null;
-            try
-            {
-                streamReader = new StreamReader(file);
-            }
-            catch (IOException e)
-            {
-                // IO Exception
-                Debug.LogError("ERROR: IOException. If Excel is open, try closing it! " +
-                    "(Or any app that might be using the data files)");
-                throw e;
-            }
+            StreamReader streamReader = new StreamReader(file);
             if (streamReader.Peek() < 0)
             {
                 Debug.LogWarning("WARNING: was unable to generate StreamReader from file " +
-                    $"{file}, skipping", gameObject);
+                    $"{file}, skipping\nConsider removing or excluding the {fileName} dataset", gameObject);
                 continue;
             }
 
