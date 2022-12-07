@@ -29,7 +29,7 @@ https://data.oecd.org/energy.htm
 - **elecgen_nuc_gwh:** Energy generation (nuclear) per country, measured in [GWh](https://en.wikipedia.org/wiki/Kilowatt-hour#Watt-hour_multiples)  
   12-01-2022, https://data.oecd.org/energy/electricity-generation.htm
 - **elecgen_nuc_per:** Energy generation (nuclear) per country, measured as a percentage of total energy generation  
-  12-01-2022, https://data.oecd.org/energy/electricity-generation.htm
+  12-06-2022, https://data.oecd.org/energy/electricity-generation.htm
 - **nuclearplants_country:** Number of nuclear power generation units in operation as of 1 January 2019 per country
   12-01-2022, https://data.oecd.org/energy/nuclear-power-plants.htm
 - **renewable_per:** Renewable energy per country, measured as a percent of its contribution to total primary energy supply
@@ -109,7 +109,7 @@ Data that has been collected, but has yet to be formatted into the sorted lists 
   - teacher_staff https://data.oecd.org/teachers/teaching-staff.htm
   - teacher_principals_avgage/perwomen/yrsexp https://data.oecd.org/teachers/school-principals.htm
   - youth_neet_total/m/w-country-latest https://data.oecd.org/youthinac/youth-not-in-employment-education-or-training-neet.htm
-- dec1 environment https://data.oecd.org/environment.htm dec1 
+- dec1 environment https://data.oecd.org/environment.htm  
   - airpoll_exposure-country-latest https://data.oecd.org/air/air-pollution-exposure.htm
   - airpoll_mortper1m-country-latest https://data.oecd.org/air/air-pollution-effects.htm
   - emm_co2/conoxsoxvoc/ghg_milton/toncap/kgpcap/thouton/thoutonco2eq https://data.oecd.org/air/air-and-ghg-emissions.htm
@@ -122,6 +122,8 @@ Data that has been collected, but has yet to be formatted into the sorted lists 
   - muniwaste_kgpcap/thouton https://data.oecd.org/waste/municipal-waste.htm
   - water_withdrawal_m3mil/m3pcap https://data.oecd.org/water/water-withdrawals.htm
   - water_wastewatertreatment https://data.oecd.org/water/wastewater-treatment.htm
+- dev6 environment https://data.oecd.org/environment.htm  
+  - biodiv_builtuparea https://data.oecd.org/biodiver/built-up-area.htm
 - govt https://data.oecd.org/government.htm dec1 
   - govt_trust https://data.oecd.org/gga/trust-in-government.htm
   - govt_deficit https://data.oecd.org/gga/general-government-deficit.htm
@@ -165,7 +167,6 @@ Data that has been collected, but has yet to be formatted into the sorted lists 
 - infotech dec2 https://data.oecd.org/innovation-and-technology.htm
   - broadband_fixedsubs_per100 https://data.oecd.org/broadband/fixed-broadband-subscriptions.htm
   - broadband_mobilesubs_per100 ttps://data.oecd.org/broadband/mobile-broadband-subscriptions.htm
-  - broadband_houseaccess https://data.oecd.org/broadband/households-with-broadband-access.htm
   - employ_empbybusinesssize_total/bynumofemp https://data.oecd.org/entrepreneur/employees-by-business-size.htm
   - employ_selfemployed_20to29mw https://data.oecd.org/entrepreneur/young-self-employed.htm
   - employ_selfemp_withemp https://data.oecd.org/entrepreneur/self-employed-with-employees.htm
@@ -176,11 +177,13 @@ Data that has been collected, but has yet to be formatted into the sorted lists 
   - itc_homecomputeraccess https://data.oecd.org/ict/access-to-computers-from-home.htm
   - ict_valueadd https://data.oecd.org/ict/ict-value-added.htm
   - ict_employment https://data.oecd.org/ict/ict-employment.htm
-  - ict_investment https://data.oecd.org/ict/ict-investment.htm
-  - ict_goodsexport https://data.oecd.org/ict/ict-goods-exports.htm
   - research_rdspend_pergdp/usdmil https://data.oecd.org/rd/gross-domestic-spending-on-r-d.htm
   - research_researchers_total/women_per1k/count/percent https://data.oecd.org/rd/researchers.htm
   - research_govt_count/percent https://data.oecd.org/rd/government-researchers.htm
+- infotech dec6 https://data.oecd.org/innovation-and-technology.htm
+  - broadband_houseaccess https://data.oecd.org/broadband/households-with-broadband-access.htm
+  - ict_goodsexport https://data.oecd.org/ict/ict-goods-exports.htm
+  - ict_investment https://data.oecd.org/ict/ict-investment.htm
 - jobs dec2 https://data.oecd.org/jobs.htm
   - ben_adequacyofminben https://data.oecd.org/benwage/adequacy-of-minimum-income-benefits.htm
   - ben_workhrspoverty_min/67avg/avg https://data.oecd.org/benwage/working-hours-needed-to-exit-poverty.htm
