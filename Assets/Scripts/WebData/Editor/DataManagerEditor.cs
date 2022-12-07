@@ -15,6 +15,7 @@ public class DataManagerEditor : DataDownloaderEditor
     private SerializedProperty _cityDatasets;
     private SerializedProperty _countryDatasets;
     private SerializedProperty _continentDatasets;
+    private SerializedProperty _exportSourceParams;
 
     private GUIStyle _foldoutHeader;
 
@@ -31,6 +32,7 @@ public class DataManagerEditor : DataDownloaderEditor
         _cityDatasets = serializedObject.FindProperty("cityDatasets");
         _countryDatasets = serializedObject.FindProperty("countryDatasets");
         _continentDatasets = serializedObject.FindProperty("continentDatasets");
+        _exportSourceParams = serializedObject.FindProperty("exportSourceParams");
         base.OnEnable();
     }
 
@@ -70,6 +72,9 @@ public class DataManagerEditor : DataDownloaderEditor
 
         if (Section("Export Data", showExports, out showExports))
         {
+            EditorGUILayout.PropertyField(_exportSourceParams);
+
+            GUILayout.Space(5);
 
             GUILayout.BeginHorizontal();
             if (Btn("Generate Export Data"))
@@ -106,7 +111,9 @@ public class DataManagerEditor : DataDownloaderEditor
 
 
         DrawPropertiesExcluding(serializedObject, new string[] {
-                "m_Script", "loadingParams", "cityDatasets", "countryDatasets", "continentDatasets" });
+                "m_Script", "loadingParams", 
+                "cityDatasets", "countryDatasets", "continentDatasets",
+                "exportSourceParams", });
 
     }
 

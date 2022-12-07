@@ -14,6 +14,8 @@ public class DataManager : DataDownloader
 
     public DatasetLoadingParams loadingParams;
 
+    public ExportSourceParams exportSourceParams;
+
     public Dataset[] cityDatasets;
     public Dataset[] countryDatasets;
     public Dataset[] continentDatasets;
@@ -345,11 +347,6 @@ public class DataManager : DataDownloader
     {
 
         [Space(5)]
-        public TextAsset sourceDataCity;
-        public TextAsset sourceDataCountry;
-        public TextAsset sourceDataContinent;
-
-        [Space(5)]
         public string[] skipDatasets;
         public string[] skipContainerFolders;
 
@@ -392,5 +389,23 @@ public class DataManager : DataDownloader
             return 0;
         }
     }
+
+
+    [Serializable]
+    public class ExportSourceParams {
+
+        [Space(5)]
+        public TextAsset sourceDataCity;
+        public TextAsset sourceDataCountry;
+        public TextAsset sourceDataCountryAliases;
+        public TextAsset sourceDataContinent;
+
+        [Serializable]
+        public class LocationSourceData {
+            public TextAsset sourceDataFile;
+        }
+
+    }
+
 
 }
