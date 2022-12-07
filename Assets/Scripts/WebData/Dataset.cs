@@ -78,7 +78,7 @@ public class Dataset
                     $"FileName: {fileName}, PreDataLines: {currentLine}, ErrorLine: {i}", dataFile);
                 return;
             }
-            string[] newData = ParseLine(preDataText[i], delimiter);
+            string[] newData = ParseLine(preDataText[i], delimiter, currentLine, -1);
             preDataLinesList.Add(newData);
             if (i == 0 || columns == -1)
             {
@@ -172,7 +172,7 @@ public class Dataset
                 continue;
             }
             // we've got a line! parse it 
-            string[] data = ParseLine(dataLine, delimiter);
+            string[] data = ParseLine(dataLine, delimiter, currentLine, columns);
             // iterate through loaded data to apply parsed info 
             for (int i = 0; i < loadedData.Length; i++)
             {
@@ -207,37 +207,27 @@ public class Dataset
         {
             // some data is still false, check for soft field indicators 
             // get false field indicators 
-            bool b = fileName.IndexOf("ump_rateedu") >= 0;
             List<Tuple<string, int>> falseFieldIndicators = new();
             for (int i = 0; i < loadedData.Length; i++)
             {
                 if (!loadedData[i])
                 {
-                    if (b)
-                    {
-                        Debug.Log("INDICATOR FOUND BAD " + i + ":" + indicators[i]);
-                    }
                     falseFieldIndicators.Add(new Tuple<string, int>(indicators[i], i));
                 }
             }
             // got false indicators, check if they're listed 
             List<int> removeIndicators = new();
-            if (b) Debug.Log("FFI TUPS LENGTH: " + falseFieldIndicators.Count);
             foreach (Tuple<string, int> indicator in falseFieldIndicators)
             {
-                if (b) Debug.Log(1);
                 if (DataManager.instance.loadingParams.softIgnoreIndicators.Contains(indicator.Item1))
                 {
-                    if (b) Debug.Log(2 + ", Item1: " + indicator.Item1 + ", Item2: " + indicator.Item2);
                     // yup! indicator is false field, slate it to be removed 
                     removeIndicators.Add(indicator.Item2);
                 }
             }
             // check if any indicators are slated to be removed 
-            if (b) Debug.Log("REMOVE COUNT: " + removeIndicators.Count);
             if (removeIndicators.Count > 0)
             {
-                if (b) Debug.Log("COUNT0: " + removeIndicators[0]);
                 // iterate through and remove necessary indicators from: indicators, loadedData, sampleData
                 // create temp arrays to hold new data 
                 string[] newIndicators = new string[indicators.Length - removeIndicators.Count];
@@ -251,10 +241,8 @@ public class Dataset
                     if (removeIndicators.Contains(i))
                     {
                         removeIndicators.Remove(i);
-                        if (b) Debug.Log("SKIPPING: " + indicators[i] + "," + i);
                         continue;
                     }
-                    if (b) Debug.Log("ADDING: " + indicators[i] + "," + i);
                     newIndicators[index] = indicators[i];
                     newSampleData[index] = sampleData[i];
                     newLoadedData[index] = loadedData[i];
@@ -280,7 +268,7 @@ public class Dataset
         }
     }
 
-    public string[] ParseLine(string input, char delimiter = ',')
+    public string[] ParseLine(string input, char delimiter, int currentLine, int columns)
     {
         switch (format)
         {
@@ -289,10 +277,13 @@ public class Dataset
                 int index = input.IndexOf('"');
                 if (index >= 0)
                 {
+                    bool multiQuoteCellProcessed = false;
                     int failsafe = input.Length + 1;
+                    string rawInput = input;
                     while (index >= 0 && failsafe > 0)
                     {
                         failsafe--;
+
                         int closing = input.IndexOf('"', index + 1);
                         if (closing < 0)
                         {
@@ -300,22 +291,43 @@ public class Dataset
                             if (WARN_CSV_QUOTE_SUS_VALUES)
                             {
                                 Debug.LogWarning($"WARNING: found a start quote but no closing quote in {fileName}, " +
-                                    $"at index {index}, while parsing string [{input}], investigate", dataFile);
+                                    $"at index {index}, \nwhile parsing line {currentLine} string <b>[{rawInput}]</b>, investigate", dataFile);
                             }
                             break;
                         }
                         // determine if the full value is quoted 
-                        bool validQuotes =
-                            (index == 0 || input[index - 1] == delimiter) &&
-                            (closing == input.Length - 1 || input[closing + 1] == delimiter);
-                        if (!validQuotes)
+                        bool validInitialQuote = index == 0 || input[index - 1] == delimiter;
+                        bool validClosingQuote = false;
+                        if (validInitialQuote)
+                        {
+                            validClosingQuote = closing == input.Length - 1 || input[closing + 1] == delimiter;
+                            if (!validClosingQuote)
+                            {
+                                // it's feasible that the quoted value has multiple quotations within it, 
+                                // search for next quote plus delimiter 
+                                closing = input.IndexOf(new string(new char[] { '"', delimiter }), index + 1);
+                                validClosingQuote = closing != -1;
+                                if (!validClosingQuote) {
+                                    // still invalid, check if the very last field ends with a quote 
+                                    closing = input.LastIndexOf('"', index + 1);
+                                    validClosingQuote = closing != -1 && closing == input.Length - 1;
+                                }
+                                if (validClosingQuote)
+                                {
+                                    multiQuoteCellProcessed = true;
+                                }
+                            }
+                        }
+                        // confirm errors for beginning/end of quote 
+                        if (!validInitialQuote || !validClosingQuote)
                         {
                             // only a partial amount of the value has a quote
                             if (WARN_CSV_QUOTE_MID_CELL_QUOTES)
                             {
-                                Debug.LogWarning("WARNING: found a value in {fileName} that is not immediatly " +
-                                    $"preceded and proceeded by delimiter {delimiter}, start index: {index}, " +
-                                    $"closing index: {closing}, string input: {input}, investigate", dataFile);
+                                Debug.LogWarning($"WARNING: found a value in {fileName} that is not immediatly " +
+                                    (validInitialQuote ? "followed" : validClosingQuote ? "preceded" : "followed by OR proceeded") +
+                                    $" by delimiter [{delimiter}], \nstart index {index}, " +
+                                    $"closing index {closing}, line {currentLine}, string: <b>[{rawInput}]</b>, investigate", dataFile);
                             }
                             break;
                         }
@@ -329,7 +341,7 @@ public class Dataset
                                 // done
                                 break;
                             }
-                            index = closing + 1;
+                            index = input.IndexOf('"', closing + 1);
                             continue;
                         }
                         string before = index == 0 ? "" : input.Substring(0, index);
@@ -342,10 +354,26 @@ public class Dataset
                             value = value.Replace(delimiter.ToString(), REPLACE_DELIM);
                         }
                         input = string.Concat(before, value, after);
-                        index = before.Length + value.Length;
+                        index = input.IndexOf('"', before.Length + value.Length);
                     }
                     // done! split apart the input based on the delimiter 
                     string[] split = input.Split(delimiter);
+                    // ensure column count still matches if multi-quote cell processing occurred 
+                    if (columns != -1 && split.Length != columns)
+                    {
+                        if (multiQuoteCellProcessed)
+                        {
+                            Debug.LogWarning("WARNING: column count mismatch after multi-quote-cell " +
+                                $"line processed, delimiter: [{delimiter}], line cols: {split.Length}, actual cols: <b>{columns}</b>,\n" +
+                                $"Line: [{rawInput}]\nPost-processed line: [{input}]", dataFile);
+                        }
+                        else
+                        {
+                            Debug.LogWarning("WARNING: column count mismatch DESPITE NO multi-quote-cell " +
+                                $"line processed, delimiter: [{delimiter}], line cols: {split.Length}, actual cols: <b>{columns}</b>,\n" +
+                                $"Line: [{rawInput}]\nPost-processed line: [{input}]", dataFile);
+                        }
+                    }
                     // iterate thru split and replace delimited values 
                     for (int i = 0; i < split.Length; i++)
                     {
