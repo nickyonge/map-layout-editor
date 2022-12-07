@@ -46,6 +46,8 @@ public class DataManagerEditor : DataDownloaderEditor
         {
             EditorGUILayout.PropertyField(_loadingParams);
 
+            GUILayout.Space(5);
+
             GUILayout.BeginHorizontal();
             if (Btn("Load Dataset"))
             {
@@ -56,6 +58,8 @@ public class DataManagerEditor : DataDownloaderEditor
                 dataManager.ClearDataFiles();
             }
             GUILayout.EndHorizontal();
+            
+            GUILayout.Space(5);
 
             EditorGUILayout.PropertyField(_cityDatasets);
             EditorGUILayout.PropertyField(_countryDatasets);
@@ -72,11 +76,13 @@ public class DataManagerEditor : DataDownloaderEditor
             {
                 dataManager.GenerateNewEntries();
             }
-            if (Btn("Clear ExpData", 120))
+            if (Btn("Clear ExpData", 100))
             {
                 dataManager.ClearDataEntries();
             }
             GUILayout.EndHorizontal();
+
+            GUILayout.Space(5);
 
             GUILayout.BeginHorizontal();
             if (Btn("Continents"))
@@ -122,7 +128,7 @@ public class DataManagerEditor : DataDownloaderEditor
         if (stateOut) { EditorGUI.indentLevel++; }
         return stateOut;
     }
-    private void EndSection() { EditorGUI.indentLevel--; }
+    private void EndSection() { GUILayout.Space(10); EditorGUI.indentLevel--; }
     private void Header(string label, bool withLine = true)
     {
         GUILayout.Space(5);
