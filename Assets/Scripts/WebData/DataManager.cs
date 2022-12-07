@@ -295,6 +295,7 @@ public class DataManager : DataDownloader
             {
                 case "CityData":
                 case "CountryData":
+                case "ContinentData":
                     // done, hop out of the city/country data folders 
                     failsafe = 0;
                     break;
