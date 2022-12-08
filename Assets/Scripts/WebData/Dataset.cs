@@ -66,8 +66,6 @@ public class Dataset
 
     public string containingFolder;
 
-    private bool _errorGenerated = false;
-
 
     [Serializable]
     public struct SampleData
