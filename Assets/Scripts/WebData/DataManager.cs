@@ -15,6 +15,7 @@ public class DataManager : DataDownloader
 {
     public static DataManager instance;
 
+    private const bool CHECK_DATASETS_FAST = false;
     public const bool DEBUG_UNIMPLEMENTED_FORMATS = false;
     public const bool SKIP_UNIMPLEMENTED_FORMATS = true;
 
@@ -25,7 +26,6 @@ public class DataManager : DataDownloader
     public Dataset[] cityDatasets;
     public Dataset[] countryDatasets;
     public Dataset[] continentDatasets;
-
 
 
     private MapDataCollector mapData;
@@ -412,8 +412,68 @@ public class DataManager : DataDownloader
         {
             public TextAsset sourceDataFile;
         }
-
     }
 
+    public Dataset GetDataset(string name)
+    {
+        // search country, then city, then continent
+        Dataset d = GetDataset(name, DataScope.Country);
+        if (d != null) { return d; }
+        d = GetDataset(name, DataScope.City);
+        if (d != null) { return d; }
+        return GetDataset(name, DataScope.Continent);
+    }
+    public Dataset GetDataset(TextAsset dataFile)
+    {
+        // search country, then city, then continent
+        Dataset d = GetDataset(dataFile, DataScope.Country);
+        if (d != null) { return d; }
+        d = GetDataset(dataFile, DataScope.City);
+        if (d != null) { return d; }
+        return GetDataset(dataFile, DataScope.Continent);
+    }
+    public Dataset GetDataset(string name, DataScope scope)
+    {
+        Dataset[] dataset = GetDatasetsByScope(scope);
+        foreach (Dataset d in dataset) {
+            if (d.DoesMatch(name, CHECK_DATASETS_FAST)) {
+                return d;
+            }
+        }
+        return null;
+    }
+    public Dataset GetDataset(TextAsset dataFile, DataScope scope)
+    {
+        Dataset[] dataset = GetDatasetsByScope(scope);
+        foreach (Dataset d in dataset) {
+            if (d.DoesMatch(dataFile)) {
+                return d;
+            }
+        }
+        return null;
+    }
+
+    /// <summary> returns the dataset array associated with the given scope </summary>
+    public Dataset[] GetDatasetsByScope(DataScope scope)
+    {
+        switch (scope)
+        {
+            case DataScope.City:
+                return cityDatasets;
+            case DataScope.Country:
+                return countryDatasets;
+            case DataScope.Continent:
+                return continentDatasets;
+            case DataScope.Other:
+                Debug.LogWarning("WARNING: OTHER is an invalid option " +
+                    "for get dataset by scope, returning null", gameObject);
+                break;
+            default:
+                Debug.LogError($"ERROR: invalid DataScope {scope}, " +
+                    "can't get dataset by scope, returning null", gameObject);
+                break;
+        }
+        return null;
+    }
 
 }
