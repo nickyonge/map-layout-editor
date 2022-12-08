@@ -11,6 +11,7 @@ public enum DataFormat { CSV, JSON, XML, XLS, XLSX, ERROR }
 /// <summary> Scope, regional, that a given dataset represents </summary>
 public enum DataScope { City = 0, Country = 1, Continent = 2, Other = 3 }
 
+[RequireComponent(typeof(DataRegionReference), typeof(DataExporter))]
 public class DataManager : DataDownloader
 {
     public static DataManager instance;
@@ -20,16 +21,26 @@ public class DataManager : DataDownloader
     public const bool SKIP_UNIMPLEMENTED_FORMATS = true;
 
     public DatasetLoadingParams loadingParams;
+    public InternalReferenceParams referenceSourceFiles;
+    public ExportDataParams exportSourceParams;
 
-    public ExportSourceParams exportSourceParams;
-
+    // LOADED DATASETS 
     public Dataset[] cityDatasets;
     public Dataset[] countryDatasets;
     public Dataset[] continentDatasets;
 
+    // INTERNAL REFERENCES 
+    public DataStructs.InternalReference_City[] referenceCities;
+    public DataStructs.InternalReference_Country[] referenceCountries;
+    public DataStructs.InternalReference_Continent[] referenceContinents;
 
+    // EXPORT DATA 
+
+
+    // local script references 
     private MapDataCollector mapData;
     private DataRegionReference dataRegionRefs;
+    private DataExporter dataExporter;
 
     private void Start()
     {
@@ -70,8 +81,14 @@ public class DataManager : DataDownloader
         {
             if (!TryGetComponent(out dataRegionRefs))
             {
-                Debug.LogError("ERROR: dataRegionRefs is null and " +
-                    "could not be found on datamanager object", gameObject);
+                dataRegionRefs = gameObject.AddComponent<DataRegionReference>();
+            }
+        }
+        if (dataExporter == null)
+        {
+            if (!TryGetComponent(out dataExporter))
+            {
+                dataExporter = gameObject.AddComponent<DataExporter>();
             }
         }
     }
@@ -356,7 +373,9 @@ public class DataManager : DataDownloader
     public void ClearInternalReferences()
     {
         Initialize();
-        dataRegionRefs.ClearInternalReferences();
+        referenceCities = new DataStructs.InternalReference_City[0];
+        referenceCountries = new DataStructs.InternalReference_Country[0];
+        referenceContinents = new DataStructs.InternalReference_Continent[0];
     }
 
 
@@ -364,39 +383,40 @@ public class DataManager : DataDownloader
 
 
 
-
-
-
-
-
-    public void GenerateNewEntries()
+    public void ExportData()
     {
-        GenerateNewContinentEntries();
-        GenerateNewCountryEntries();
-        GenerateNewCityEntries();
+        ExportCitiesData();
+        ExportCountriesData();
+        ExportContinentsData();
     }
 
-    public void GenerateNewContinentEntries()
+    public void ExportCitiesData()
     {
-        GenerateEntriesByScope(DataScope.Continent);
+        ExportDataByScope(DataScope.Continent);
     }
-    public void GenerateNewCountryEntries()
+    public void ExportCountriesData()
     {
-        GenerateEntriesByScope(DataScope.Country);
+        ExportDataByScope(DataScope.Country);
     }
-    public void GenerateNewCityEntries()
+    public void ExportContinentsData()
     {
-        GenerateEntriesByScope(DataScope.City);
+        ExportDataByScope(DataScope.City);
     }
 
-    private void GenerateEntriesByScope(DataScope scope)
+    private void ExportDataByScope(DataScope scope)
+    {
+        Initialize();
+        dataExporter.ExportDataByScope(scope);
+    }
+    public void ClearExportData()
     {
         Initialize();
     }
-    public void ClearDataEntries()
-    {
-        Initialize();
-    }
+
+
+
+
+
 
 
     [Serializable]
@@ -447,9 +467,8 @@ public class DataManager : DataDownloader
         }
     }
 
-
     [Serializable]
-    public class ExportSourceParams
+    public class InternalReferenceParams
     {
 
         [Space(5)]
@@ -478,6 +497,12 @@ public class DataManager : DataDownloader
                     return null;
             }
         }
+    }
+
+    [Serializable]
+    public class ExportDataParams
+    {
+
     }
 
     public Dataset GetDataset(string name)

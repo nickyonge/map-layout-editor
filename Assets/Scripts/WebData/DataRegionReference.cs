@@ -6,10 +6,6 @@ using UnityEngine;
 public class DataRegionReference : MonoBehaviour
 {
 
-    public RegionCity[] refCities;
-    public RegionCountry[] refCountries;
-    public RegionContinent[] refContinents;
-
 
 
     private DataManager dataManager;
@@ -60,12 +56,12 @@ public class DataRegionReference : MonoBehaviour
         Initialize();
         // get data source
         Dataset d = dataManager.GetDataset(
-            dataManager.exportSourceParams.sourceDataCity,
+            dataManager.referenceSourceFiles.sourceDataCity,
             DataScope.City);
         if (d == null)
         {
             Debug.LogError("ERROR: Could not find source data file for City, " +
-                "ensure it's in dataManager.exportSourceParams, returning", gameObject);
+                "ensure it's in dataManager.internalReferenceParams, returning", gameObject);
             return;
         }
         LoadInternalReferenceFromDatasets(DataScope.City, d);
@@ -74,21 +70,21 @@ public class DataRegionReference : MonoBehaviour
     {
         Initialize();
         Dataset d = dataManager.GetDataset(
-            dataManager.exportSourceParams.sourceDataCountry,
+            dataManager.referenceSourceFiles.sourceDataCountry,
             DataScope.Country);
         if (d == null)
         {
             Debug.LogError("ERROR: Could not find source data file for Country, " +
-                "ensure it's in dataManager.exportSourceParams, returning", gameObject);
+                "ensure it's in dataManager.internalReferenceParams, returning", gameObject);
             return;
         }
         Dataset dAlt = dataManager.GetDataset(
-            dataManager.exportSourceParams.sourceDataCountryAliases,
+            dataManager.referenceSourceFiles.sourceDataCountryAliases,
             DataScope.Country);
         if (dAlt == null)
         {
             Debug.LogError("ERROR: Could not find source data file for Country (AltNames), " +
-                "ensure it's in dataManager.exportSourceParams, returning", gameObject);
+                "ensure it's in dataManager.internalReferenceParams, returning", gameObject);
             return;
         }
         LoadInternalReferenceFromDatasets(DataScope.Country, d, dAlt);
@@ -97,12 +93,12 @@ public class DataRegionReference : MonoBehaviour
     {
         Initialize();
         Dataset d = dataManager.GetDataset(
-            dataManager.exportSourceParams.sourceDataContinent,
+            dataManager.referenceSourceFiles.sourceDataContinent,
             DataScope.Continent);
         if (d == null)
         {
             Debug.LogError("ERROR: Could not find source data file for Continent, " +
-                "ensure it's in dataManager.exportSourceParams, returning", gameObject);
+                "ensure it's in dataManager.internalReferenceParams, returning", gameObject);
             return;
         }
         LoadInternalReferenceFromDatasets(DataScope.Continent, d);
@@ -116,63 +112,9 @@ public class DataRegionReference : MonoBehaviour
     }
 
 
-
-
     public void ClearInternalReferences() {
-        refCities = new RegionCity[0];
-        refCountries = new RegionCountry[0];
-        refContinents = new RegionContinent[0];
-    }
-
-
-
-    [Serializable]
-    public struct RegionCity
-    {
-        ///<summary> ASCII name (no special chars) for the country </summary>
-        [Header("Export Fields")]
-        public string asciiName;
-        ///<summary> 2char country code </summary>
-        public string countryIso2;
-        public string continentCode;
-
-        [Header("Internal Refernce Fields")]
-        public string properName;
-        public string simplifiedName;
-        public string countryFullName;
-        public string[] alternateNames;
-    }
-
-    [Serializable]
-    public struct RegionCountry
-    {
-        [Header("Export Fields")]
-        public string asciiName;
-        public string isoA2;
-        public string isoA3;
-        public int isoN3;
-        public string isoN3String
-        {
-            get { return isoN3.ToString("000"); }
-        }
-        public string continentCode;
-
-        [Header("Internal Reference Fields")]
-        public string baseName;
-        public string simplifiedName;
-        public string[] alternateNames;
-
-    }
-
-    [Serializable]
-    public struct RegionContinent
-    {
-
-        [Header("Export Fields")]
-        public string name;
-        public string code;
-        [Header("Internal Reference Fields")]
-        public string[] alternateNames;
+        Initialize();
+        dataManager.ClearInternalReferences();
     }
 
 

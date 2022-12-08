@@ -7,6 +7,8 @@ using UnityEngine;
 [CustomEditor(typeof(DataManager))]
 public class DataManagerEditor : DataDownloaderEditor
 {
+    private const int BTN_HEIGHT_BIG = 30;
+    private const int BTN_HEIGHT_SMALL = 20;
 
     private DataManager dataManager;
 
@@ -15,12 +17,22 @@ public class DataManagerEditor : DataDownloaderEditor
     private SerializedProperty _cityDatasets;
     private SerializedProperty _countryDatasets;
     private SerializedProperty _continentDatasets;
+    private SerializedProperty _internalReferenceParams;
     private SerializedProperty _exportSourceParams;
+
+    private SerializedProperty _referenceCities;
+    private SerializedProperty _referenceCountries;
+    private SerializedProperty _referenceContinents;
+
 
     private GUIStyle _foldoutHeader;
 
-    private static bool showDatasets;
-    private static bool showExports;
+    private static bool showLoadDatasets;
+    private static bool showInternalRefs;
+    private static bool showExportData;
+
+
+    private static bool _repeatMethodFailsafe = false;
 
     protected override void OnEnable()
     {
@@ -34,18 +46,43 @@ public class DataManagerEditor : DataDownloaderEditor
             _cityDatasets = serializedObject.FindProperty("cityDatasets");
             _countryDatasets = serializedObject.FindProperty("countryDatasets");
             _continentDatasets = serializedObject.FindProperty("continentDatasets");
+            _internalReferenceParams = serializedObject.FindProperty("referenceSourceFiles");
             _exportSourceParams = serializedObject.FindProperty("exportSourceParams");
+            _referenceCities = serializedObject.FindProperty("referenceCities");
+            _referenceCountries = serializedObject.FindProperty("referenceCountries");
+            _referenceContinents = serializedObject.FindProperty("referenceContinents");
             base.OnEnable();
         }
         catch
         {
             // error, do nothing except close foldouts
-            showDatasets = false;
-            showExports = false;
+            showLoadDatasets = false;
+            showInternalRefs = false;
+            showExportData = false;
         }
     }
 
     public override void OnInspectorGUI()
+    {
+        // editor reload hotfix, wrap entire OnInspectorGUI in a try/catch
+        try
+        {
+            DataManagerInspectorGUI();
+        }
+        catch
+        {
+            if (!_repeatMethodFailsafe)
+            {
+                OnEnable();
+                OnInspectorGUI();
+                _repeatMethodFailsafe = true;
+            }
+            return;
+        }
+        _repeatMethodFailsafe = false;
+    }
+
+    private void DataManagerInspectorGUI()
     {
         // show script property up top 
         bool en = GUI.enabled;// preserve GUI.enabled state 
@@ -53,25 +90,18 @@ public class DataManagerEditor : DataDownloaderEditor
         EditorGUILayout.PropertyField(_scriptReference);
         GUI.enabled = en;
 
-        if (Section("Datasets", showDatasets, out showDatasets))
+        if (Section("Dataset Loader", showLoadDatasets, out showLoadDatasets))
         {
-            try
-            {
-                EditorGUILayout.PropertyField(_loadingParams);
-            } catch {
-                OnEnable();
-                OnInspectorGUI();
-                return;
-            }
+            EditorGUILayout.PropertyField(_loadingParams);
 
             GUILayout.Space(5);
 
             GUILayout.BeginHorizontal();
-            if (Btn("Load Dataset"))
+            if (Btn("Load Dataset", 0, BTN_HEIGHT_BIG))
             {
                 dataManager.LoadAllDataFiles();
             }
-            if (Btn("Clear Datasets", 120))
+            if (Btn("Clear Datasets", 120, BTN_HEIGHT_BIG))
             {
                 dataManager.ClearDataFiles();
             }
@@ -86,45 +116,85 @@ public class DataManagerEditor : DataDownloaderEditor
             EndSection();
         }
 
-        if (Section("Export Data", showExports, out showExports))
+        if (Section("Internal Reference Data", showInternalRefs, out showInternalRefs))
         {
-            try
-            {
-                EditorGUILayout.PropertyField(_exportSourceParams);
-            } catch {
-                OnEnable();
-                OnInspectorGUI();
-                return;
-            }
+            EditorGUILayout.PropertyField(_internalReferenceParams);
 
             GUILayout.Space(5);
 
             GUILayout.BeginHorizontal();
-            if (Btn("Generate Export Data"))
+            if (Btn("Load Internal References", 0, BTN_HEIGHT_BIG))
             {
-                dataManager.GenerateNewEntries();
+                dataManager.LoadInternalReferences();
             }
-            if (Btn("Clear ExpData", 100))
+            if (Btn("Clear InRefs", 100, BTN_HEIGHT_BIG))
             {
-                dataManager.ClearDataEntries();
+                dataManager.ClearInternalReferences();
             }
+            GUILayout.EndHorizontal();
+
+            GUILayout.Space(2);
+
+            GUILayout.BeginHorizontal();
+            GUILayout.Space(8);
+            if (Btn("Continents", 0, BTN_HEIGHT_SMALL))
+            {
+                dataManager.LoadInternalContinentReferences();
+            }
+            if (Btn("Countries", 0, BTN_HEIGHT_SMALL))
+            {
+                dataManager.LoadInternalCountryReferences();
+            }
+            if (Btn("Cities", 0, BTN_HEIGHT_SMALL))
+            {
+                dataManager.LoadInternalCityReferences();
+            }
+            GUILayout.Space(10);
             GUILayout.EndHorizontal();
 
             GUILayout.Space(5);
 
+            EditorGUILayout.PropertyField(_referenceCities);
+            EditorGUILayout.PropertyField(_referenceCountries);
+            EditorGUILayout.PropertyField(_referenceContinents);
+
+            EndSection();
+        }
+
+        if (Section("Export Data", showExportData, out showExportData))
+        {
+            EditorGUILayout.PropertyField(_exportSourceParams);
+
+            GUILayout.Space(5);
+
             GUILayout.BeginHorizontal();
-            if (Btn("Continents"))
+            if (Btn("Export All Data", 0, BTN_HEIGHT_BIG))
             {
-                dataManager.GenerateNewContinentEntries();
+                dataManager.ExportData();
             }
-            if (Btn("Countries"))
+            if (Btn("Clear ExpData", 100, BTN_HEIGHT_BIG))
             {
-                dataManager.GenerateNewCountryEntries();
+                dataManager.ClearExportData();
             }
-            if (Btn("Cities"))
+            GUILayout.EndHorizontal();
+
+            GUILayout.Space(2);
+
+            GUILayout.BeginHorizontal();
+            GUILayout.Space(8);
+            if (Btn("Continents", 0, BTN_HEIGHT_SMALL))
             {
-                dataManager.GenerateNewCityEntries();
+                dataManager.ExportContinentsData();
             }
+            if (Btn("Countries", 0, BTN_HEIGHT_SMALL))
+            {
+                dataManager.ExportCountriesData();
+            }
+            if (Btn("Cities", 0, BTN_HEIGHT_SMALL))
+            {
+                dataManager.ExportCitiesData();
+            }
+            GUILayout.Space(10);
             GUILayout.EndHorizontal();
 
             EndSection();
@@ -132,19 +202,27 @@ public class DataManagerEditor : DataDownloaderEditor
 
         serializedObject.ApplyModifiedProperties();
 
-
         DrawPropertiesExcluding(serializedObject, new string[] {
                 "m_Script", "loadingParams",
                 "cityDatasets", "countryDatasets", "continentDatasets",
-                "exportSourceParams", });
-
+                "referenceSourceFiles", "exportSourceParams",
+                "referenceCities", "referenceCountries", "referenceContinents" });
     }
 
-    private bool Btn(string label, int width = 0)
+    private bool Btn(string label, int width = 0, int height = 0)
     {
         if (width > 0)
         {
-            return GUILayout.Button(label, GUILayout.MaxWidth(width));
+            if (height > 0)
+            {
+                return GUILayout.Button(label,
+                    GUILayout.Width(width), GUILayout.Height(height));
+            }
+            return GUILayout.Button(label, GUILayout.Width(width));
+        }
+        else if (height > 0)
+        {
+            return GUILayout.Button(label, GUILayout.Height(height));
         }
         return GUILayout.Button(label);
     }
