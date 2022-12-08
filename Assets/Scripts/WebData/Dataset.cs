@@ -25,12 +25,8 @@ public class Dataset
             StringSplitOptions.RemoveEmptyEntries);
         foreach (string s in splits)
         {
-            if (!fast)
-            {
-                s = s.SimplifyString();
-            }
             if ((fast && s.IndexOf(fileName) == 0) ||
-                (!fast && s.IndexOf(fileName) >= 0))
+                (!fast && s.SimplifyString().IndexOf(fileName) >= 0))
             {
                 return true;
             }

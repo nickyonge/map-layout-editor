@@ -19,21 +19,30 @@ public class DataManagerEditor : DataDownloaderEditor
 
     private GUIStyle _foldoutHeader;
 
-    private bool showDatasets = false;
-    private bool showExports = false;
+    private static bool showDatasets;
+    private static bool showExports;
 
     protected override void OnEnable()
     {
-        dataManager = (DataManager)target;
-        _scriptReference = serializedObject.FindProperty("m_Script");
-        dataManager.Initialize();
-        _foldoutHeader = new GUIStyle(EditorStyles.foldoutHeader);
-        _loadingParams = serializedObject.FindProperty("loadingParams");
-        _cityDatasets = serializedObject.FindProperty("cityDatasets");
-        _countryDatasets = serializedObject.FindProperty("countryDatasets");
-        _continentDatasets = serializedObject.FindProperty("continentDatasets");
-        _exportSourceParams = serializedObject.FindProperty("exportSourceParams");
-        base.OnEnable();
+        try
+        {
+            dataManager = (DataManager)target;
+            _scriptReference = serializedObject.FindProperty("m_Script");
+            dataManager.Initialize();
+            _foldoutHeader = new GUIStyle(EditorStyles.foldoutHeader);
+            _loadingParams = serializedObject.FindProperty("loadingParams");
+            _cityDatasets = serializedObject.FindProperty("cityDatasets");
+            _countryDatasets = serializedObject.FindProperty("countryDatasets");
+            _continentDatasets = serializedObject.FindProperty("continentDatasets");
+            _exportSourceParams = serializedObject.FindProperty("exportSourceParams");
+            base.OnEnable();
+        }
+        catch
+        {
+            // error, do nothing except close foldouts
+            showDatasets = false;
+            showExports = false;
+        }
     }
 
     public override void OnInspectorGUI()
@@ -46,7 +55,14 @@ public class DataManagerEditor : DataDownloaderEditor
 
         if (Section("Datasets", showDatasets, out showDatasets))
         {
-            EditorGUILayout.PropertyField(_loadingParams);
+            try
+            {
+                EditorGUILayout.PropertyField(_loadingParams);
+            } catch {
+                OnEnable();
+                OnInspectorGUI();
+                return;
+            }
 
             GUILayout.Space(5);
 
@@ -60,7 +76,7 @@ public class DataManagerEditor : DataDownloaderEditor
                 dataManager.ClearDataFiles();
             }
             GUILayout.EndHorizontal();
-            
+
             GUILayout.Space(5);
 
             EditorGUILayout.PropertyField(_cityDatasets);
@@ -72,7 +88,14 @@ public class DataManagerEditor : DataDownloaderEditor
 
         if (Section("Export Data", showExports, out showExports))
         {
-            EditorGUILayout.PropertyField(_exportSourceParams);
+            try
+            {
+                EditorGUILayout.PropertyField(_exportSourceParams);
+            } catch {
+                OnEnable();
+                OnInspectorGUI();
+                return;
+            }
 
             GUILayout.Space(5);
 
@@ -111,7 +134,7 @@ public class DataManagerEditor : DataDownloaderEditor
 
 
         DrawPropertiesExcluding(serializedObject, new string[] {
-                "m_Script", "loadingParams", 
+                "m_Script", "loadingParams",
                 "cityDatasets", "countryDatasets", "continentDatasets",
                 "exportSourceParams", });
 
