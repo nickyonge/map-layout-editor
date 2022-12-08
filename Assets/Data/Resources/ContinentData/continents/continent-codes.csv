@@ -1,8 +1,9 @@
-Code,Name
-AF,Africa
-NA,North America
-OC,Oceania
-AN,Antarctica
-AS,Asia
-EU,Europe
-SA,South America
+Code,Name,AlternateNames
+AF,Africa,Afrika
+NA,North America,"N. America,Northern America"
+OC,Oceania,"Australia,Australian Subcontinent,South Pacific"
+AN,Antarctica,"Antarctic,South Pole"
+AS,Asia,"India,Indian Subcontinent"
+EU,Europe,
+SA,South America,"S. America,Southern America"
+AM,AMBIGUOUS,"Americas,America,Americas,Central America,Eurasia,Middle-East,Arctic,Arctic,North Pole,Greenland"
