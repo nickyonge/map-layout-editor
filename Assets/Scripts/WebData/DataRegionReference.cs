@@ -5,31 +5,125 @@ using UnityEngine;
 
 public class DataRegionReference : MonoBehaviour
 {
+
+    public RegionCity[] refCities;
+    public RegionCountry[] refCountries;
+    public RegionContinent[] refContinents;
+
+
+
     private DataManager dataManager;
 
     private bool _initialized = false;
 
 
-    private void Start() {
-
+    private void Start()
+    {
+        Initialize();
     }
-    public void Initialize() {
+    public void Initialize()
+    {
         if (_initialized) { return; }
         _initialized = true;
-        if (!TryGetComponent(out dataManager)) {
+        if (!TryGetComponent(out dataManager))
+        {
             Debug.LogError("ERROR: No DataManager found on DataRegionRef's gameObject", gameObject);
         }
     }
 
-    public void LoadCities() {
-        Initialize();
+
+    public void LoadInternalReferences(DataScope scope)
+    {
+        switch (scope)
+        {
+            case DataScope.City:
+                LoadCities();
+                break;
+            case DataScope.Country:
+                LoadCountries();
+                break;
+            case DataScope.Continent:
+                LoadContinents();
+                break;
+            case DataScope.Other:
+                Debug.LogWarning("WARNING: OTHER is invalid scope for " +
+                    "LoadInternalReferences");
+                break;
+            default:
+                Debug.LogWarning($"WARNING: Invalid scope: {scope}, for " +
+                    "LoadInternalReferences");
+                break;
+        }
     }
-    public void LoadCountries() {
+    private void LoadCities()
+    {
         Initialize();
+        // get data source
+        Dataset d = dataManager.GetDataset(
+            dataManager.exportSourceParams.sourceDataCity,
+            DataScope.City);
+        if (d == null)
+        {
+            Debug.LogError("ERROR: Could not find source data file for City, " +
+                "ensure it's in dataManager.exportSourceParams, returning", gameObject);
+            return;
+        }
+        LoadInternalReferenceFromDatasets(DataScope.City, d);
     }
-    public void LoadContinents() {
+    private void LoadCountries()
+    {
         Initialize();
+        Dataset d = dataManager.GetDataset(
+            dataManager.exportSourceParams.sourceDataCountry,
+            DataScope.Country);
+        if (d == null)
+        {
+            Debug.LogError("ERROR: Could not find source data file for Country, " +
+                "ensure it's in dataManager.exportSourceParams, returning", gameObject);
+            return;
+        }
+        Dataset dAlt = dataManager.GetDataset(
+            dataManager.exportSourceParams.sourceDataCountryAliases,
+            DataScope.Country);
+        if (dAlt == null)
+        {
+            Debug.LogError("ERROR: Could not find source data file for Country (AltNames), " +
+                "ensure it's in dataManager.exportSourceParams, returning", gameObject);
+            return;
+        }
+        LoadInternalReferenceFromDatasets(DataScope.Country, d, dAlt);
     }
+    private void LoadContinents()
+    {
+        Initialize();
+        Dataset d = dataManager.GetDataset(
+            dataManager.exportSourceParams.sourceDataContinent,
+            DataScope.Continent);
+        if (d == null)
+        {
+            Debug.LogError("ERROR: Could not find source data file for Continent, " +
+                "ensure it's in dataManager.exportSourceParams, returning", gameObject);
+            return;
+        }
+        LoadInternalReferenceFromDatasets(DataScope.Continent, d);
+    }
+
+
+    private void LoadInternalReferenceFromDatasets(DataScope scope,
+        Dataset dataset, Dataset alternateNames = null)
+    {
+        Debug.Log("LOAD THE INTERNAL REGION REFERENCES");
+    }
+
+
+
+
+    public void ClearInternalReferences() {
+        refCities = new RegionCity[0];
+        refCountries = new RegionCountry[0];
+        refContinents = new RegionContinent[0];
+    }
+
 
 
     [Serializable]
@@ -71,7 +165,8 @@ public class DataRegionReference : MonoBehaviour
     }
 
     [Serializable]
-    public struct RegionContinent {
+    public struct RegionContinent
+    {
 
         [Header("Export Fields")]
         public string name;

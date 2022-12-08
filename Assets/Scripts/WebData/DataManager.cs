@@ -29,6 +29,7 @@ public class DataManager : DataDownloader
 
 
     private MapDataCollector mapData;
+    private DataRegionReference dataRegionRefs;
 
     private void Start()
     {
@@ -60,7 +61,17 @@ public class DataManager : DataDownloader
             mapData = GetComponentInChildren<MapDataCollector>();
             if (mapData == null)
             {
-                Debug.LogError("ERROR: mapData is null and could not be found in datamanager children", gameObject);
+                Debug.LogError("ERROR: mapData is null and could " +
+                    "not be found in datamanager children", gameObject);
+            }
+        }
+
+        if (dataRegionRefs == null)
+        {
+            if (!TryGetComponent(out dataRegionRefs))
+            {
+                Debug.LogError("ERROR: dataRegionRefs is null and " +
+                    "could not be found on datamanager object", gameObject);
             }
         }
     }
@@ -316,6 +327,48 @@ public class DataManager : DataDownloader
         return containingFolders.ToArray();
     }
 
+
+    public void LoadInternalReferences()
+    {
+        LoadInternalContinentReferences();
+        LoadInternalCountryReferences();
+        LoadInternalCityReferences();
+    }
+
+    public void LoadInternalContinentReferences()
+    {
+        LoadInternalReferencesByScope(DataScope.Continent);
+    }
+    public void LoadInternalCountryReferences()
+    {
+        LoadInternalReferencesByScope(DataScope.Country);
+    }
+    public void LoadInternalCityReferences()
+    {
+        LoadInternalReferencesByScope(DataScope.City);
+    }
+
+    private void LoadInternalReferencesByScope(DataScope scope)
+    {
+        Initialize();
+        dataRegionRefs.LoadInternalReferences(scope);
+    }
+    public void ClearInternalReferences()
+    {
+        Initialize();
+        dataRegionRefs.ClearInternalReferences();
+    }
+
+
+
+
+
+
+
+
+
+
+
     public void GenerateNewEntries()
     {
         GenerateNewContinentEntries();
@@ -325,23 +378,21 @@ public class DataManager : DataDownloader
 
     public void GenerateNewContinentEntries()
     {
-        GenerateEntries(DataScope.Continent);
+        GenerateEntriesByScope(DataScope.Continent);
     }
     public void GenerateNewCountryEntries()
     {
-        GenerateEntries(DataScope.Country);
+        GenerateEntriesByScope(DataScope.Country);
     }
     public void GenerateNewCityEntries()
     {
-        GenerateEntries(DataScope.City);
+        GenerateEntriesByScope(DataScope.City);
     }
 
-    private void GenerateEntries(DataScope scope)
+    private void GenerateEntriesByScope(DataScope scope)
     {
         Initialize();
     }
-
-
     public void ClearDataEntries()
     {
         Initialize();
@@ -407,10 +458,25 @@ public class DataManager : DataDownloader
         public TextAsset sourceDataCountryAliases;
         public TextAsset sourceDataContinent;
 
-        [Serializable]
-        public class LocationSourceData
+        public TextAsset GetSourceDataByScope(DataScope scope, bool altNames = false)
         {
-            public TextAsset sourceDataFile;
+            switch (scope)
+            {
+                case DataScope.City:
+                    return sourceDataCity;
+                case DataScope.Country:
+                    return sourceDataCountry;
+                case DataScope.Continent:
+                    return sourceDataContinent;
+                case DataScope.Other:
+                    Debug.LogWarning("WARNING: OTHER is invalid scope for " +
+                        "GetSourceDataByScope, returning null");
+                    return null;
+                default:
+                    Debug.LogWarning($"WARNING: Invalid scope: {scope}, for " +
+                        "GetSourceDataByScope, returning null");
+                    return null;
+            }
         }
     }
 
@@ -435,8 +501,10 @@ public class DataManager : DataDownloader
     public Dataset GetDataset(string name, DataScope scope)
     {
         Dataset[] dataset = GetDatasetsByScope(scope);
-        foreach (Dataset d in dataset) {
-            if (d.DoesMatch(name, CHECK_DATASETS_FAST)) {
+        foreach (Dataset d in dataset)
+        {
+            if (d.DoesMatch(name, CHECK_DATASETS_FAST))
+            {
                 return d;
             }
         }
@@ -445,8 +513,10 @@ public class DataManager : DataDownloader
     public Dataset GetDataset(TextAsset dataFile, DataScope scope)
     {
         Dataset[] dataset = GetDatasetsByScope(scope);
-        foreach (Dataset d in dataset) {
-            if (d.DoesMatch(dataFile)) {
+        foreach (Dataset d in dataset)
+        {
+            if (d.DoesMatch(dataFile))
+            {
                 return d;
             }
         }
