@@ -5,6 +5,12 @@ using System.IO;
 using System.Linq;
 using UnityEngine;
 
+/// <summary> Format types for data to read (note: as of this writing, only CSV is supported) </summary>
+public enum DataFormat { CSV, JSON, XML, XLS, XLSX, ERROR }
+
+/// <summary> Scope, regional, that a given dataset represents </summary>
+public enum DataScope { City = 0, Country = 1, Continent = 2, Other = 3 }
+
 public class DataManager : DataDownloader
 {
     public static DataManager instance;
@@ -105,22 +111,22 @@ public class DataManager : DataDownloader
         // iterate through all files 
         foreach (string file in files)
         {
-            Dataset.DataScope scope = Dataset.DataScope.City;
+            DataScope scope = DataScope.City;
             if (file.IndexOf("CityData") >= 0)
             {
-                scope = Dataset.DataScope.City;
+                scope = DataScope.City;
             }
             else if (file.IndexOf("CountryData") >= 0)
             {
-                scope = Dataset.DataScope.Country;
+                scope = DataScope.Country;
             }
             else if (file.IndexOf("ContinentData") >= 0)
             {
-                scope = Dataset.DataScope.Continent;
+                scope = DataScope.Continent;
             }
             else
             {
-                scope = Dataset.DataScope.Other;
+                scope = DataScope.Other;
                 Debug.LogWarning("WARNING: invalid data subdirectory, cannot determine scope. " +
                     $"Consider organizing. File: {file}", gameObject);
                 continue;
@@ -161,37 +167,37 @@ public class DataManager : DataDownloader
 
             // determine filetype format 
             string type = fileNameWithExtension.Substring(extensionIndex + 1).ToLower();
-            Dataset.DataFormat format = Dataset.DataFormat.CSV;
+            DataFormat format = DataFormat.CSV;
 #pragma warning disable CS0162
             switch (type)
             {
                 case "csv":
-                    format = Dataset.DataFormat.CSV;
+                    format = DataFormat.CSV;
                     break;
                 case "xls":
-                    format = Dataset.DataFormat.XLS;
+                    format = DataFormat.XLS;
                     if (DEBUG_UNIMPLEMENTED_FORMATS) Debug.LogWarning("WARNING: TEST XLS FOR FUNCTION");
                     if (SKIP_UNIMPLEMENTED_FORMATS) continue;
                     break;
                 case "xlsx":
-                    format = Dataset.DataFormat.XLSX;
+                    format = DataFormat.XLSX;
                     if (DEBUG_UNIMPLEMENTED_FORMATS) Debug.LogWarning("WARNING: TEST XLSX FOR FUNCTION");
                     if (SKIP_UNIMPLEMENTED_FORMATS) continue;
                     break;
                 case "json":
-                    format = Dataset.DataFormat.JSON;
+                    format = DataFormat.JSON;
                     if (DEBUG_UNIMPLEMENTED_FORMATS) Debug.LogWarning("WARNING: TEST JSON FOR FUNCTION");
                     if (SKIP_UNIMPLEMENTED_FORMATS) continue;
                     break;
                 case "xml":
-                    format = Dataset.DataFormat.XML;
+                    format = DataFormat.XML;
                     if (DEBUG_UNIMPLEMENTED_FORMATS) Debug.LogWarning("WARNING: TEST XML FOR FUNCTION");
                     if (SKIP_UNIMPLEMENTED_FORMATS) continue;
                     break;
                 default:
                     Debug.LogError($"ERROR: Invalid Dataset format, format: {type}, " +
                         $"filepath: {file}, cannot parse file", gameObject);
-                    format = Dataset.DataFormat.ERROR;
+                    format = DataFormat.ERROR;
                     break;
             }
 #pragma warning restore CS0162
@@ -238,13 +244,13 @@ public class DataManager : DataDownloader
             // assign datasets 
             switch (scope)
             {
-                case Dataset.DataScope.City:
+                case DataScope.City:
                     cityDatasets.Add(dataset);
                     break;
-                case Dataset.DataScope.Country:
+                case DataScope.Country:
                     countryDatasets.Add(dataset);
                     break;
-                case Dataset.DataScope.Continent:
+                case DataScope.Continent:
                     continentDatasets.Add(dataset);
                     break;
             }
@@ -319,18 +325,18 @@ public class DataManager : DataDownloader
 
     public void GenerateNewContinentEntries()
     {
-        GenerateEntries(Dataset.DataScope.Continent);
+        GenerateEntries(DataScope.Continent);
     }
     public void GenerateNewCountryEntries()
     {
-        GenerateEntries(Dataset.DataScope.Country);
+        GenerateEntries(DataScope.Country);
     }
     public void GenerateNewCityEntries()
     {
-        GenerateEntries(Dataset.DataScope.City);
+        GenerateEntries(DataScope.City);
     }
 
-    private void GenerateEntries(Dataset.DataScope scope)
+    private void GenerateEntries(DataScope scope)
     {
         Initialize();
     }
@@ -392,7 +398,8 @@ public class DataManager : DataDownloader
 
 
     [Serializable]
-    public class ExportSourceParams {
+    public class ExportSourceParams
+    {
 
         [Space(5)]
         public TextAsset sourceDataCity;
@@ -401,7 +408,8 @@ public class DataManager : DataDownloader
         public TextAsset sourceDataContinent;
 
         [Serializable]
-        public class LocationSourceData {
+        public class LocationSourceData
+        {
             public TextAsset sourceDataFile;
         }
 
