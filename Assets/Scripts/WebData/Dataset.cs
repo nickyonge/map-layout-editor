@@ -8,6 +8,44 @@ using UnityEngine;
 public class Dataset
 {
 
+    public bool DoesMatch(string fileName, bool fast = true)
+    {
+        if (fast)
+        {
+            if (this.fileName.IndexOf(fileName) == 0)
+            {
+                return true;
+            }
+        }
+        else
+        {
+            fileName = fileName.SimplifyString();
+        }
+        string[] splits = fileName.Split(new string[] { " / ", " : " },
+            StringSplitOptions.RemoveEmptyEntries);
+        foreach (string s in splits)
+        {
+            if (!fast)
+            {
+                s = s.SimplifyString();
+            }
+            if ((fast && s.IndexOf(fileName) == 0) ||
+                (!fast && s.IndexOf(fileName) >= 0))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+    public bool DoesMatch(TextAsset dataFile)
+    {
+        if (this.dataFile == dataFile)
+        {
+            return true;
+        }
+        return false;
+    }
+
     /// <summary> name of this dataset </summary>
     public string fileName;
 
