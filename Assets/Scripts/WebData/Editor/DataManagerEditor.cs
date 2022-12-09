@@ -7,8 +7,10 @@ using UnityEngine;
 [CustomEditor(typeof(DataManager))]
 public class DataManagerEditor : DataDownloaderEditor
 {
+
     private const int BTN_HEIGHT_BIG = 30;
     private const int BTN_HEIGHT_SMALL = 20;
+    private const int BTN_CLEAR_WIDTH = 110;
 
     private DataManager dataManager;
 
@@ -111,7 +113,7 @@ public class DataManagerEditor : DataDownloaderEditor
             {
                 dataManager.LoadAllDataFiles();
             }
-            if (Btn("Clear Datasets", 120, BTN_HEIGHT_BIG))
+            if (Btn("Clear Datasets", BTN_CLEAR_WIDTH, BTN_HEIGHT_BIG))
             {
                 dataManager.ClearDataFiles();
             }
@@ -129,26 +131,26 @@ public class DataManagerEditor : DataDownloaderEditor
         {
             GUILayout.Space(-6);
             GUILayout.BeginHorizontal();
-            GUILayout.Space(1);
             if (Btn("Load Dataset", 0, BTN_HEIGHT_SMALL))
             {
                 dataManager.LoadAllDataFiles();
             }
-            if (Btn("Clear Datasets", 120, BTN_HEIGHT_SMALL))
+            if (Btn("Clear Datasets", BTN_CLEAR_WIDTH, BTN_HEIGHT_SMALL))
             {
                 dataManager.ClearDataFiles();
             }
-            GUILayout.Space(20);
             GUILayout.EndHorizontal();
             GUILayout.Space(15);
         }
 
-
-        GUI.enabled = dataManager.HaveLoadedDatasets();
-        string loadMsg = GUI.enabled ? "" : " (Load Datasets First)";
+        bool haveLoaded = dataManager.HaveLoadedDatasets();
+        GUI.enabled = haveLoaded;
+        string loadMsg = haveLoaded ? "" : " (Load Datasets First)";
         if (Section("Map Reference Data" + loadMsg, showMapReferences, out showMapReferences))
         {
+            GUI.enabled = true;// can always edit data properties 
             EditorGUILayout.PropertyField(_mapReferenceParams);
+            GUI.enabled = haveLoaded;
 
             GUILayout.Space(5);
 
@@ -157,7 +159,7 @@ public class DataManagerEditor : DataDownloaderEditor
             {
                 dataManager.LoadMapReferences();
             }
-            if (Btn("Clear MapRefs", 100, BTN_HEIGHT_BIG))
+            if (Btn("Clear MapRefs", BTN_CLEAR_WIDTH, BTN_HEIGHT_BIG))
             {
                 dataManager.ClearMapReferences();
             }
@@ -194,25 +196,25 @@ public class DataManagerEditor : DataDownloaderEditor
         {
             GUILayout.Space(-6);
             GUILayout.BeginHorizontal();
-            GUILayout.Space(1);
             if (Btn("Populate Map References", 0, BTN_HEIGHT_SMALL))
             {
                 dataManager.LoadMapReferences();
             }
-            if (Btn("Clear MapRefs", 100, BTN_HEIGHT_SMALL))
+            if (Btn("Clear MapRefs", BTN_CLEAR_WIDTH, BTN_HEIGHT_SMALL))
             {
                 dataManager.ClearMapReferences();
             }
-            GUILayout.Space(20);
             GUILayout.EndHorizontal();
             GUILayout.Space(15);
         }
-
-        GUI.enabled = dataManager.HaveLoadedMapReferences();
-        loadMsg = GUI.enabled ? "" : " (Load Map Refs First)";
-        if (Section("Internal Reference Data", showInternalRefs, out showInternalRefs))
+        haveLoaded = dataManager.HaveLoadedMapReferences();
+        GUI.enabled = haveLoaded;
+        loadMsg = haveLoaded ? "" : " (Load Map Refs First)";
+        if (Section("Internal Reference Data" + loadMsg, showInternalRefs, out showInternalRefs))
         {
+            GUI.enabled = true;// can always edit data properties 
             EditorGUILayout.PropertyField(_internalReferenceParams);
+            GUI.enabled = haveLoaded;
 
             GUILayout.Space(5);
 
@@ -221,7 +223,7 @@ public class DataManagerEditor : DataDownloaderEditor
             {
                 dataManager.LoadInternalReferences();
             }
-            if (Btn("Clear InRefs", 100, BTN_HEIGHT_BIG))
+            if (Btn("Clear InRefs", BTN_CLEAR_WIDTH, BTN_HEIGHT_BIG))
             {
                 dataManager.ClearInternalReferences();
             }
@@ -258,25 +260,26 @@ public class DataManagerEditor : DataDownloaderEditor
         {
             GUILayout.Space(-6);
             GUILayout.BeginHorizontal();
-            GUILayout.Space(1);
             if (Btn("Load Internal References", 0, BTN_HEIGHT_SMALL))
             {
                 dataManager.LoadInternalReferences();
             }
-            if (Btn("Clear InRefs", 100, BTN_HEIGHT_SMALL))
+            if (Btn("Clear InRefs", BTN_CLEAR_WIDTH, BTN_HEIGHT_SMALL))
             {
                 dataManager.ClearInternalReferences();
             }
-            GUILayout.Space(20);
             GUILayout.EndHorizontal();
             GUILayout.Space(15);
         }
 
-        GUI.enabled = dataManager.HaveLoadedInternalReferences();
-        loadMsg = GUI.enabled ? "" : " (Load Internal Refs First)";
-        if (Section("Export Data", showExportData, out showExportData))
+        haveLoaded = dataManager.HaveLoadedInternalReferences();
+        GUI.enabled = haveLoaded;
+        loadMsg = haveLoaded ? "" : " (Load Internal Refs First)";
+        if (Section("Export Data" + loadMsg, showExportData, out showExportData))
         {
+            GUI.enabled = true;// can always edit data properties 
             EditorGUILayout.PropertyField(_exportSourceParams);
+            GUI.enabled = haveLoaded;
 
             GUILayout.Space(5);
 
@@ -285,7 +288,7 @@ public class DataManagerEditor : DataDownloaderEditor
             {
                 dataManager.ExportData();
             }
-            if (Btn("Clear ExpData", 100, BTN_HEIGHT_BIG))
+            if (Btn("Clear ExpData", BTN_CLEAR_WIDTH, BTN_HEIGHT_BIG))
             {
                 dataManager.ClearExportData();
             }
@@ -316,16 +319,14 @@ public class DataManagerEditor : DataDownloaderEditor
         {
             GUILayout.Space(-6);
             GUILayout.BeginHorizontal();
-            GUILayout.Space(1);
             if (Btn("Export All Data", 0, BTN_HEIGHT_SMALL))
             {
                 dataManager.ExportData();
             }
-            if (Btn("Clear ExpData", 100, BTN_HEIGHT_SMALL))
+            if (Btn("Clear ExpData", BTN_CLEAR_WIDTH, BTN_HEIGHT_SMALL))
             {
                 dataManager.ClearExportData();
             }
-            GUILayout.Space(20);
             GUILayout.EndHorizontal();
             GUILayout.Space(15);
         }
