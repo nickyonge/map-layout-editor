@@ -21,6 +21,7 @@ public class DataManager : DataDownloader
     public const bool SKIP_UNIMPLEMENTED_FORMATS = true;
 
     public DatasetLoadingParams loadingParams;
+    public MapReferenceParams mapReferenceParams;
     public InternalReferenceParams referenceSourceFiles;
     public ExportDataParams exportSourceParams;
 
@@ -29,10 +30,12 @@ public class DataManager : DataDownloader
     public Dataset[] countryDatasets;
     public Dataset[] continentDatasets;
 
+    // MAP REFERENCES 
+    public DataStructs.MapReference[] mapCities;// found in in-app map
+    public DataStructs.MapReference[] mapCountries;
+    public DataStructs.MapReference[] mapContinents;
+
     // INTERNAL REFERENCES 
-    public DataStructs.InternalMapReference internalMapCities;// found in in-app map
-    public DataStructs.InternalMapReference internalMapCountries;
-    public DataStructs.InternalMapReference internalMapContinents;
     public DataStructs.InternalReference_City[] referenceCities;// loaded from datasets 
     public DataStructs.InternalReference_Country[] referenceCountries;
     public DataStructs.InternalReference_Continent[] referenceContinents;
@@ -42,7 +45,8 @@ public class DataManager : DataDownloader
 
     // local script references 
     private MapDataCollector mapData;
-    private DataInternalReferences dataRegionRefs;
+    private DataMapReferences dataMapRefs;
+    private DataInternalReferences dataInternalRefs;
     private DataExporter dataExporter;
 
     private void Start()
@@ -80,11 +84,18 @@ public class DataManager : DataDownloader
             }
         }
 
-        if (dataRegionRefs == null)
+        if (dataMapRefs == null)
         {
-            if (!TryGetComponent(out dataRegionRefs))
+            if (!TryGetComponent(out dataMapRefs))
             {
-                dataRegionRefs = gameObject.AddComponent<DataInternalReferences>();
+                dataMapRefs = gameObject.AddComponent<DataMapReferences>();
+            }
+        }
+        if (dataInternalRefs == null)
+        {
+            if (!TryGetComponent(out dataInternalRefs))
+            {
+                dataInternalRefs = gameObject.AddComponent<DataInternalReferences>();
             }
         }
         if (dataExporter == null)
@@ -348,13 +359,14 @@ public class DataManager : DataDownloader
     }
 
 
+
+
     public void LoadInternalReferences()
     {
         LoadInternalContinentReferences();
         LoadInternalCountryReferences();
         LoadInternalCityReferences();
     }
-
     public void LoadInternalContinentReferences()
     {
         LoadInternalReferencesByScope(DataScope.Continent);
@@ -371,7 +383,7 @@ public class DataManager : DataDownloader
     private void LoadInternalReferencesByScope(DataScope scope)
     {
         Initialize();
-        dataRegionRefs.LoadInternalReferences(scope);
+        dataInternalRefs.LoadInternalReferences(scope);
     }
     public void ClearInternalReferences()
     {
@@ -379,6 +391,41 @@ public class DataManager : DataDownloader
         referenceCities = new DataStructs.InternalReference_City[0];
         referenceCountries = new DataStructs.InternalReference_Country[0];
         referenceContinents = new DataStructs.InternalReference_Continent[0];
+    }
+
+
+    
+
+    public void LoadMapReferences()
+    {
+        LoadMapContinentReferences();
+        LoadMapCountryReferences();
+        LoadMapCityReferences();
+    }
+    public void LoadMapContinentReferences()
+    {
+        LoadMapReferencesByScope(DataScope.Continent);
+    }
+    public void LoadMapCountryReferences()
+    {
+        LoadMapReferencesByScope(DataScope.Country);
+    }
+    public void LoadMapCityReferences()
+    {
+        LoadMapReferencesByScope(DataScope.City);
+    }
+
+    private void LoadMapReferencesByScope(DataScope scope)
+    {
+        Initialize();
+        dataMapRefs.LoadMapReferences(scope);
+    }
+    public void ClearMapReferences()
+    {
+        Initialize();
+        mapCities = new DataStructs.MapReference[0];
+        mapCountries = new DataStructs.MapReference[0];
+        mapContinents = new DataStructs.MapReference[0];
     }
 
 
@@ -503,6 +550,11 @@ public class DataManager : DataDownloader
     }
 
     [Serializable]
+    public class MapReferenceParams
+    {
+    }
+
+    [Serializable]
     public class ExportDataParams
     {
 
@@ -573,5 +625,25 @@ public class DataManager : DataDownloader
         }
         return null;
     }
+
+
+    public bool HaveLoadedDatasets() {
+        return
+            cityDatasets.Length > 0 &&
+            countryDatasets.Length > 0 &&
+            continentDatasets.Length > 0;
+    } 
+    public bool HaveLoadedMapReferences() {
+        return HaveLoadedDatasets() &&
+            mapCities.Length > 0 &&
+            mapCountries.Length > 0 &&
+            mapContinents.Length > 0;
+    } 
+    public bool HaveLoadedInternalReferences() {
+        return HaveLoadedMapReferences() &&
+            referenceCities.Length > 0 &&
+            referenceCountries.Length > 0 &&
+            referenceContinents.Length > 0;
+    } 
 
 }

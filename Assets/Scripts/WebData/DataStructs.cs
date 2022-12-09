@@ -6,7 +6,7 @@ using UnityEngine;
 public static class DataStructs {
 
     [Serializable]
-    public struct InternalMapReference {
+    public struct MapReference {
         public string basicName;
         public string simpleName;
         public string[] Names { get { return new string[] { basicName, simpleName }; } }

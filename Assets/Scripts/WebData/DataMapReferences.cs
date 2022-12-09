@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class DataInternalReferences : MonoBehaviour
+public class DataMapReferences : MonoBehaviour
 {
 
 
@@ -28,7 +28,7 @@ public class DataInternalReferences : MonoBehaviour
     }
 
 
-    public void LoadInternalReferences(DataScope scope)
+    public void LoadMapReferences(DataScope scope)
     {
         switch (scope)
         {
@@ -43,11 +43,11 @@ public class DataInternalReferences : MonoBehaviour
                 break;
             case DataScope.Other:
                 Debug.LogWarning("WARNING: OTHER is invalid scope for " +
-                    "LoadInternalReferences");
+                    "LoadMapReferences");
                 break;
             default:
                 Debug.LogWarning($"WARNING: Invalid scope: {scope}, for " +
-                    "LoadInternalReferences");
+                    "LoadMapReferences");
                 break;
         }
     }
@@ -61,10 +61,10 @@ public class DataInternalReferences : MonoBehaviour
         if (d == null)
         {
             Debug.LogError("ERROR: Could not find source data file for City, " +
-                "ensure it's in dataManager.internalReferenceParams, returning", gameObject);
+                "ensure it's in dataManager.mapReferenceParams, returning", gameObject);
             return;
         }
-        LoadInternalReferenceFromDatasets(DataScope.City, d);
+        LoadMapReferenceFromDatasets(DataScope.City, d);
     }
     private void LoadCountries()
     {
@@ -75,7 +75,7 @@ public class DataInternalReferences : MonoBehaviour
         if (d == null)
         {
             Debug.LogError("ERROR: Could not find source data file for Country, " +
-                "ensure it's in dataManager.internalReferenceParams, returning", gameObject);
+                "ensure it's in dataManager.mapReferenceParams, returning", gameObject);
             return;
         }
         Dataset dAlt = dataManager.GetDataset(
@@ -84,10 +84,10 @@ public class DataInternalReferences : MonoBehaviour
         if (dAlt == null)
         {
             Debug.LogError("ERROR: Could not find source data file for Country (AltNames), " +
-                "ensure it's in dataManager.internalReferenceParams, returning", gameObject);
+                "ensure it's in dataManager.mapReferenceParams, returning", gameObject);
             return;
         }
-        LoadInternalReferenceFromDatasets(DataScope.Country, d, dAlt);
+        LoadMapReferenceFromDatasets(DataScope.Country, d, dAlt);
     }
     private void LoadContinents()
     {
@@ -98,17 +98,17 @@ public class DataInternalReferences : MonoBehaviour
         if (d == null)
         {
             Debug.LogError("ERROR: Could not find source data file for Continent, " +
-                "ensure it's in dataManager.internalReferenceParams, returning", gameObject);
+                "ensure it's in dataManager.mapReferenceParams, returning", gameObject);
             return;
         }
-        LoadInternalReferenceFromDatasets(DataScope.Continent, d);
+        LoadMapReferenceFromDatasets(DataScope.Continent, d);
     }
 
 
-    private void LoadInternalReferenceFromDatasets(DataScope scope,
+    private void LoadMapReferenceFromDatasets(DataScope scope,
         Dataset dataset, Dataset alternateNames = null)
     {
-        Debug.Log("LOAD THE INTERNAL REGION REFERENCES " + scope);
+        Debug.Log("LOAD THE MAP REFERENCES " + scope);
 
 
 
@@ -116,9 +116,9 @@ public class DataInternalReferences : MonoBehaviour
     }
 
 
-    public void ClearInternalReferences() {
+    public void ClearMapReferences() {
         Initialize();
-        dataManager.ClearInternalReferences();
+        dataManager.ClearMapReferences();
     }
 
 

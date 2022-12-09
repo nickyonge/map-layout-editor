@@ -17,12 +17,13 @@ public class DataManagerEditor : DataDownloaderEditor
     private SerializedProperty _cityDatasets;
     private SerializedProperty _countryDatasets;
     private SerializedProperty _continentDatasets;
+    private SerializedProperty _mapReferenceParams;
     private SerializedProperty _internalReferenceParams;
     private SerializedProperty _exportSourceParams;
 
-    private SerializedProperty _internalMapCities;
-    private SerializedProperty _internalMapCountries;
-    private SerializedProperty _internalMapContinents;
+    private SerializedProperty _mapCities;
+    private SerializedProperty _mapCountries;
+    private SerializedProperty _mapContinents;
     private SerializedProperty _referenceCities;
     private SerializedProperty _referenceCountries;
     private SerializedProperty _referenceContinents;
@@ -31,6 +32,7 @@ public class DataManagerEditor : DataDownloaderEditor
     private GUIStyle _foldoutHeader;
 
     private static bool showLoadDatasets;
+    private static bool showMapReferences;
     private static bool showInternalRefs;
     private static bool showExportData;
 
@@ -49,11 +51,12 @@ public class DataManagerEditor : DataDownloaderEditor
             _cityDatasets = serializedObject.FindProperty("cityDatasets");
             _countryDatasets = serializedObject.FindProperty("countryDatasets");
             _continentDatasets = serializedObject.FindProperty("continentDatasets");
+            _mapReferenceParams = serializedObject.FindProperty("referenceSourceFiles");
             _internalReferenceParams = serializedObject.FindProperty("referenceSourceFiles");
             _exportSourceParams = serializedObject.FindProperty("exportSourceParams");
-            _internalMapCities = serializedObject.FindProperty("internalMapCities");
-            _internalMapCountries = serializedObject.FindProperty("internalMapCountries");
-            _internalMapContinents = serializedObject.FindProperty("internalMapContinents");
+            _mapCities = serializedObject.FindProperty("mapCities");
+            _mapCountries = serializedObject.FindProperty("mapCountries");
+            _mapContinents = serializedObject.FindProperty("mapContinents");
             _referenceCities = serializedObject.FindProperty("referenceCities");
             _referenceCountries = serializedObject.FindProperty("referenceCountries");
             _referenceContinents = serializedObject.FindProperty("referenceContinents");
@@ -63,6 +66,7 @@ public class DataManagerEditor : DataDownloaderEditor
         {
             // error, do nothing except close foldouts
             showLoadDatasets = false;
+            showMapReferences = false;
             showInternalRefs = false;
             showExportData = false;
         }
@@ -91,10 +95,10 @@ public class DataManagerEditor : DataDownloaderEditor
     private void DataManagerInspectorGUI()
     {
         // show script property up top 
-        bool en = GUI.enabled;// preserve GUI.enabled state 
+        bool guiEnabledState = GUI.enabled;// preserve GUI.enabled state 
         GUI.enabled = false;
         EditorGUILayout.PropertyField(_scriptReference);
-        GUI.enabled = en;
+        GUI.enabled = guiEnabledState;
 
         if (Section("Dataset Loader", showLoadDatasets, out showLoadDatasets))
         {
@@ -121,7 +125,91 @@ public class DataManagerEditor : DataDownloaderEditor
 
             EndSection();
         }
+        else
+        {
+            GUILayout.Space(-6);
+            GUILayout.BeginHorizontal();
+            GUILayout.Space(1);
+            if (Btn("Load Dataset", 0, BTN_HEIGHT_SMALL))
+            {
+                dataManager.LoadAllDataFiles();
+            }
+            if (Btn("Clear Datasets", 120, BTN_HEIGHT_SMALL))
+            {
+                dataManager.ClearDataFiles();
+            }
+            GUILayout.Space(20);
+            GUILayout.EndHorizontal();
+            GUILayout.Space(15);
+        }
 
+
+        GUI.enabled = dataManager.HaveLoadedDatasets();
+        string loadMsg = GUI.enabled ? "" : " (Load Datasets First)";
+        if (Section("Map Reference Data" + loadMsg, showMapReferences, out showMapReferences))
+        {
+            EditorGUILayout.PropertyField(_mapReferenceParams);
+
+            GUILayout.Space(5);
+
+            GUILayout.BeginHorizontal();
+            if (Btn("Populate Map References", 0, BTN_HEIGHT_BIG))
+            {
+                dataManager.LoadMapReferences();
+            }
+            if (Btn("Clear MapRefs", 100, BTN_HEIGHT_BIG))
+            {
+                dataManager.ClearMapReferences();
+            }
+            GUILayout.EndHorizontal();
+
+            GUILayout.Space(2);
+
+            GUILayout.BeginHorizontal();
+            GUILayout.Space(8);
+            if (Btn("Continents", 0, BTN_HEIGHT_SMALL))
+            {
+                dataManager.LoadMapContinentReferences();
+            }
+            if (Btn("Countries", 0, BTN_HEIGHT_SMALL))
+            {
+                dataManager.LoadMapCountryReferences();
+            }
+            if (Btn("Cities", 0, BTN_HEIGHT_SMALL))
+            {
+                dataManager.LoadMapCityReferences();
+            }
+            GUILayout.Space(10);
+            GUILayout.EndHorizontal();
+
+            GUILayout.Space(5);
+
+            EditorGUILayout.PropertyField(_mapCities);
+            EditorGUILayout.PropertyField(_mapCountries);
+            EditorGUILayout.PropertyField(_mapContinents);
+
+            EndSection();
+        }
+        else
+        {
+            GUILayout.Space(-6);
+            GUILayout.BeginHorizontal();
+            GUILayout.Space(1);
+            if (Btn("Populate Map References", 0, BTN_HEIGHT_SMALL))
+            {
+                dataManager.LoadMapReferences();
+            }
+            if (Btn("Clear MapRefs", 100, BTN_HEIGHT_SMALL))
+            {
+                dataManager.ClearMapReferences();
+            }
+            GUILayout.Space(20);
+            GUILayout.EndHorizontal();
+            GUILayout.Space(15);
+        }
+
+        GUI.enabled = dataManager.HaveLoadedMapReferences();
+        loadMsg = GUI.enabled ? "" : " (Load Map Refs First)";
         if (Section("Internal Reference Data", showInternalRefs, out showInternalRefs))
         {
             EditorGUILayout.PropertyField(_internalReferenceParams);
@@ -159,12 +247,6 @@ public class DataManagerEditor : DataDownloaderEditor
             GUILayout.EndHorizontal();
 
             GUILayout.Space(5);
-            
-            EditorGUILayout.PropertyField(_internalMapCities);
-            EditorGUILayout.PropertyField(_internalMapCountries);
-            EditorGUILayout.PropertyField(_internalMapContinents);
-
-            GUILayout.Space(5);
 
             EditorGUILayout.PropertyField(_referenceCities);
             EditorGUILayout.PropertyField(_referenceCountries);
@@ -172,7 +254,26 @@ public class DataManagerEditor : DataDownloaderEditor
 
             EndSection();
         }
+        else
+        {
+            GUILayout.Space(-6);
+            GUILayout.BeginHorizontal();
+            GUILayout.Space(1);
+            if (Btn("Load Internal References", 0, BTN_HEIGHT_SMALL))
+            {
+                dataManager.LoadInternalReferences();
+            }
+            if (Btn("Clear InRefs", 100, BTN_HEIGHT_SMALL))
+            {
+                dataManager.ClearInternalReferences();
+            }
+            GUILayout.Space(20);
+            GUILayout.EndHorizontal();
+            GUILayout.Space(15);
+        }
 
+        GUI.enabled = dataManager.HaveLoadedInternalReferences();
+        loadMsg = GUI.enabled ? "" : " (Load Internal Refs First)";
         if (Section("Export Data", showExportData, out showExportData))
         {
             EditorGUILayout.PropertyField(_exportSourceParams);
@@ -211,15 +312,34 @@ public class DataManagerEditor : DataDownloaderEditor
 
             EndSection();
         }
+        else
+        {
+            GUILayout.Space(-6);
+            GUILayout.BeginHorizontal();
+            GUILayout.Space(1);
+            if (Btn("Export All Data", 0, BTN_HEIGHT_SMALL))
+            {
+                dataManager.ExportData();
+            }
+            if (Btn("Clear ExpData", 100, BTN_HEIGHT_SMALL))
+            {
+                dataManager.ClearExportData();
+            }
+            GUILayout.Space(20);
+            GUILayout.EndHorizontal();
+            GUILayout.Space(15);
+        }
+
+        GUI.enabled = guiEnabledState;
 
         serializedObject.ApplyModifiedProperties();
 
         DrawPropertiesExcluding(serializedObject, new string[] {
-                "m_Script", "loadingParams",
+                "m_Script", "loadingParams", "mapReferenceParams",
                 "cityDatasets", "countryDatasets", "continentDatasets",
                 "referenceSourceFiles", "exportSourceParams",
                 "referenceCities", "referenceCountries", "referenceContinents",
-                "internalMapCities","internalMapCountries","internalMapContinents", });
+                "mapCities","mapCountries","mapContinents", });
     }
 
     private bool Btn(string label, int width = 0, int height = 0)
@@ -249,7 +369,7 @@ public class DataManagerEditor : DataDownloaderEditor
         if (stateOut) { EditorGUI.indentLevel++; }
         return stateOut;
     }
-    private void EndSection() { GUILayout.Space(10); EditorGUI.indentLevel--; }
+    private void EndSection() { GUILayout.Space(25); EditorGUI.indentLevel--; }
     private void Header(string label, bool withLine = true)
     {
         GUILayout.Space(5);
