@@ -189,12 +189,25 @@ public class MapDataCollector : MonoBehaviour
     public class SerializedMapData
     {
         public string name;
+        public string simpleName;
         public MapData mapData;
         public SerializedMapData(MapData mapData)
         {
             this.mapData = mapData;
             name = mapData.name;
+            simpleName = name.SimplifyString();
             Populate();
+        }
+        public bool DoesMatch(params string[] names)
+        {
+            foreach (string n in names)
+            {
+                if (simpleName == n.SimplifyString())
+                {
+                    return true;
+                }
+            }
+            return false;
         }
         public void Populate()
         {
