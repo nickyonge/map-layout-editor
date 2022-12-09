@@ -1,9 +1,9 @@
-Code,Name,AlternateNames
-AF,Africa,Afrika
-NA,North America,"N. America,Northern America"
-OC,Oceania,"Australia,Australian Subcontinent,South Pacific"
-AN,Antarctica,"Antarctic,South Pole"
-AS,Asia,"India,Indian Subcontinent"
-EU,Europe,
-SA,South America,"S. America,Southern America"
-AM,AMBIGUOUS,"Americas,America,Americas,Central America,Eurasia,Middle-East,Arctic,Arctic,North Pole,Greenland"
+Code,M49,Name,AlternateNames
+AF,002,Africa,Afrika
+NA,003,North America,"N. America,Northern America"
+OC,009,Oceania,"Australia,Australian Subcontinent,South Pacific,Melanesia,Micronesia,Polynesia"
+AN,010,Antarctica,"Antarctic,South Pole"
+AS,142,Asia,"India,Indian Subcontinent"
+EU,150,Europe,
+SA,005,South America,"S. America,Southern America"
+AM,000,AMBIGUOUS,"Americas,America,Americas,Central America,Eurasia,Middle-East,Arctic,Arctic,North Pole,Greenland,Eastern Europe"
