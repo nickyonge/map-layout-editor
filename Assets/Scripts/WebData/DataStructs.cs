@@ -48,10 +48,10 @@ public static class DataStructs
         public string asciiName;
         public string isoA2;
         public string isoA3;
-        public int isoN3;
-        public string isoN3String
+        public int m49;
+        public string m49String
         {
-            get { return isoN3.ToString("000"); }
+            get { return m49.ToString("000"); }
         }
         public string continentCode;
 

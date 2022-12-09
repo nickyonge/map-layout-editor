@@ -191,11 +191,13 @@ public class MapDataCollector : MonoBehaviour
         public string name;
         public string simpleName;
         public MapData mapData;
+        public DataScope scope;
         public SerializedMapData(MapData mapData)
         {
             this.mapData = mapData;
             name = mapData.name;
             simpleName = name.SimplifyString();
+            scope = DataScope.Other;
             Populate();
         }
         public bool DoesMatch(params string[] names)
@@ -208,6 +210,9 @@ public class MapDataCollector : MonoBehaviour
                 }
             }
             return false;
+        }
+        public virtual bool CheckValid() {
+            return !string.IsNullOrWhiteSpace(name);
         }
         public void Populate()
         {
@@ -243,6 +248,8 @@ public class MapDataCollector : MonoBehaviour
     {
         public World(MapData mapData) : base(mapData) { if (name == mapData.name || string.IsNullOrEmpty(name)) { name = "World"; } }
         public Continent[] continents;
+        public int m49 { get { return 1; } }
+        public string m49String { get { return m49.ToString("000"); } }
         protected override void GeneratedPopulation(SerializedMapData[] childData) { continents = Array.ConvertAll(childData, i => (Continent)i); }
         protected override SerializedMapData CreateSerializedMapData(MapData mapData) { return new Continent(mapData); }
         public Country[] countries
@@ -273,7 +280,15 @@ public class MapDataCollector : MonoBehaviour
     [Serializable]
     public class Continent : SerializedMapData
     {
-        public Continent(MapData mapData) : base(mapData) { }
+        public string continentCode;
+        public int m49;
+        public string m49String { get { return m49.ToString("000"); } }
+        public Continent(MapData mapData) : base(mapData)
+        {
+            scope = DataScope.Continent;
+            m49 = default;
+            continentCode = default;
+        }
         public Country[] countries;
         protected override void GeneratedPopulation(SerializedMapData[] childData) { countries = Array.ConvertAll(childData, i => (Country)i); }
         protected override SerializedMapData CreateSerializedMapData(MapData mapData) { return new Country(mapData); }
@@ -289,18 +304,34 @@ public class MapDataCollector : MonoBehaviour
                 return cities.ToArray();
             }
         }
+        public override bool CheckValid() {
+            return !string.IsNullOrWhiteSpace(continentCode) && base.CheckValid() && m49 > 1;
+        }
     }
     [Serializable]
     public class Country : SerializedMapData
     {
-        public Country(MapData mapData) : base(mapData) { }
+        public string isoA2;
+        public string isoA3;
+        public int m49;
+        public Country(MapData mapData) : base(mapData)
+        {
+            scope = DataScope.Country;
+            isoA2 = isoA3 = default;
+            m49 = default;
+        }
         public City[] cities;
         protected override void GeneratedPopulation(SerializedMapData[] childData) { cities = Array.ConvertAll(childData, i => (City)i); }
         protected override SerializedMapData CreateSerializedMapData(MapData mapData) { return new City(mapData); }
+        public override bool CheckValid() {
+            return !string.IsNullOrWhiteSpace(isoA2) && !string.IsNullOrWhiteSpace(isoA3) && 
+                isoA2.Length == 2 && isoA3.Length == 3 && m49 > 1 &&
+                base.CheckValid();
+        }
     }
     [Serializable]
     public class City : SerializedMapData
     {
-        public City(MapData mapData) : base(mapData) { }
+        public City(MapData mapData) : base(mapData) { scope = DataScope.City; }
     }
 }

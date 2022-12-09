@@ -394,7 +394,7 @@ public class DataManager : DataDownloader
     }
 
 
-    
+
 
     public void LoadMapReferences()
     {
@@ -407,6 +407,9 @@ public class DataManager : DataDownloader
         mapCities = new DataStructs.MapReference[0];
         mapCountries = new DataStructs.MapReference[0];
         mapContinents = new DataStructs.MapReference[0];
+        if (_useMapDataCollecterAsMapRefs) {
+            
+        }
     }
 
 
@@ -608,23 +611,41 @@ public class DataManager : DataDownloader
     }
 
 
-    public bool HaveLoadedDatasets() {
+    public bool HaveLoadedDatasets()
+    {
         return
             cityDatasets.Length > 0 &&
             countryDatasets.Length > 0 &&
             continentDatasets.Length > 0;
-    } 
-    public bool HaveLoadedMapReferences() {
+    }
+    public static bool _useMapDataCollecterAsMapRefs = true;
+    public bool HaveLoadedMapReferences()
+    {
+        // check if using map data collection as map refs
+        // if so, ensure that the proper country codes have been established 
+        if (_useMapDataCollecterAsMapRefs)
+        {
+            if (mapData.world.continents.Length == 0 ||
+                !mapData.world.continents[0].CheckValid() ||
+                !mapData.world.continents[mapData.world.continents.Length - 1].CheckValid())
+                return false;
+            if (mapData.world.continents[0].countries.Length == 0 ||
+                !mapData.world.continents[0].countries[0].CheckValid() ||
+                !mapData.world.continents[0].countries
+                    [mapData.world.continents[0].countries.Length - 1].CheckValid())
+                return false;
+        }
         return HaveLoadedDatasets() &&
             mapCities.Length > 0 &&
             mapCountries.Length > 0 &&
             mapContinents.Length > 0;
-    } 
-    public bool HaveLoadedInternalReferences() {
+    }
+    public bool HaveLoadedInternalReferences()
+    {
         return HaveLoadedMapReferences() &&
             referenceCities.Length > 0 &&
             referenceCountries.Length > 0 &&
             referenceContinents.Length > 0;
-    } 
+    }
 
 }

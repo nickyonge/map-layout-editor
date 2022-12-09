@@ -167,9 +167,12 @@ public class DataManagerEditor : DataDownloaderEditor
 
             GUILayout.Space(5);
 
-            EditorGUILayout.PropertyField(_mapCities);
-            EditorGUILayout.PropertyField(_mapCountries);
-            EditorGUILayout.PropertyField(_mapContinents);
+            if (!DataManager._useMapDataCollecterAsMapRefs)
+            {
+                EditorGUILayout.PropertyField(_mapCities);
+                EditorGUILayout.PropertyField(_mapCountries);
+                EditorGUILayout.PropertyField(_mapContinents);
+            }
 
             EndSection();
         }
@@ -188,6 +191,7 @@ public class DataManagerEditor : DataDownloaderEditor
             GUILayout.EndHorizontal();
             GUILayout.Space(15);
         }
+
         haveLoaded = dataManager.HaveLoadedMapReferences();
         GUI.enabled = haveLoaded;
         loadMsg = haveLoaded ? "" : " (Load Map Refs First)";

@@ -6,8 +6,6 @@ using UnityEngine;
 public class DataMapReferences : MonoBehaviour
 {
 
-
-
     private DataManager dataManager;
 
     private bool _initialized = false;
