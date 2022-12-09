@@ -3,13 +3,25 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public static class DataStructs {
+public static class DataStructs
+{
 
     [Serializable]
-    public struct MapReference {
+    public struct MapReference
+    {
         public string basicName;
         public string simpleName;
         public string[] Names { get { return new string[] { basicName, simpleName }; } }
+
+        public MapReference(MapDataCollector.SerializedMapData mapData)
+        {
+            basicName = mapData.name;
+            simpleName = basicName.SimplifyString();
+        }
+        public MapReference(string name) {
+            basicName = name;
+            simpleName = basicName.SimplifyString();
+        }
     }
 
     [Serializable]

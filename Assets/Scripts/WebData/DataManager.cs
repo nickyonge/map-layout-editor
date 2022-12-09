@@ -44,7 +44,7 @@ public class DataManager : DataDownloader
 
 
     // local script references 
-    private MapDataCollector mapData;
+    public MapDataCollector mapData;
     private DataMapReferences dataMapRefs;
     private DataInternalReferences dataInternalRefs;
     private DataExporter dataExporter;
@@ -398,27 +398,8 @@ public class DataManager : DataDownloader
 
     public void LoadMapReferences()
     {
-        LoadMapContinentReferences();
-        LoadMapCountryReferences();
-        LoadMapCityReferences();
-    }
-    public void LoadMapContinentReferences()
-    {
-        LoadMapReferencesByScope(DataScope.Continent);
-    }
-    public void LoadMapCountryReferences()
-    {
-        LoadMapReferencesByScope(DataScope.Country);
-    }
-    public void LoadMapCityReferences()
-    {
-        LoadMapReferencesByScope(DataScope.City);
-    }
-
-    private void LoadMapReferencesByScope(DataScope scope)
-    {
         Initialize();
-        dataMapRefs.LoadMapReferences(scope);
+        dataMapRefs.LoadMapReferences();
     }
     public void ClearMapReferences()
     {

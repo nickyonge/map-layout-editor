@@ -165,25 +165,6 @@ public class DataManagerEditor : DataDownloaderEditor
             }
             GUILayout.EndHorizontal();
 
-            GUILayout.Space(2);
-
-            GUILayout.BeginHorizontal();
-            GUILayout.Space(8);
-            if (Btn("Continents", 0, BTN_HEIGHT_SMALL))
-            {
-                dataManager.LoadMapContinentReferences();
-            }
-            if (Btn("Countries", 0, BTN_HEIGHT_SMALL))
-            {
-                dataManager.LoadMapCountryReferences();
-            }
-            if (Btn("Cities", 0, BTN_HEIGHT_SMALL))
-            {
-                dataManager.LoadMapCityReferences();
-            }
-            GUILayout.Space(10);
-            GUILayout.EndHorizontal();
-
             GUILayout.Space(5);
 
             EditorGUILayout.PropertyField(_mapCities);
@@ -336,7 +317,7 @@ public class DataManagerEditor : DataDownloaderEditor
         serializedObject.ApplyModifiedProperties();
 
         DrawPropertiesExcluding(serializedObject, new string[] {
-                "m_Script", "loadingParams", "mapReferenceParams",
+                "m_Script", "mapData", "loadingParams", "mapReferenceParams",
                 "cityDatasets", "countryDatasets", "continentDatasets",
                 "referenceSourceFiles", "exportSourceParams",
                 "referenceCities", "referenceCountries", "referenceContinents",

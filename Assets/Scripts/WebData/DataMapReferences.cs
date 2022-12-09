@@ -28,95 +28,43 @@ public class DataMapReferences : MonoBehaviour
     }
 
 
-    public void LoadMapReferences(DataScope scope)
+    public void LoadMapReferences()
     {
-        switch (scope)
+        // load all map references from mapData
+        // Dictionary<Continent, Dictionary<Country, City[]>> AllCitiesByCountryByContinent
+
+        List<DataStructs.MapReference> mapCities = new();
+        List<DataStructs.MapReference> mapCountries = new();
+        List<DataStructs.MapReference> mapContinents = new();
+        // iterate through continents, countries, cities
+        foreach (KeyValuePair<MapDataCollector.Continent,
+            Dictionary<MapDataCollector.Country, MapDataCollector.City[]>>
+            continent in dataManager.mapData.AllCitiesByCountryByContinent)
         {
-            case DataScope.City:
-                LoadCities();
-                break;
-            case DataScope.Country:
-                LoadCountries();
-                break;
-            case DataScope.Continent:
-                LoadContinents();
-                break;
-            case DataScope.Other:
-                Debug.LogWarning("WARNING: OTHER is invalid scope for " +
-                    "LoadMapReferences");
-                break;
-            default:
-                Debug.LogWarning($"WARNING: Invalid scope: {scope}, for " +
-                    "LoadMapReferences");
-                break;
+            // get continent
+            mapContinents.Add(new DataStructs.MapReference(continent.Key));
+            // iterate through countries, cities 
+            foreach (KeyValuePair<MapDataCollector.Country, MapDataCollector.City[]>
+                country in continent.Value)
+            {
+                // get country
+                mapCountries.Add(new DataStructs.MapReference(country.Key));
+                // iterate through cities 
+                foreach (MapDataCollector.City city in country.Value)
+                {
+                    // get city 
+                    mapCities.Add(new DataStructs.MapReference(city));
+                }
+            }
         }
-    }
-    private void LoadCities()
-    {
-        Initialize();
-        // get data source
-        Dataset d = dataManager.GetDataset(
-            dataManager.referenceSourceFiles.sourceDataCity,
-            DataScope.City);
-        if (d == null)
-        {
-            Debug.LogError("ERROR: Could not find source data file for City, " +
-                "ensure it's in dataManager.mapReferenceParams, returning", gameObject);
-            return;
-        }
-        LoadMapReferenceFromDatasets(DataScope.City, d);
-    }
-    private void LoadCountries()
-    {
-        Initialize();
-        Dataset d = dataManager.GetDataset(
-            dataManager.referenceSourceFiles.sourceDataCountry,
-            DataScope.Country);
-        if (d == null)
-        {
-            Debug.LogError("ERROR: Could not find source data file for Country, " +
-                "ensure it's in dataManager.mapReferenceParams, returning", gameObject);
-            return;
-        }
-        Dataset dAlt = dataManager.GetDataset(
-            dataManager.referenceSourceFiles.sourceDataCountryAliases,
-            DataScope.Country);
-        if (dAlt == null)
-        {
-            Debug.LogError("ERROR: Could not find source data file for Country (AltNames), " +
-                "ensure it's in dataManager.mapReferenceParams, returning", gameObject);
-            return;
-        }
-        LoadMapReferenceFromDatasets(DataScope.Country, d, dAlt);
-    }
-    private void LoadContinents()
-    {
-        Initialize();
-        Dataset d = dataManager.GetDataset(
-            dataManager.referenceSourceFiles.sourceDataContinent,
-            DataScope.Continent);
-        if (d == null)
-        {
-            Debug.LogError("ERROR: Could not find source data file for Continent, " +
-                "ensure it's in dataManager.mapReferenceParams, returning", gameObject);
-            return;
-        }
-        LoadMapReferenceFromDatasets(DataScope.Continent, d);
+        dataManager.mapCities = mapCities.ToArray();
+        dataManager.mapCountries = mapCountries.ToArray();
+        dataManager.mapContinents = mapContinents.ToArray();
     }
 
 
-    private void LoadMapReferenceFromDatasets(DataScope scope,
-        Dataset dataset, Dataset alternateNames = null)
+    public void ClearMapReferences()
     {
-        Debug.Log("LOAD THE MAP REFERENCES " + scope);
-
-
-
-        
-    }
-
-
-    public void ClearMapReferences() {
         Initialize();
         dataManager.ClearMapReferences();
     }
