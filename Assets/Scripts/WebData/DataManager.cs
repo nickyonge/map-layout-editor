@@ -30,7 +30,10 @@ public class DataManager : DataDownloader
     public Dataset[] continentDatasets;
 
     // INTERNAL REFERENCES 
-    public DataStructs.InternalReference_City[] referenceCities;
+    public DataStructs.InternalMapReference internalMapCities;// found in in-app map
+    public DataStructs.InternalMapReference internalMapCountries;
+    public DataStructs.InternalMapReference internalMapContinents;
+    public DataStructs.InternalReference_City[] referenceCities;// loaded from datasets 
     public DataStructs.InternalReference_Country[] referenceCountries;
     public DataStructs.InternalReference_Continent[] referenceContinents;
 

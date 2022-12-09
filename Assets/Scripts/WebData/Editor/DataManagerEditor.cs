@@ -20,6 +20,9 @@ public class DataManagerEditor : DataDownloaderEditor
     private SerializedProperty _internalReferenceParams;
     private SerializedProperty _exportSourceParams;
 
+    private SerializedProperty _internalMapCities;
+    private SerializedProperty _internalMapCountries;
+    private SerializedProperty _internalMapContinents;
     private SerializedProperty _referenceCities;
     private SerializedProperty _referenceCountries;
     private SerializedProperty _referenceContinents;
@@ -48,6 +51,9 @@ public class DataManagerEditor : DataDownloaderEditor
             _continentDatasets = serializedObject.FindProperty("continentDatasets");
             _internalReferenceParams = serializedObject.FindProperty("referenceSourceFiles");
             _exportSourceParams = serializedObject.FindProperty("exportSourceParams");
+            _internalMapCities = serializedObject.FindProperty("internalMapCities");
+            _internalMapCountries = serializedObject.FindProperty("internalMapCountries");
+            _internalMapContinents = serializedObject.FindProperty("internalMapContinents");
             _referenceCities = serializedObject.FindProperty("referenceCities");
             _referenceCountries = serializedObject.FindProperty("referenceCountries");
             _referenceContinents = serializedObject.FindProperty("referenceContinents");
@@ -73,9 +79,9 @@ public class DataManagerEditor : DataDownloaderEditor
         {
             if (!_repeatMethodFailsafe)
             {
+                _repeatMethodFailsafe = true;
                 OnEnable();
                 OnInspectorGUI();
-                _repeatMethodFailsafe = true;
             }
             return;
         }
@@ -153,6 +159,12 @@ public class DataManagerEditor : DataDownloaderEditor
             GUILayout.EndHorizontal();
 
             GUILayout.Space(5);
+            
+            EditorGUILayout.PropertyField(_internalMapCities);
+            EditorGUILayout.PropertyField(_internalMapCountries);
+            EditorGUILayout.PropertyField(_internalMapContinents);
+
+            GUILayout.Space(5);
 
             EditorGUILayout.PropertyField(_referenceCities);
             EditorGUILayout.PropertyField(_referenceCountries);
@@ -206,7 +218,8 @@ public class DataManagerEditor : DataDownloaderEditor
                 "m_Script", "loadingParams",
                 "cityDatasets", "countryDatasets", "continentDatasets",
                 "referenceSourceFiles", "exportSourceParams",
-                "referenceCities", "referenceCountries", "referenceContinents" });
+                "referenceCities", "referenceCountries", "referenceContinents",
+                "internalMapCities","internalMapCountries","internalMapContinents", });
     }
 
     private bool Btn(string label, int width = 0, int height = 0)
