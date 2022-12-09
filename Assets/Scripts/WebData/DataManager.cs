@@ -11,7 +11,7 @@ public enum DataFormat { CSV, JSON, XML, XLS, XLSX, ERROR }
 /// <summary> Scope, regional, that a given dataset represents </summary>
 public enum DataScope { City = 0, Country = 1, Continent = 2, Other = 3 }
 
-[RequireComponent(typeof(DataRegionReference), typeof(DataExporter))]
+[RequireComponent(typeof(DataInternalReferences), typeof(DataExporter))]
 public class DataManager : DataDownloader
 {
     public static DataManager instance;
@@ -42,7 +42,7 @@ public class DataManager : DataDownloader
 
     // local script references 
     private MapDataCollector mapData;
-    private DataRegionReference dataRegionRefs;
+    private DataInternalReferences dataRegionRefs;
     private DataExporter dataExporter;
 
     private void Start()
@@ -84,7 +84,7 @@ public class DataManager : DataDownloader
         {
             if (!TryGetComponent(out dataRegionRefs))
             {
-                dataRegionRefs = gameObject.AddComponent<DataRegionReference>();
+                dataRegionRefs = gameObject.AddComponent<DataInternalReferences>();
             }
         }
         if (dataExporter == null)
