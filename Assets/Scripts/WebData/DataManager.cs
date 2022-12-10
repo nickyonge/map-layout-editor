@@ -407,8 +407,9 @@ public class DataManager : DataDownloader
         mapCities = new DataStructs.MapReference[0];
         mapCountries = new DataStructs.MapReference[0];
         mapContinents = new DataStructs.MapReference[0];
-        if (_useMapDataCollecterAsMapRefs) {
-            
+        if (_useMapDataCollecterAsMapRefs)
+        {
+
         }
     }
 
@@ -621,22 +622,35 @@ public class DataManager : DataDownloader
     public static bool _useMapDataCollecterAsMapRefs = true;
     public bool HaveLoadedMapReferences()
     {
-        // check if using map data collection as map refs
+        // check if using map data collection as map refs 
         // if so, ensure that the proper country codes have been established 
+        if (!HaveLoadedDatasets()) { return false; }
         if (_useMapDataCollecterAsMapRefs)
         {
+                Debug.Log(1);
+            if (!mapData.IsDataCollected(true))
+            {
+                return false;
+            }
+            Debug.Log(2);
             if (mapData.world.continents.Length == 0 ||
                 !mapData.world.continents[0].CheckValid() ||
                 !mapData.world.continents[mapData.world.continents.Length - 1].CheckValid())
+            {
                 return false;
+            }
+            Debug.Log(3);
             if (mapData.world.continents[0].countries.Length == 0 ||
                 !mapData.world.continents[0].countries[0].CheckValid() ||
                 !mapData.world.continents[0].countries
                     [mapData.world.continents[0].countries.Length - 1].CheckValid())
+            {
                 return false;
+            }
+            Debug.Log(4);
+            return true;
         }
-        return HaveLoadedDatasets() &&
-            mapCities.Length > 0 &&
+        return mapCities.Length > 0 &&
             mapCountries.Length > 0 &&
             mapContinents.Length > 0;
     }

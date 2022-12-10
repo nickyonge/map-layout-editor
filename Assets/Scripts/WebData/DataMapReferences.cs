@@ -31,6 +31,14 @@ public class DataMapReferences : MonoBehaviour
         // load all map references from mapData
         // Dictionary<Continent, Dictionary<Country, City[]>> AllCitiesByCountryByContinent
 
+        // ensure data manager is up to date 
+        dataManager.mapData.CollectData();
+
+        if (DataManager._useMapDataCollecterAsMapRefs)
+        {
+            return;
+        }
+
         List<DataStructs.MapReference> mapCities = new();
         List<DataStructs.MapReference> mapCountries = new();
         List<DataStructs.MapReference> mapContinents = new();

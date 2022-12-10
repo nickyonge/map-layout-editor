@@ -142,7 +142,7 @@ public class MapDataCollector : MonoBehaviour
                     countryCount++;
                 }
             }
-            if (AllCountries().Length != countryCount)
+            if (AllCountries.Length != countryCount)
             {
                 return false;
             }
@@ -206,12 +206,11 @@ public class MapDataCollector : MonoBehaviour
     }
     public void GetAllLocations(out Continent[] continents, out Country[] countries, out City[] cities)
     {
-        continents = AllContinents();
+        continents = AllContinents;
         List<Country> allCountries = new();
         List<City> allCities = new();
-        foreach (Continent continent in AllContinents)
+        foreach (Continent continent in continents)
         {
-            allContinents.Add(continent);
             foreach (Country country in continent.countries)
             {
                 allCountries.Add(country);
@@ -219,7 +218,7 @@ public class MapDataCollector : MonoBehaviour
             }
         }
         countries = allCountries.ToArray();
-        cities = allCountries.ToArray();
+        cities = allCities.ToArray();
     }
     public Dictionary<Continent, Country[]> AllCountriesByContinent
     {

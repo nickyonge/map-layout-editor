@@ -41,11 +41,11 @@ public class DataExporter : MonoBehaviour
                 break;
             case DataScope.Other:
                 Debug.LogWarning("WARNING: OTHER is invalid scope for " +
-                    "GenerateNewEntries", gameObject);
+                    "ExportDataByScope", gameObject);
                 break;
             default:
                 Debug.LogWarning($"WARNING: Invalid scope: {scope}, for " +
-                    "GenerateNewEntries", gameObject);
+                    "ExportDataByScope", gameObject);
                 break;
         }
     }
