@@ -14,12 +14,12 @@ public enum DataScope { City = 0, Country = 1, Continent = 2, Other = 3 }
 [RequireComponent(typeof(DataInternalReferences), typeof(DataExporter))]
 public class DataManager : DataDownloader
 {
-
     public static DataManager instance;
 
     private const bool CHECK_DATASETS_FAST = false;
     public const bool DEBUG_UNIMPLEMENTED_FORMATS = false;
     public const bool SKIP_UNIMPLEMENTED_FORMATS = true;
+    private const int NUM_EDITOR_STEPS = 4;
 
     public DatasetLoadingParams loadingParams;
     public MapReferenceParams mapReferenceParams;
@@ -612,15 +612,31 @@ public class DataManager : DataDownloader
         return null;
     }
 
-
+    public bool[] LoadedEditorSteps
+    {
+        get
+        {
+            bool[] stepDone = new bool[NUM_EDITOR_STEPS];
+            bool valid = true;// valid check to preserve previous step state 
+            for (int i = 0; i < NUM_EDITOR_STEPS; i++)
+            {
+                if (valid)
+                {
+                    valid = HaveLoadedEditorStep(i);
+                }
+                stepDone[i] = valid;
+            }
+            return stepDone;
+        }
+    }
     public bool HaveLoadedEditorStep(int step)
     {
         switch (step)
         {
             case 0: return ReadyForDatasetLoad();
             case 1: return HaveLoadedDatasets();
-            case 2: return HaveLoadedMapReferences();
-            case 3: return HaveLoadedInternalReferences();
+            case 2: return HaveLoadedInternalReferences();
+            case 3: return HaveLoadedMapReferences();
         }
         Debug.LogWarning($"WARNING: invalid have loaded check step {step}", gameObject);
         return false;
@@ -641,7 +657,6 @@ public class DataManager : DataDownloader
     {
         // check if using map data collection as map refs 
         // if so, ensure that the proper country codes have been established 
-        if (!HaveLoadedDatasets()) { return false; }
         if (_useMapDataCollecterAsMapRefs)
         {
             if (!mapData.IsDataCollected(true))
@@ -669,7 +684,7 @@ public class DataManager : DataDownloader
     }
     public bool HaveLoadedInternalReferences()
     {
-        return HaveLoadedMapReferences() &&
+        return
             referenceCities.Length > 0 &&
             referenceCountries.Length > 0 &&
             referenceContinents.Length > 0;

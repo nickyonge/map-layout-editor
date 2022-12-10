@@ -102,19 +102,28 @@ public class DataManagerEditor : DataDownloaderEditor
         EditorGUILayout.PropertyField(_scriptReference);
         GUI.enabled = guiEnabledState;
         
-        bool haveLoaded = false;
+
+        bool isReady = false;
+        bool isLoaded = false;
         string loadMsg = "";
+
+        bool[] loadedEditorSteps = dataManager.LoadedEditorSteps;
+        bool step1 = loadedEditorSteps[0];
+        bool step2 = loadedEditorSteps[1];
+        bool step3 = loadedEditorSteps[2];
+        bool step4 = loadedEditorSteps[3];
 
 
         // <----------------------------------------------------------------- DATASET LOADER 
-        haveLoaded = dataManager.HaveLoadedEditorStep(0);
-        GUI.enabled = haveLoaded;
-        loadMsg = haveLoaded ? "" : " (Must Be Able To Load Datasets)";
+        isReady = step1;
+        isLoaded = isReady && step2;
+        GUI.enabled = isReady;
+        loadMsg = isReady ? "" : " (Must Be Able To Load Datasets)";
         if (Section("Dataset Loader" + loadMsg, showLoadDatasets, out showLoadDatasets))
         {
             GUI.enabled = true;// can always edit data properties 
             EditorGUILayout.PropertyField(_loadingParams);
-            GUI.enabled = haveLoaded;
+            GUI.enabled = isReady;
 
             GUILayout.Space(5);
 
@@ -123,10 +132,12 @@ public class DataManagerEditor : DataDownloaderEditor
             {
                 dataManager.LoadAllDataFiles();
             }
+            GUI.enabled = isLoaded;
             if (Btn("Clear Datasets", BTN_CLEAR_WIDTH, BTN_HEIGHT_BIG))
             {
                 dataManager.ClearDataFiles();
             }
+            GUI.enabled = isReady;
             GUILayout.EndHorizontal();
 
             GUILayout.Space(5);
@@ -145,62 +156,12 @@ public class DataManagerEditor : DataDownloaderEditor
             {
                 dataManager.LoadAllDataFiles();
             }
+            GUI.enabled = isLoaded;
             if (Btn("Clear Datasets", BTN_CLEAR_WIDTH, BTN_HEIGHT_SMALL))
             {
                 dataManager.ClearDataFiles();
             }
-            GUILayout.EndHorizontal();
-            GUILayout.Space(15);
-        }
-        // -- >
-
-
-        // <----------------------------------------------------------------- MAP REFERENCE DATA 
-        haveLoaded = dataManager.HaveLoadedEditorStep(1);
-        GUI.enabled = haveLoaded;
-        loadMsg = haveLoaded ? "" : " (Load Datasets First)";
-        if (Section("Map Reference Data" + loadMsg, showMapReferences, out showMapReferences))
-        {
-            GUI.enabled = true;// can always edit data properties 
-            EditorGUILayout.PropertyField(_mapReferenceParams);
-            GUI.enabled = haveLoaded;
-
-            GUILayout.Space(5);
-
-            GUILayout.BeginHorizontal();
-            if (Btn("Populate Map References", 0, BTN_HEIGHT_BIG))
-            {
-                dataManager.LoadMapReferences();
-            }
-            if (Btn("Clear MapRefs", BTN_CLEAR_WIDTH, BTN_HEIGHT_BIG))
-            {
-                dataManager.ClearMapReferences();
-            }
-            GUILayout.EndHorizontal();
-
-            GUILayout.Space(5);
-
-            if (!DataManager._useMapDataCollecterAsMapRefs)
-            {
-                EditorGUILayout.PropertyField(_mapCities);
-                EditorGUILayout.PropertyField(_mapCountries);
-                EditorGUILayout.PropertyField(_mapContinents);
-            }
-
-            EndSection();
-        }
-        else
-        {
-            GUILayout.Space(-6);
-            GUILayout.BeginHorizontal();
-            if (Btn("Populate Map References", 0, BTN_HEIGHT_SMALL))
-            {
-                dataManager.LoadMapReferences();
-            }
-            if (Btn("Clear MapRefs", BTN_CLEAR_WIDTH, BTN_HEIGHT_SMALL))
-            {
-                dataManager.ClearMapReferences();
-            }
+            GUI.enabled = isReady;
             GUILayout.EndHorizontal();
             GUILayout.Space(15);
         }
@@ -208,14 +169,15 @@ public class DataManagerEditor : DataDownloaderEditor
 
 
         // <----------------------------------------------------------------- INTERNAL REFERENCE DATA 
-        haveLoaded = dataManager.HaveLoadedEditorStep(2);
-        GUI.enabled = haveLoaded;
-        loadMsg = haveLoaded ? "" : " (Load Map Refs First)";
+        isReady = step2;
+        isLoaded = isReady && step3;
+        GUI.enabled = isReady;
+        loadMsg = isReady ? "" : " (Load Map Refs First)";
         if (Section("Internal Reference Data" + loadMsg, showInternalRefs, out showInternalRefs))
         {
             GUI.enabled = true;// can always edit data properties 
             EditorGUILayout.PropertyField(_internalReferenceParams);
-            GUI.enabled = haveLoaded;
+            GUI.enabled = isReady;
 
             GUILayout.Space(5);
 
@@ -224,10 +186,12 @@ public class DataManagerEditor : DataDownloaderEditor
             {
                 dataManager.LoadInternalReferences();
             }
+            GUI.enabled = isLoaded;
             if (Btn("Clear InRefs", BTN_CLEAR_WIDTH, BTN_HEIGHT_BIG))
             {
                 dataManager.ClearInternalReferences();
             }
+            GUI.enabled = isReady;
             GUILayout.EndHorizontal();
 
             GUILayout.Space(2);
@@ -265,10 +229,69 @@ public class DataManagerEditor : DataDownloaderEditor
             {
                 dataManager.LoadInternalReferences();
             }
+            GUI.enabled = isLoaded;
             if (Btn("Clear InRefs", BTN_CLEAR_WIDTH, BTN_HEIGHT_SMALL))
             {
                 dataManager.ClearInternalReferences();
             }
+            GUI.enabled = isReady;
+            GUILayout.EndHorizontal();
+            GUILayout.Space(15);
+        }
+        // -- >
+
+
+        // <----------------------------------------------------------------- MAP REFERENCE DATA 
+        isReady = step3;
+        isLoaded = isReady && step4;
+        GUI.enabled = isReady;
+        loadMsg = isReady ? "" : " (Load Datasets First)";
+        if (Section("Map Reference Data" + loadMsg, showMapReferences, out showMapReferences))
+        {
+            GUI.enabled = true;// can always edit data properties 
+            EditorGUILayout.PropertyField(_mapReferenceParams);
+            GUI.enabled = isReady;
+
+            GUILayout.Space(5);
+
+            GUILayout.BeginHorizontal();
+            if (Btn("Populate Map References", 0, BTN_HEIGHT_BIG))
+            {
+                dataManager.LoadMapReferences();
+            }
+            GUI.enabled = isLoaded;
+            if (Btn("Clear MapRefs", BTN_CLEAR_WIDTH, BTN_HEIGHT_BIG))
+            {
+                dataManager.ClearMapReferences();
+            }
+            GUI.enabled = isReady;
+            GUILayout.EndHorizontal();
+
+            GUILayout.Space(5);
+
+            if (!DataManager._useMapDataCollecterAsMapRefs)
+            {
+                EditorGUILayout.PropertyField(_mapCities);
+                EditorGUILayout.PropertyField(_mapCountries);
+                EditorGUILayout.PropertyField(_mapContinents);
+            }
+
+            EndSection();
+        }
+        else
+        {
+            GUILayout.Space(-6);
+            GUILayout.BeginHorizontal();
+            if (Btn("Populate Map References", 0, BTN_HEIGHT_SMALL))
+            {
+                dataManager.LoadMapReferences();
+            }
+            GUI.enabled = isLoaded;
+            if (Btn("Clear MapRefs", BTN_CLEAR_WIDTH, BTN_HEIGHT_SMALL))
+            {
+                dataManager.ClearMapReferences();
+            }
+            GUI.enabled = isReady;
             GUILayout.EndHorizontal();
             GUILayout.Space(15);
         }
@@ -276,14 +299,15 @@ public class DataManagerEditor : DataDownloaderEditor
 
 
         // <----------------------------------------------------------------- EXPORT DATA
-        haveLoaded = dataManager.HaveLoadedEditorStep(3);
-        GUI.enabled = haveLoaded;
-        loadMsg = haveLoaded ? "" : " (Load Internal Refs First)";
+        isReady = step4;
+        isLoaded = isReady && step4;// NOTE: this should be manually adjusted later 
+        GUI.enabled = isReady;
+        loadMsg = isReady ? "" : " (Load Internal Refs First)";
         if (Section("Export Data" + loadMsg, showExportData, out showExportData))
         {
             GUI.enabled = true;// can always edit data properties 
             EditorGUILayout.PropertyField(_exportSourceParams);
-            GUI.enabled = haveLoaded;
+            GUI.enabled = isReady;
 
             GUILayout.Space(5);
 
@@ -292,10 +316,12 @@ public class DataManagerEditor : DataDownloaderEditor
             {
                 dataManager.ExportData();
             }
+            GUI.enabled = isLoaded;
             if (Btn("Clear ExpData", BTN_CLEAR_WIDTH, BTN_HEIGHT_BIG))
             {
                 dataManager.ClearExportData();
             }
+            GUI.enabled = isReady;
             GUILayout.EndHorizontal();
 
             GUILayout.Space(2);
@@ -327,10 +353,12 @@ public class DataManagerEditor : DataDownloaderEditor
             {
                 dataManager.ExportData();
             }
+            GUI.enabled = isLoaded;
             if (Btn("Clear ExpData", BTN_CLEAR_WIDTH, BTN_HEIGHT_SMALL))
             {
                 dataManager.ClearExportData();
             }
+            GUI.enabled = isReady;
             GUILayout.EndHorizontal();
             GUILayout.Space(15);
         }
