@@ -14,6 +14,7 @@ public enum DataScope { City = 0, Country = 1, Continent = 2, Other = 3 }
 [RequireComponent(typeof(DataInternalReferences), typeof(DataExporter))]
 public class DataManager : DataDownloader
 {
+
     public static DataManager instance;
 
     private const bool CHECK_DATASETS_FAST = false;
@@ -612,6 +613,22 @@ public class DataManager : DataDownloader
     }
 
 
+    public bool HaveLoadedEditorStep(int step)
+    {
+        switch (step)
+        {
+            case 0: return ReadyForDatasetLoad();
+            case 1: return HaveLoadedDatasets();
+            case 2: return HaveLoadedMapReferences();
+            case 3: return HaveLoadedInternalReferences();
+        }
+        Debug.LogWarning($"WARNING: invalid have loaded check step {step}", gameObject);
+        return false;
+    }
+    public bool ReadyForDatasetLoad()
+    {
+        return true;
+    }
     public bool HaveLoadedDatasets()
     {
         return
@@ -627,19 +644,16 @@ public class DataManager : DataDownloader
         if (!HaveLoadedDatasets()) { return false; }
         if (_useMapDataCollecterAsMapRefs)
         {
-                Debug.Log(1);
             if (!mapData.IsDataCollected(true))
             {
                 return false;
             }
-            Debug.Log(2);
             if (mapData.world.continents.Length == 0 ||
                 !mapData.world.continents[0].CheckValid() ||
                 !mapData.world.continents[mapData.world.continents.Length - 1].CheckValid())
             {
                 return false;
             }
-            Debug.Log(3);
             if (mapData.world.continents[0].countries.Length == 0 ||
                 !mapData.world.continents[0].countries[0].CheckValid() ||
                 !mapData.world.continents[0].countries
@@ -647,7 +661,6 @@ public class DataManager : DataDownloader
             {
                 return false;
             }
-            Debug.Log(4);
             return true;
         }
         return mapCities.Length > 0 &&
