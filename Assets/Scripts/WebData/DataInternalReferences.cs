@@ -108,9 +108,6 @@ public class DataInternalReferences : MonoBehaviour
     private void LoadInternalReferenceFromDatasets(DataScope scope,
         Dataset dataset, Dataset alternateNames = null)
     {
-        Debug.Log("LOAD THE INTERNAL REGION REFERENCES " + scope);
-
-
 
         
     }

@@ -79,7 +79,11 @@ public class Dataset
         }
     }
 
-    public void LoadData(StreamReader streamReader)
+    public struct FullData {
+        
+    }
+
+    public void LoadData(StreamReader streamReader, bool loadSampleData)
     {
         // get indicators 
         int currentLine = DataManager.instance.loadingParams.GetInitialDataLine(this);

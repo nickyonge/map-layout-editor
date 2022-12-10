@@ -282,7 +282,7 @@ public class DataManager : DataDownloader
             };
             // regenerate streamreader to load data 
             streamReader = new StreamReader(file);
-            dataset.LoadData(streamReader);
+            dataset.LoadData(streamReader, true);
 
             // assign datasets 
             switch (scope)
