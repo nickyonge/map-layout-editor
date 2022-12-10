@@ -109,8 +109,71 @@ public class MapDataCollector : MonoBehaviour
         }
 
         world = new World(worldData);
-
     }
+
+
+    public bool IsDataCollected(bool fast = true)
+    {
+        // basic nullcheck 
+        if (world == null ||
+            world.continents == null || world.continents.Length == 0 ||
+            world.continents[0] == null ||
+            world.continents[0].countries == null ||
+            world.continents[0].countries.Length == 0 ||
+            world.continents[0].countries[0] == null ||
+            world.continents[0].countries[0].cities == null ||
+            world.continents[0].countries[0].cities.Length == 0 ||
+            world.continents[0].countries[0].cities[0] == null)
+        {
+            return false;
+        }
+        // iterative child check 
+        if (fast)
+        {
+            if (world.continents.Length != transform.childCount)
+            {
+                return false;
+            }
+            int countryCount = 0;
+            foreach (Transform c1 in transform)
+            {
+                foreach (Transform country in c1)
+                {
+                    countryCount++;
+                }
+            }
+            if (AllCountries().Length != countryCount)
+            {
+                return false;
+            }
+            return true;
+        }
+        else
+        {
+            int continentCount = 0;
+            int countryCount = 0;
+            int cityCount = 0;
+            foreach (Transform c1 in transform)
+            {
+                continentCount++;
+                foreach (Transform c2 in c1)
+                {
+                    countryCount++;
+                    foreach (Transform c3 in c2)
+                    {
+                        cityCount++;
+                    }
+                }
+            }
+            GetAllLocations(out Continent[] loadedContinents,
+                out Country[] loadedCountries, out City[] loadedCities);
+            return
+                continentCount == loadedContinents.Length &&
+                countryCount == loadedCountries.Length &&
+                cityCount == loadedCities.Length;
+        }
+    }
+
 
     public Continent[] AllContinents
     {
@@ -140,6 +203,23 @@ public class MapDataCollector : MonoBehaviour
             }
             return cities.ToArray();
         }
+    }
+    public void GetAllLocations(out Continent[] continents, out Country[] countries, out City[] cities)
+    {
+        continents = AllContinents();
+        List<Country> allCountries = new();
+        List<City> allCities = new();
+        foreach (Continent continent in AllContinents)
+        {
+            allContinents.Add(continent);
+            foreach (Country country in continent.countries)
+            {
+                allCountries.Add(country);
+                allCities.AddRange(country.cities);
+            }
+        }
+        countries = allCountries.ToArray();
+        cities = allCountries.ToArray();
     }
     public Dictionary<Continent, Country[]> AllCountriesByContinent
     {
@@ -211,7 +291,8 @@ public class MapDataCollector : MonoBehaviour
             }
             return false;
         }
-        public virtual bool CheckValid() {
+        public virtual bool CheckValid()
+        {
             return !string.IsNullOrWhiteSpace(name);
         }
         public void Populate()
@@ -304,7 +385,8 @@ public class MapDataCollector : MonoBehaviour
                 return cities.ToArray();
             }
         }
-        public override bool CheckValid() {
+        public override bool CheckValid()
+        {
             return !string.IsNullOrWhiteSpace(continentCode) && base.CheckValid() && m49 > 1;
         }
     }
@@ -323,8 +405,9 @@ public class MapDataCollector : MonoBehaviour
         public City[] cities;
         protected override void GeneratedPopulation(SerializedMapData[] childData) { cities = Array.ConvertAll(childData, i => (City)i); }
         protected override SerializedMapData CreateSerializedMapData(MapData mapData) { return new City(mapData); }
-        public override bool CheckValid() {
-            return !string.IsNullOrWhiteSpace(isoA2) && !string.IsNullOrWhiteSpace(isoA3) && 
+        public override bool CheckValid()
+        {
+            return !string.IsNullOrWhiteSpace(isoA2) && !string.IsNullOrWhiteSpace(isoA3) &&
                 isoA2.Length == 2 && isoA3.Length == 3 && m49 > 1 &&
                 base.CheckValid();
         }
